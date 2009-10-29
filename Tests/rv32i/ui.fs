@@ -13,7 +13,7 @@ let Ui instr x3 =
     let mstate = MachineState.InitMachineState Map.empty RV32i true
     let mstate = mstate.setPC addr
 
-    let executor = Decoder.Decode instr
+    let executor = Decoder.Decode mstate instr
     Assert.NotEqual(executor, None)
     let mstate = executor.Value mstate
     Assert.Equal(x3, mstate.getRegister 3)

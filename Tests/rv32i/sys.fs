@@ -15,7 +15,7 @@ let System instr trap =
     let mstate = mstate.setPC addr
     let newmstate = mstate.incPC
 
-    let executor = Decoder.Decode instr
+    let executor = Decoder.Decode mstate instr
     Assert.NotEqual(executor, None)
     let mstate = executor.Value mstate
 

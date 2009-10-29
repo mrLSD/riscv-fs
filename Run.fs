@@ -48,7 +48,7 @@ let rec runCycle (mstate : MachineState) =
         | None -> mstate.setRunState (Trap (InstructionFetch mstate.PC))
         | _ ->
             let instrValue = instr.Value
-            let executor = Decoder.Decode instrValue
+            let executor = Decoder.Decode mstate instrValue
 
             match executor with
             | None -> mstate.setRunState (Trap TrapErrors.InstructionDecode)

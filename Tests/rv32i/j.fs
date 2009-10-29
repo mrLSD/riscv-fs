@@ -16,7 +16,7 @@ let Jump instr x2 x3 resultAddr =
     let mstate = mstate.setRegister 2 x2
     let resMstate = mstate.incPC
 
-    let executor = Decoder.Decode instr
+    let executor = Decoder.Decode mstate instr
     Assert.NotEqual(executor, None)
     let mstate = executor.Value mstate
 

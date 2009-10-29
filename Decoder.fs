@@ -16,8 +16,8 @@ type execFunc = MachineState -> MachineState
 //    | None
 
 // Aggregate decoded data
-let Decode (instr: InstrField) : execFunc option =
-    let decI32 = I.Decode instr
+let Decode (mstate : MachineState) (instr: InstrField) : execFunc option =
+    let decI32 = I.Decode mstate instr
     let decI64 =
         if decI32 = I.InstructionI.None then
             I64.Decode instr

@@ -62,11 +62,6 @@ type InstructionI =
 //================================================================
 // Sub-opcodes for 'I' instructions
 
-// Sub opcode_OP_IMM.SLLI/SRLI/SRAI - 32 & 64 bit
-let msbs6_SLLI      = 0b0000000L
-let msbs6_SRLI      = 0b0000000L
-let msbs6_SRAI      = 0b0100000L
-
 // opcode_MISC_MEM sub-opcodes
 let funct3_FENCE         = 0b000L
 
@@ -76,7 +71,7 @@ let funct12_ECALL    = 0b000000000000L
 let funct12_EBREAK   = 0b000000000001L
 
 /// Decode 'I' instructions
-let Decode (instr: InstrField) : InstructionI =
+let Decode (mstate : MachineState) (instr: InstrField) : InstructionI =
     let opcode = instr.bitSlice 6   0
     // Register number can be: 0-32
     let rd     = int32(instr.bitSlice 11  7)
@@ -87,11 +82,15 @@ let Decode (instr: InstrField) : InstructionI =
     let funct7 = instr.bitSlice 31 25
 
     // Shamt funcs
-    let shamt   = instr.bitSlice 24 20
-    let shamt5  = instr.bitSlice 24 20
-    let shamt6  = instr.bitSlice 25 20
-    // TODO: x32/64 check for Shamt
-    let shamt_ok = true
+    let shamt =
+        if mstate.Arch.archBits = RV32 then
+            instr.bitSlice 24 20
+        else
+            instr.bitSlice 24 20
+    let funct6 = instr.bitSlice 31 26
+    let shamt_ok =
+        ((instr.bitSlice 25 25) = 0L) ||
+        (mstate.Arch.archBits = RV64)
 
     let imm12_I = (instr.bitSlice 31 20).signExtend 12
     let imm20_U = ((instr.bitSlice 31 12) <<< 12).signExtend 32
@@ -172,9 +171,9 @@ let Decode (instr: InstrField) : InstructionI =
         | 0b111L -> ANDI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
 
         // Shift Immediate Opcodes
-        | 0b001L when funct7 = msbs6_SLLI  -> SLLI {| rd = rd; rs1 = rs1; shamt = shamt |}
-        | 0b101L when funct7 = msbs6_SRLI  -> SRLI {| rd = rd; rs1 = rs1; shamt = shamt |}
-        | 0b101L when funct7 = msbs6_SRAI  -> SRAI {| rd = rd; rs1 = rs1; shamt = shamt |}
+        | 0b001L when funct6 = 0b000000L && shamt_ok -> SLLI {| rd = rd; rs1 = rs1; shamt = shamt |}
+        | 0b101L when funct6 = 0b000000L && shamt_ok -> SRLI {| rd = rd; rs1 = rs1; shamt = shamt |}
+        | 0b101L when funct6 = 0b010000L && shamt_ok -> SRAI {| rd = rd; rs1 = rs1; shamt = shamt |}
         | _      -> None
 
     // ALU Opcodes

@@ -34,7 +34,7 @@ let loadMemory instr x2 imm nBytes unsign =
             let mstate = mstate.setMemoryByte (memAddr+2L) 0xb2uy
             (mstate.setMemoryByte (memAddr+3L) 0xc3uy, int64(0xc3b2a10fl))
 
-    let executor = Decoder.Decode instr
+    let executor = Decoder.Decode mstate instr
     Assert.NotEqual(executor, None)
     let mstate = executor.Value mstate
     Assert.Equal(x2, mstate.getRegister 2)
@@ -49,7 +49,7 @@ let storeMemory instr x3 x2 imm nBytes =
     let mstate = mstate.setRegister 2 x2
     let mstate = mstate.setRegister 3 x3
 
-    let executor = Decoder.Decode instr
+    let executor = Decoder.Decode mstate instr
     Assert.NotEqual(executor, None)
 
     // Get memory value
