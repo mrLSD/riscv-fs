@@ -29,3 +29,8 @@ type MachineState = {
         let mem = x.Memory
         Array.set mem addr value
         { x with Memory = mem }
+
+let combineBytes (x : int8 array) : int64 =
+    let xz = Array.zip [|0..x.Length-1|] x
+    let res = Array.fold (fun acc (x : (int*int8)) -> acc ||| (int64(snd x) <<< (fst x)*8 )) 0L xz
+    res

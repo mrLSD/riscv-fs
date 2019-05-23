@@ -10,9 +10,10 @@
         <Compile Include="Bits.fs" />
         <Compile Include="Arch.fs" />
         <Compile Include="MachineState.fs" />
+        <Compile Include="Fetch.fs" />
         <Compile Include="DecodeI.fs" />
         <Compile Include="Decoder.fs" />
-        <Compile Include="Program.fs" />                        
+        <Compile Include="Program.fs" />
     </ItemGroup>
 
 </Project>
