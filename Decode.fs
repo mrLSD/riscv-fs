@@ -223,13 +223,28 @@ let DecodeI (instr: InstrField) : InstructionI =
     | (op) when op = opcode_STORE && funct3 = funct3_SB -> SB {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
     | (op) when op = opcode_STORE && funct3 = funct3_SH -> SH {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
     | (op) when op = opcode_STORE && funct3 = funct3_SW -> SW {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
+    
+    | (op) when op = opcode_OP_IMM && funct3 = funct3_ADDI  -> ADDI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLTI  -> SLTI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLTIU -> SLTIU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_OP_IMM && funct3 = funct3_XORI  -> XORI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_OP_IMM && funct3 = funct3_ORI   -> ORI   {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_OP_IMM && funct3 = funct3_ANDI  -> ANDI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
 
-    // OP_IMM    
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_ADDI  -> ADDI {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    // Shamt
     | (op) when op = opcode_OP_IMM && funct3 = funct3_SLLI && funct7 = msbs6_SLLI  -> SLLI {| rd = rd; rs1 = rs1; shamt = shamt |}
-    // OP
-    | (op) when op = opcode_OP && funct3 = funct3_ADD && funct7 = funct7_ADD  -> ADD {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLLI && funct7 = msbs6_SRLI  -> SRLI {| rd = rd; rs1 = rs1; shamt = shamt |}
+    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLLI && funct7 = msbs6_SRAI  -> SRAI {| rd = rd; rs1 = rs1; shamt = shamt |}
+
+    | (op) when op = opcode_OP && funct3 = funct3_ADD && funct7 = funct7_ADD   -> ADD  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP && funct3 = funct3_SUB && funct7 = funct7_SUB   -> SUB  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP && funct3 = funct3_SLL && funct7 = funct7_SLL   -> SLL  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP && funct3 = funct3_SLT && funct7 = funct7_SLT   -> SLT  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP && funct3 = funct3_SLTU && funct7 = funct7_SLTU -> SLTU {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP && funct3 = funct3_XOR && funct7 = funct7_XOR   -> XOR  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP && funct3 = funct3_SRL && funct7 = funct7_SRL   -> SRL  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_SRA   -> SRA  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_OR    -> OR   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_AND   -> AND  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
         
     | (op) when op = opcode_MISC_MEM && rd = 0 && rs1 = 0 && funct3 = funct3_FENCE -> FENCE {| fm = fm; pred = pred; succ = succ  |}
 
