@@ -1,5 +1,5 @@
 /// Decode instructions set
- 
+
 module ISA.RISCV.Decode
 
 open ISA.RISCV.Utils.Bits
@@ -7,14 +7,14 @@ open ISA.RISCV.Utils.Bits
 type MachineInt = int32
 type Register = MachineInt
 type Opcode = MachineInt
-type InstrField = MachineInt 
+type InstrField = MachineInt
 
 //================================================================ -- \begin_latex{Major_Opcodes}
 // 'I' (Base instruction set)
 type InstructionI =
     | LUI of   {| rd: Register; imm20: MachineInt |}
     | AUIPC of {| rd: Register; imm20: MachineInt |}
-        
+
     | JALR of {| rd: Register; rs1: Register; imm12: MachineInt  |}
     | JAL of  {| rd: Register; imm20: MachineInt  |}
 
@@ -24,7 +24,7 @@ type InstructionI =
     | BGE of  {| rs1: Register; rs2: Register; imm12: MachineInt |}
     | BLTU of {| rs1: Register; rs2: Register; imm12: MachineInt |}
     | BGEU of {| rs1: Register; rs2: Register; imm12: MachineInt |}
-        
+
     | LB of  {| rd: Register; rs1: Register; imm12: MachineInt |}
     | LH of  {| rd: Register; rs1: Register; imm12: MachineInt |}
     | LW of  {| rd: Register; rs1: Register; imm12: MachineInt |}
@@ -34,18 +34,18 @@ type InstructionI =
     | SB of {| rs1: Register; rs2: Register; imm12: MachineInt |}
     | SH of {| rs1: Register; rs2: Register; imm12: MachineInt |}
     | SW of {| rs1: Register; rs2: Register; imm12: MachineInt |}
-        
+
     | ADDI of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
     | SLTI of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
     | SLTIU of {| rd: Register; rs1: Register; imm12: MachineInt  |}
     | XORI of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
     | ORI of   {| rd: Register; rs1: Register; imm12: MachineInt  |}
     | ANDI of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
-    
+
     | SLLI of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
     | SRLI of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
     | SRAI of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
-    
+
     | ADD of  {| rd: Register; rs1: Register; rs2: Register |}
     | SUB of  {| rd: Register; rs1: Register; rs2: Register |}
     | SLL of  {| rd: Register; rs1: Register; rs2: Register |}
@@ -60,13 +60,13 @@ type InstructionI =
     | FENCE of {| pred: MachineInt; succ: MachineInt; fm: MachineInt |}
     | ECALL
     | EBREAK
-    
+
     | None // Instruction not found
-123
+
 //================================================================ -- \begin_latex{Major_Opcodes}
 // Major Opcodes
 let opcode_LUI       = 0b0110111
-let opcode_AUIPC     = 0b0010111   
+let opcode_AUIPC     = 0b0010111
 let opcode_JAL       = 0b1101111
 let opcode_JALR      = 0b1100111
 let opcode_BRANCH    = 0b1100011
@@ -162,14 +162,14 @@ let funct12_EBREAK   = 0b000000000001
 
 /// Decode 'I' instructions
 let DecodeI (instr: InstrField) : InstructionI =
-    let opcode = instr.bitSlice 6   0 
+    let opcode = instr.bitSlice 6   0
     let rd     = instr.bitSlice 11  7
     let funct3 = instr.bitSlice 14 12
     let rs1    = instr.bitSlice 19 15
     let rs2    = instr.bitSlice 24 20
     let funct7 = instr.bitSlice 31 25
 
-    // Shamt funcs    
+    // Shamt funcs
     let shamt   = instr.bitSlice 24 20
     let shamt5  = instr.bitSlice 24 20
     let shamt6  = instr.bitSlice 25 20
@@ -183,37 +183,37 @@ let DecodeI (instr: InstrField) : InstructionI =
                 ((instr.bitSlice 31 25) <<< 5) |||
                 ( instr.bitSlice 11  7)
 
-    let imm12_B = 
+    let imm12_B =
                ((instr.bitSlice 31  31) <<< 12) |||
                ((instr.bitSlice 30  25) <<< 5 ) |||
                ((instr.bitSlice 11   8) <<< 1 ) |||
                ((instr.bitSlice  7   7) <<< 11)
 
-    let imm20_J = 
+    let imm20_J =
                ((instr.bitSlice  31  31) <<< 20) |||
                ((instr.bitSlice  30  21) <<<  1) |||
                ((instr.bitSlice  20  20) <<< 11) |||
                ((instr.bitSlice  19  12) <<< 12)
-    
+
     // Fence
     let fm    = instr.bitSlice 31 28
     let pred  = instr.bitSlice 27 24
     let succ  = instr.bitSlice 23 20
-    
+
     match (opcode) with
     | (op) when op = opcode_LUI   -> LUI   {| rd = rd; imm20 = imm20_U |}
     | (op) when op = opcode_AUIPC -> AUIPC {| rd = rd; imm20 = imm20_U |}
-    
+
     | (op) when op = opcode_JALR -> JALR {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
     | (op) when op = opcode_JAL  -> JAL  {| rd = rd; imm20 = imm20_J |}
-    
+
     | (op) when op = opcode_BRANCH && funct3 = funct3_BEQ  -> BEQ  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
     | (op) when op = opcode_BRANCH && funct3 = funct3_BNE  -> BNE  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
     | (op) when op = opcode_BRANCH && funct3 = funct3_BLT  -> BLT  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
     | (op) when op = opcode_BRANCH && funct3 = funct3_BGE  -> BGE  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
     | (op) when op = opcode_BRANCH && funct3 = funct3_BLTU -> BLTU {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
     | (op) when op = opcode_BRANCH && funct3 = funct3_BGEU -> BGEU {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    
+
     | (op) when op = opcode_LOAD && funct3 = funct3_LB  -> LB  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
     | (op) when op = opcode_LOAD && funct3 = funct3_LH  -> LH  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
     | (op) when op = opcode_LOAD && funct3 = funct3_LW  -> LW  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
@@ -223,7 +223,7 @@ let DecodeI (instr: InstrField) : InstructionI =
     | (op) when op = opcode_STORE && funct3 = funct3_SB -> SB {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
     | (op) when op = opcode_STORE && funct3 = funct3_SH -> SH {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
     | (op) when op = opcode_STORE && funct3 = funct3_SW -> SW {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
-    
+
     | (op) when op = opcode_OP_IMM && funct3 = funct3_ADDI  -> ADDI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
     | (op) when op = opcode_OP_IMM && funct3 = funct3_SLTI  -> SLTI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
     | (op) when op = opcode_OP_IMM && funct3 = funct3_SLTIU -> SLTIU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
@@ -245,16 +245,16 @@ let DecodeI (instr: InstrField) : InstructionI =
     | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_SRA   -> SRA  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
     | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_OR    -> OR   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
     | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_AND   -> AND  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-        
+
     | (op) when op = opcode_MISC_MEM && rd = 0 && rs1 = 0 && funct3 = funct3_FENCE -> FENCE {| fm = fm; pred = pred; succ = succ  |}
 
     | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_ECALL  -> ECALL
     | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> EBREAK
-        
+
     | _ -> None
 
 //type Instructions =
-//    | IInsruction of InstructionI32 
-    
+//    | IInsruction of InstructionI32
+
 let decode_execution =
     printfn "Decode instructions: %d" 10
