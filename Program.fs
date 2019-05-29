@@ -11,5 +11,5 @@ let printBits (x: int) =
 
 [<EntryPoint>]
 let main argv =
-    Decode.decode_execution
+    printBits 7
     0 // return an integer exit code

@@ -1,4 +1,4 @@
-module ISA.RISCV.Decode.I
+module ISA.RISCV.DecodeI
 
 open ISA.RISCV.Decode
 open ISA.RISCV.Utils.Bits
