@@ -1,7 +1,7 @@
-module ISA.RISCV.DecodeI
+module ISA.RISCV.Decode.I
 
-open ISA.RISCV.Decode
 open ISA.RISCV.Utils.Bits
+open ISA.RISCV.Arch
 
 //================================================================ -- \begin_latex{Major_Opcodes}
 // 'I' (Base instruction set)
@@ -178,17 +178,20 @@ let DecodeI (instr: InstrField) : InstructionI =
                 ( instr.bitSlice 11  7)
 
     let imm12_B =
+            (
                ((instr.bitSlice 31  31) <<< 12) |||
                ((instr.bitSlice 30  25) <<< 5 ) |||
                ((instr.bitSlice 11   8) <<< 1 ) |||
                ((instr.bitSlice  7   7) <<< 11)
+            ).signExtend 21
 
     let imm20_J =
-               (((instr.bitSlice  31  31) <<< 20) |||
+            (
+               ((instr.bitSlice  31  31) <<< 20) |||
                ((instr.bitSlice  30  21) <<<  1) |||
                ((instr.bitSlice  20  20) <<< 11) |||
                ((instr.bitSlice  19  12) <<< 12)
-                ).signExtend 21
+            ).signExtend 21
 
     // Fence
     let fm    = instr.bitSlice 31 28

@@ -1,8 +1,8 @@
 /// Decode instructions set
 
-module ISA.RISCV.Decode
+module ISA.RISCV.Decoder
 
-type MachineInt = int32
-type Register = MachineInt
-type Opcode = MachineInt
-type InstrField = MachineInt
+open ISA.RISCV.Decode.I
+
+type Instructions =
+    | I of InstructionI
