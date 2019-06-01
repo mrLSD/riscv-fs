@@ -156,6 +156,7 @@ let funct7_AND       = 0b0000000
 let funct3_FENCE         = 0b000
 
 // opcode_SYSTEM sub-opcodes
+let funct3_PRIV      = 0b000
 let funct12_ECALL    = 0b000000000000
 let funct12_EBREAK   = 0b000000000001
 
@@ -167,7 +168,8 @@ let DecodeI (instr: InstrField) : InstructionI =
     let rs1    = instr.bitSlice 19 15
     let rs2    = instr.bitSlice 24 20
     let funct7 = instr.bitSlice 31 25
-    
+
+    // Shamt funcs    
     let shamt   = instr.bitSlice 24 20
     let shamt5  = instr.bitSlice 24 20
     let shamt6  = instr.bitSlice 25 20
@@ -192,7 +194,12 @@ let DecodeI (instr: InstrField) : InstructionI =
                ((instr.bitSlice  30  21) <<<  1) |||
                ((instr.bitSlice  20  20) <<< 11) |||
                ((instr.bitSlice  19  12) <<< 12)
-        
+    
+    // Fence
+    let fm    = instr.bitSlice 31 28
+    let pred  = instr.bitSlice 27 24
+    let succ  = instr.bitSlice 23 20
+    
     match (opcode) with
     | (op) when op = opcode_LUI   -> Lui   {| rd = rd; imm20 = imm20_U |}
     | (op) when op = opcode_AUIPC -> Auipc {| rd = rd; imm20 = imm20_U |}
@@ -223,9 +230,9 @@ let DecodeI (instr: InstrField) : InstructionI =
     | (op) when op = opcode_OP_IMM && funct3 = funct3_SLLI && funct7 = msbs6_SLLI  -> Slli {| rd = rd; rs1 = rs1; shamt = shamt |}
     // OP
     | (op) when op = opcode_OP && funct3 = funct3_ADD && funct7 = funct7_ADD  -> Add {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-    // Fence        
+        
     | (op) when op = opcode_MISC_MEM && rd = 0 && rs1 = 0 && funct3 = funct3_FENCE -> Fence {| fm = fm; pred = pred; succ = succ  |}
-    // System
+
     | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_ECALL  -> Ecall
     | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> Ebreak
         
