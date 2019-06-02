@@ -12,57 +12,57 @@ type InstrField = MachineInt
 //================================================================ -- \begin_latex{Major_Opcodes}
 // 'I' (Base instruction set)
 type InstructionI =
-    | Lui of   {| rd: Register; imm20: MachineInt |}
-    | Auipc of {| rd: Register; imm20: MachineInt |}
+    | LUI of   {| rd: Register; imm20: MachineInt |}
+    | AUIPC of {| rd: Register; imm20: MachineInt |}
         
-    | Jalr of {| rd: Register; rs1: Register; imm12: MachineInt  |}
-    | Jal of  {| rd: Register; imm20: MachineInt  |}
+    | JALR of {| rd: Register; rs1: Register; imm12: MachineInt  |}
+    | JAL of  {| rd: Register; imm20: MachineInt  |}
 
-    | Beq of  {| rs1: Register; rs2: Register; imm12: MachineInt |}
-    | Bne of  {| rs1: Register; rs2: Register; imm12: MachineInt |}
-    | Blt of  {| rs1: Register; rs2: Register; imm12: MachineInt |}
-    | Bge of  {| rs1: Register; rs2: Register; imm12: MachineInt |}
-    | Bltu of {| rs1: Register; rs2: Register; imm12: MachineInt |}
-    | Bgeu of {| rs1: Register; rs2: Register; imm12: MachineInt |}
+    | BEQ of  {| rs1: Register; rs2: Register; imm12: MachineInt |}
+    | BNE of  {| rs1: Register; rs2: Register; imm12: MachineInt |}
+    | BLT of  {| rs1: Register; rs2: Register; imm12: MachineInt |}
+    | BGE of  {| rs1: Register; rs2: Register; imm12: MachineInt |}
+    | BLTU of {| rs1: Register; rs2: Register; imm12: MachineInt |}
+    | BGEU of {| rs1: Register; rs2: Register; imm12: MachineInt |}
         
-    | Lb of  {| rd: Register; rs1: Register; imm12: MachineInt |}
-    | Lh of  {| rd: Register; rs1: Register; imm12: MachineInt |}
-    | Lw of  {| rd: Register; rs1: Register; imm12: MachineInt |}
-    | Lbu of {| rd: Register; rs1: Register; imm12: MachineInt |}
-    | Lhu of {| rd: Register; rs1: Register; imm12: MachineInt |}
+    | LB of  {| rd: Register; rs1: Register; imm12: MachineInt |}
+    | LH of  {| rd: Register; rs1: Register; imm12: MachineInt |}
+    | LW of  {| rd: Register; rs1: Register; imm12: MachineInt |}
+    | LBU of {| rd: Register; rs1: Register; imm12: MachineInt |}
+    | LHU of {| rd: Register; rs1: Register; imm12: MachineInt |}
 
-    | Sb of {| rs1: Register; rs2: Register; imm12: MachineInt |}
-    | Sh of {| rs1: Register; rs2: Register; imm12: MachineInt |}
-    | Sw of {| rs1: Register; rs2: Register; imm12: MachineInt |}
+    | SB of {| rs1: Register; rs2: Register; imm12: MachineInt |}
+    | SH of {| rs1: Register; rs2: Register; imm12: MachineInt |}
+    | SW of {| rs1: Register; rs2: Register; imm12: MachineInt |}
         
-    | Addi of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
-    | Slti of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
-    | Sltiu of {| rd: Register; rs1: Register; imm12: MachineInt  |}
-    | Xori of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
-    | Ori of   {| rd: Register; rs1: Register; imm12: MachineInt  |}
-    | Andi of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
+    | ADDI of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
+    | SLTI of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
+    | SLTIU of {| rd: Register; rs1: Register; imm12: MachineInt  |}
+    | XORI of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
+    | ORI of   {| rd: Register; rs1: Register; imm12: MachineInt  |}
+    | ANDI of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
     
-    | Slli of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
-    | Srli of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
-    | Srai of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
+    | SLLI of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
+    | SRLI of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
+    | SRAI of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
     
-    | Add of  {| rd: Register; rs1: Register; rs2: Register |}
-    | Sub of  {| rd: Register; rs1: Register; rs2: Register |}
-    | Sll of  {| rd: Register; rs1: Register; rs2: Register |}
-    | Slt of  {| rd: Register; rs1: Register; rs2: Register |}
-    | Sltu of {| rd: Register; rs1: Register; rs2: Register |}
-    | Xor of  {| rd: Register; rs1: Register; rs2: Register |}
-    | Srl of  {| rd: Register; rs1: Register; rs2: Register |}
-    | Sra of  {| rd: Register; rs1: Register; rs2: Register |}
-    | Or of   {| rd: Register; rs1: Register; rs2: Register |}
-    | And of  {| rd: Register; rs1: Register; rs2: Register |}
+    | ADD of  {| rd: Register; rs1: Register; rs2: Register |}
+    | SUB of  {| rd: Register; rs1: Register; rs2: Register |}
+    | SLL of  {| rd: Register; rs1: Register; rs2: Register |}
+    | SLT of  {| rd: Register; rs1: Register; rs2: Register |}
+    | SLTU of {| rd: Register; rs1: Register; rs2: Register |}
+    | XOR of  {| rd: Register; rs1: Register; rs2: Register |}
+    | SRL of  {| rd: Register; rs1: Register; rs2: Register |}
+    | SRA of  {| rd: Register; rs1: Register; rs2: Register |}
+    | OR of   {| rd: Register; rs1: Register; rs2: Register |}
+    | AND of  {| rd: Register; rs1: Register; rs2: Register |}
 
-    | Fence of {| pred: MachineInt; succ: MachineInt; fm: MachineInt |}
-    | Ecall
-    | Ebreak
+    | FENCE of {| pred: MachineInt; succ: MachineInt; fm: MachineInt |}
+    | ECALL
+    | EBREAK
     
     | None // Instruction not found
-
+123
 //================================================================ -- \begin_latex{Major_Opcodes}
 // Major Opcodes
 let opcode_LUI       = 0b0110111
@@ -201,40 +201,40 @@ let DecodeI (instr: InstrField) : InstructionI =
     let succ  = instr.bitSlice 23 20
     
     match (opcode) with
-    | (op) when op = opcode_LUI   -> Lui   {| rd = rd; imm20 = imm20_U |}
-    | (op) when op = opcode_AUIPC -> Auipc {| rd = rd; imm20 = imm20_U |}
+    | (op) when op = opcode_LUI   -> LUI   {| rd = rd; imm20 = imm20_U |}
+    | (op) when op = opcode_AUIPC -> AUIPC {| rd = rd; imm20 = imm20_U |}
     
-    | (op) when op = opcode_JALR -> Jalr {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_JAL  -> Jal  {| rd = rd; imm20 = imm20_J |}
+    | (op) when op = opcode_JALR -> JALR {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_JAL  -> JAL  {| rd = rd; imm20 = imm20_J |}
     
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BEQ  -> Beq  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BNE  -> Bne  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BLT  -> Blt  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BGE  -> Bge  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BLTU -> Bltu {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BGEU -> Bgeu {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+    | (op) when op = opcode_BRANCH && funct3 = funct3_BEQ  -> BEQ  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+    | (op) when op = opcode_BRANCH && funct3 = funct3_BNE  -> BNE  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+    | (op) when op = opcode_BRANCH && funct3 = funct3_BLT  -> BLT  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+    | (op) when op = opcode_BRANCH && funct3 = funct3_BGE  -> BGE  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+    | (op) when op = opcode_BRANCH && funct3 = funct3_BLTU -> BLTU {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+    | (op) when op = opcode_BRANCH && funct3 = funct3_BGEU -> BGEU {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
     
-    | (op) when op = opcode_LOAD && funct3 = funct3_LB  -> Lb  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_LOAD && funct3 = funct3_LH  -> Lh  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_LOAD && funct3 = funct3_LW  -> Lw  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_LOAD && funct3 = funct3_LBU -> Lbu {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_LOAD && funct3 = funct3_LHU -> Lhu {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_LOAD && funct3 = funct3_LB  -> LB  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_LOAD && funct3 = funct3_LH  -> LH  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_LOAD && funct3 = funct3_LW  -> LW  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_LOAD && funct3 = funct3_LBU -> LBU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_LOAD && funct3 = funct3_LHU -> LHU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
 
-    | (op) when op = opcode_STORE && funct3 = funct3_SB -> Sb {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
-    | (op) when op = opcode_STORE && funct3 = funct3_SH -> Sh {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
-    | (op) when op = opcode_STORE && funct3 = funct3_SW -> Sw {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
+    | (op) when op = opcode_STORE && funct3 = funct3_SB -> SB {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
+    | (op) when op = opcode_STORE && funct3 = funct3_SH -> SH {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
+    | (op) when op = opcode_STORE && funct3 = funct3_SW -> SW {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
 
     // OP_IMM    
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_ADDI  -> Addi {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_OP_IMM && funct3 = funct3_ADDI  -> ADDI {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
     // Shamt
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLLI && funct7 = msbs6_SLLI  -> Slli {| rd = rd; rs1 = rs1; shamt = shamt |}
+    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLLI && funct7 = msbs6_SLLI  -> SLLI {| rd = rd; rs1 = rs1; shamt = shamt |}
     // OP
-    | (op) when op = opcode_OP && funct3 = funct3_ADD && funct7 = funct7_ADD  -> Add {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    | (op) when op = opcode_OP && funct3 = funct3_ADD && funct7 = funct7_ADD  -> ADD {| rd = rd; rs1 = rs1; rs2 = rs2 |}
         
-    | (op) when op = opcode_MISC_MEM && rd = 0 && rs1 = 0 && funct3 = funct3_FENCE -> Fence {| fm = fm; pred = pred; succ = succ  |}
+    | (op) when op = opcode_MISC_MEM && rd = 0 && rs1 = 0 && funct3 = funct3_FENCE -> FENCE {| fm = fm; pred = pred; succ = succ  |}
 
-    | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_ECALL  -> Ecall
-    | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> Ebreak
+    | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_ECALL  -> ECALL
+    | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> EBREAK
         
     | _ -> None
 
