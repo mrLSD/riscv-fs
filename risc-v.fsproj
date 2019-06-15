@@ -5,7 +5,11 @@
         <TargetFramework>netcoreapp2.2</TargetFramework>
         <RootNamespace>RISCV</RootNamespace>
     </PropertyGroup>
-    
+
+    <ItemGroup>
+        <PackageReference Include="ELFSharp" Version="2.1.1" />
+    </ItemGroup>
+
     <ItemGroup>
         <Compile Include="Bits.fs" />
         <Compile Include="Arch.fs" />

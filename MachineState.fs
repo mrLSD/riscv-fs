@@ -4,7 +4,7 @@ open Microsoft.FSharp.Collections
 open ISA.RISCV.Arch
 
 type MachineState = {
-        PC:         uint64
+        PC:         int32
         Registers:  Register array
         Memory:     int8 array
     } with
@@ -16,7 +16,7 @@ type MachineState = {
         Array.set registers reg value
         { x with Registers = registers }
 
-    member x.setPC (pc : uint64) : MachineState =
+    member x.setPC (pc : int32) : MachineState =
         { x with PC = pc }
 
     member x.getMemory(addr : int32) : int8 =
@@ -29,8 +29,3 @@ type MachineState = {
         let mem = x.Memory
         Array.set mem addr value
         { x with Memory = mem }
-
-let combineBytes (x : int8 array) : int64 =
-    let xz = Array.zip [|0..x.Length-1|] x
-    let res = Array.fold (fun acc (x : (int*int8)) -> acc ||| (int64(snd x) <<< (fst x)*8 )) 0L xz
-    res

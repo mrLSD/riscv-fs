@@ -44,3 +44,23 @@ type System.Int32 with
     (* misc methods *)
     member x.abs = // fast math.abs
         (x ^^^ (x >>> 31)) - (x >>> 31)
+
+let combineBytes (x : int8 array) : int64 =
+    let xz = Array.zip [|0..x.Length-1|] x
+    Array.fold (fun acc (x : (int*int8)) -> acc ||| (int64(snd x) <<< (fst x)*8 )) 0L xz
+
+// Load from Memory 1 byte
+let loadByte (mem : int8 array) (addr : int32) : int8 =
+    mem.[addr]
+
+// Load from Memory 2 bytes
+let loadHalf (mem : int8 array) (addr : int32) : int16 =
+    int16(combineBytes mem.[addr..addr+1])
+
+// Load from Memory 4 bytes
+let loadWord (mem : int8 array) (addr : int32) : int32 =
+    int32(combineBytes mem.[addr..addr+3])
+
+// Load from Memory 8 bytes
+let loadDouble (mem : int8 array) (addr : int32) : int64 =
+    combineBytes mem.[addr..addr+7]
