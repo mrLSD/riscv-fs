@@ -1,5 +1,8 @@
 ﻿module main
 
+open System
+
+open System
 open ISA.RISCV
 
 let printBits (x: int) =
@@ -8,10 +11,5 @@ let printBits (x: int) =
     
 [<EntryPoint>]
 let main argv =
-    let x = -255
-    printBits x
-    x>>>5 |> printBits
-    x<<<5 |> printBits
-    5<<<x |> printBits
     Decode.decode_execution
     0 // return an integer exit code

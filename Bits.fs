@@ -1,14 +1,12 @@
 module ISA.RISCV.Utils.Bits
 
 type System.Int32 with
+    member x.bitSlice endBit startBit =
+        (x >>> startBit) &&& ~~~(-1 <<< (endBit - startBit + 1))
     member x.flip i = // change bit
         (x ^^^ (1 <<< i))         
     member x.isSet i = // test if bit set at a specified position
-        x &&& (1 <<< i) <> 0   
-    member x.reverse =                              
-        let rec go b i acc =
-            if i = 32 then acc else go (b>>>1) (i+1) ((acc <<< 1) ||| (b &&& 1))
-        go x 0 0
+        x &&& (1 <<< i) <> 0
     member x.rotateLeft r =
         (x<<<r) ||| (x>>>(32-r)) 
     member x.rotateRight r =
