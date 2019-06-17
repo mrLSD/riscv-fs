@@ -11,7 +11,7 @@ type InstrField = MachineInt
 
 //================================================================ -- \begin_latex{Major_Opcodes}
 // 'I' (Base instruction set)
-type InstructionI32 =
+type InstructionI =
     | Lui of   {| rd: Register; imm20: MachineInt |}
     | Auipc of {| rd: Register; imm20: MachineInt |}
         
@@ -69,6 +69,9 @@ let opcode_AUIPC     = 0b0010111
 let opcode_JAL       = 0b1101111
 let opcode_JALR      = 0b1100111
 let opcode_BRANCH    = 0b1100011
+let opcode_LOAD      = 0b0000011
+let opcode_STORE     = 0b0100011
+let opcode_OP_IMM    = 0b0010011
 
 //================================================================
 // Sub-opcodes for 'I' instructions
@@ -84,7 +87,7 @@ let funct3_BGE       = 0b101
 let funct3_BLTU      = 0b110
 let funct3_BGEU      = 0b111
 
-// LOAD sub-opcodes
+// opcode_LOAD sub-opcodes
 let funct3_LB          = 0b000
 let funct3_LH          = 0b001
 let funct3_LW          = 0b010
@@ -93,9 +96,14 @@ let funct3_LBU         = 0b100
 let funct3_LHU         = 0b101
 let funct3_LWU         = 0b110
 
-// opcode_LOAD sub-opcodes
+// opcode_STORE sub-opcodes
+let funct3_SB          = 0b000
+let funct3_SH          = 0b001
+let funct3_SW          = 0b010
+let funct3_SD          = 0b011
 
-let DecodeI32 (instr: InstrField) : InstructionI32 =
+/// Decode 'I' instructions
+let DecodeI (instr: InstrField) : InstructionI =
     let opcode = instr.bitSlice 6   0 
     let rd     = instr.bitSlice 11  7
     let funct3 = instr.bitSlice 14 12
@@ -139,8 +147,8 @@ let DecodeI32 (instr: InstrField) : InstructionI32 =
     | _ -> Nothing
 
 
-type Instructions =
-    | IInsruction of InstructionI32 
+//type Instructions =
+//    | IInsruction of InstructionI32 
     
 let decode_execution =
     printfn "Decode instructions: %d" 10
