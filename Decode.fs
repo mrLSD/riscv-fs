@@ -88,20 +88,29 @@ let funct3_BLTU      = 0b110
 let funct3_BGEU      = 0b111
 
 // opcode_LOAD sub-opcodes
-let funct3_LB          = 0b000
-let funct3_LH          = 0b001
-let funct3_LW          = 0b010
-let funct3_LD          = 0b011
-let funct3_LBU         = 0b100
-let funct3_LHU         = 0b101
-let funct3_LWU         = 0b110
+let funct3_LB        = 0b000
+let funct3_LH        = 0b001
+let funct3_LW        = 0b010
+let funct3_LD        = 0b011
+let funct3_LBU       = 0b100
+let funct3_LHU       = 0b101
 
 // opcode_STORE sub-opcodes
-let funct3_SB          = 0b000
-let funct3_SH          = 0b001
-let funct3_SW          = 0b010
-let funct3_SD          = 0b011
+let funct3_SB        = 0b000
+let funct3_SH        = 0b001
+let funct3_SW        = 0b010
 
+ // opcode_OP_IMM sub-opcodes
+let funct3_ADDI      = 0b000
+let funct3_SLTI      = 0b010
+let funct3_SLTIU     = 0b011
+let funct3_XORI      = 0b100
+let funct3_ORI       = 0b110
+let funct3_ANDI      = 0b111
+let funct3_SLLI      = 0b001
+let funct3_SRLI      = 0b101
+let funct3_SRAI      = 0b101
+ 
 /// Decode 'I' instructions
 let DecodeI (instr: InstrField) : InstructionI =
     let opcode = instr.bitSlice 6   0 
@@ -144,6 +153,16 @@ let DecodeI (instr: InstrField) : InstructionI =
     | (op) when op = opcode_BRANCH && funct3 = funct3_BLTU -> Bltu {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
     | (op) when op = opcode_BRANCH && funct3 = funct3_BGEU -> Bgeu {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
     
+    | (op) when op = opcode_LOAD && funct3 = funct3_LB  -> Lb  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_LOAD && funct3 = funct3_LH  -> Lh  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_LOAD && funct3 = funct3_LW  -> Lw  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_LOAD && funct3 = funct3_LBU -> Lbu {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | (op) when op = opcode_LOAD && funct3 = funct3_LHU -> Lhu {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+
+    | (op) when op = opcode_STORE && funct3 = funct3_SB -> Sb {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+    | (op) when op = opcode_STORE && funct3 = funct3_SH -> Sh {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+    | (op) when op = opcode_STORE && funct3 = funct3_SW -> Sw {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+        
     | _ -> Nothing
 
 
