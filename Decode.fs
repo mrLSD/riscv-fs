@@ -72,6 +72,9 @@ let opcode_BRANCH    = 0b1100011
 let opcode_LOAD      = 0b0000011
 let opcode_STORE     = 0b0100011
 let opcode_OP_IMM    = 0b0010011
+let opcode_OP        = 0b0110011
+let opcode_MISC_MEM  = 0b0001111
+let opcode_SYSTEM    = 0b1110011
 
 //================================================================
 // Sub-opcodes for 'I' instructions
@@ -110,7 +113,50 @@ let funct3_ANDI      = 0b111
 let funct3_SLLI      = 0b001
 let funct3_SRLI      = 0b101
 let funct3_SRAI      = 0b101
- 
+
+// opcode_OP_IMM.SLLI/SRLI/SRAI
+let funct7_SLLI      = 0b0000000
+let funct7_SRLI      = 0b0000000
+let funct7_SRAI      = 0b0100000
+
+// opcode_OP sub-opcodes
+let funct3_ADD       = 0b000
+let funct7_ADD       = 0b0000000
+
+let funct3_SUB       = 0b000
+let funct7_SUB       = 0b0100000
+
+let funct3_SLL       = 0b001
+let funct7_SLL       = 0b0000000
+
+let funct3_SLT       = 0b010
+let funct7_SLT       = 0b0000000
+
+let funct3_SLTU      = 0b011
+let funct7_SLTU      = 0b0000000
+
+let funct3_XOR       = 0b100
+let funct7_XOR       = 0b0000000
+
+let funct3_SRL       = 0b101
+let funct7_SRL       = 0b0000000
+
+let funct3_SRA       = 0b101
+let funct7_SRA       = 0b0100000
+
+let funct3_OR        = 0b110
+let funct7_OR        = 0b0000000
+
+let funct3_AND       = 0b111
+let funct7_AND       = 0b0000000
+
+// opcode_MISC_MEM sub-opcodes
+let funct3_FENCE         = 0b000
+
+// opcode_SYSTEM sub-opcodes
+let funct12_ECALL    = 0b000000000000
+let funct12_EBREAK   = 0b000000000001
+
 /// Decode 'I' instructions
 let DecodeI (instr: InstrField) : InstructionI =
     let opcode = instr.bitSlice 6   0 
