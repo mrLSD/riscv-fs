@@ -1,5 +1,6 @@
 module ISA.RISCV.MachineState
 
+open System
 open Microsoft.FSharp.Collections
 open ISA.RISCV.Arch
 
@@ -29,3 +30,10 @@ type MachineState = {
         let mem = x.Memory
         Array.set mem addr value
         { x with Memory = mem }
+
+let InitMachineState : MachineState =
+    {
+        PC = 0
+        Registers = Array.zeroCreate 32
+        Memory =  Array.zeroCreate (1024*1024)
+    }

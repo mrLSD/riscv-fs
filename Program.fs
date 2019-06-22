@@ -1,20 +1,42 @@
 ﻿module main
 
-open ISA.RISCV
+open ISA.RISCV.Fetch
+open ISA.RISCV.MachineState
 open Microsoft.FSharp.Collections
 open System
 open ELFSharp.ELF
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
 
 let printBits (x: int64) =
     let res = System.Convert.ToString(x, 2).PadLeft(64, '0')
     printfn "Bits: %s" res
 
 let readElfFile =
-    let elf = ELFReader.Load "add32.elf"
-    Array.concat [| for x in elf.GetSections() -> x.GetContents().AsMemory().ToArray() |]
+//    let elf = ELFReader.Load "add32.elf"
+    let elf = ELFReader.Load "and32.elf"
+//    let elf = ELFReader.Load "rv32mi.elf"
+//        printfn "S: %A | %A" (s.Name) (s.GetContents().Length)
+    Array.concat [| for x in elf.GetSections() -> if x.Name = ".text.init" then x.GetContents().AsMemory().ToArray() else [||] |]
+
+let rec runCycle (binData : byte array) (mstate : MachineState) =
+    let instr = FetchInstruction binData mstate
+    let decodedInstr = I.DecodeI instr
+    printfn "%A\t | 0x%x\t" mstate.PC instr
+
+//    match decodedInstr with
+//    | I.InstructionI.None -> ()
+//    | _ -> printfn "%A\t| %A" mstate.PC decodedInstr
+
+    if mstate.PC + 8 < binData.Length then
+        let mstate = {mstate with PC = mstate.PC + 4}
+        runCycle binData mstate
 
 [<EntryPoint>]
 let main argv =
     let data = readElfFile
+    let mstate = InitMachineState
+    do runCycle data mstate
+
     printfn "Program data length: %A" data.Length
     0 // return an integer exit code
