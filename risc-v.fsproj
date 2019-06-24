@@ -3,7 +3,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp2.2</TargetFramework>
-        <RootNamespace>RISCV</RootNamespace>
+        <RootNamespace>ISA.RISCV</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,10 +14,10 @@
         <Compile Include="Bits.fs" />
         <Compile Include="Arch.fs" />
         <Compile Include="MachineState.fs" />
-        <Compile Include="Fetch.fs" />
         <Compile Include="DecodeI.fs" />
         <Compile Include="Decoder.fs" />
-        <Compile Include="Program.fs" />
+        <Compile Include="Run.fs" />
+        <Compile Include="Program.fs" />        
     </ItemGroup>
 
 </Project>

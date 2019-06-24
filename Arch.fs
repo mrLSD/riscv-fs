@@ -4,3 +4,6 @@ type MachineInt   = int32
 type Register     = int32
 type Opcode       = MachineInt
 type InstrField   = MachineInt
+
+type TrapErrors =
+    | InstructionFetch

@@ -50,17 +50,43 @@ let combineBytes (x : byte array) : int64 =
     Array.fold (fun acc (x : (int*byte)) -> acc ||| (int64(snd x) <<< (fst x)*8 )) 0L xz
 
 // Load from Memory 1 byte
-let loadByte (mem : byte array) (addr : int32) : byte =
-    mem.[addr]
+let loadByte (mem : Map<int32, byte>) (addr : int32) : byte option =
+    if Map.containsKey addr mem then
+        Some(mem.[addr])
+    else
+        None
 
 // Load from Memory 2 bytes
-let loadHalf (mem : byte array) (addr : int32) : int16 =
-    int16(combineBytes mem.[addr..addr+1])
+let loadHalfWord (mem : Map<int32, byte>) (addr : int32) : int16 option =
+    if Map.containsKey addr mem &&
+       Map.containsKey (addr+1) mem then
+        let halfWord = [| mem.[addr]; mem.[addr+1] |]
+        Some(int16(combineBytes halfWord))
+    else
+        None
 
 // Load from Memory 4 bytes
-let loadWord (mem : byte array) (addr : int32) : int32 =
-    int32(combineBytes mem.[addr..addr+3])
+let loadWord (mem : Map<int32, byte>) (addr : int32) : int32 option =
+    if Map.containsKey addr mem &&
+       Map.containsKey (addr+1) mem &&
+       Map.containsKey (addr+2) mem &&
+       Map.containsKey (addr+3) mem then
+        let word = [| mem.[addr]; mem.[addr+1]; mem.[addr+2]; mem.[addr+3] |]
+        Some(int32(combineBytes word))
+    else
+        None
 
 // Load from Memory 8 bytes
-let loadDouble (mem : byte array) (addr : int32) : int64 =
-    combineBytes mem.[addr..addr+7]
+let loadDouble (mem : Map<int32, byte>) (addr : int32) : int64 option =
+    if Map.containsKey addr mem &&
+       Map.containsKey (addr+1) mem &&
+       Map.containsKey (addr+2) mem &&
+       Map.containsKey (addr+3) mem &&
+       Map.containsKey (addr+4) mem &&
+       Map.containsKey (addr+5) mem &&
+       Map.containsKey (addr+6) mem &&
+       Map.containsKey (addr+7) mem then
+        let dWord = [| mem.[addr]; mem.[addr+1]; mem.[addr+2]; mem.[addr+3]; mem.[addr+4]; mem.[addr+5]; mem.[addr+6]; mem.[addr+7] |]
+        Some(int64(combineBytes dWord))
+    else
+        None

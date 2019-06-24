@@ -1,13 +1,20 @@
 module ISA.RISCV.MachineState
 
-open System
 open Microsoft.FSharp.Collections
 open ISA.RISCV.Arch
+
+type RunMachineState =
+    | NotRun
+    | Run
+    | Stopped
+    | Trap of TrapErrors
 
 type MachineState = {
         PC:         int32
         Registers:  Register array
-        Memory:     int8 array
+        Memory:     Map<uint32, byte>
+        Verbosity:  uint8
+        RunState:   RunMachineState
     } with
     member x.getRegister(reg: int32) : Register =
         x.Registers.[reg]
@@ -20,20 +27,27 @@ type MachineState = {
     member x.setPC (pc : int32) : MachineState =
         { x with PC = pc }
 
-    member x.getMemory(addr : int32) : int8 =
-        if addr >= x.Memory.Length then
-            0y
-        else
+    member x.getMemory(addr : int32) : byte =
+        if Map.containsKey addr x.Memory then
             x.Memory.[addr]
+        else
+            0uy
 
-    member x.setMemory (addr : int32) (value : sbyte) : MachineState =
+    member x.setMemory (addr : int32) (value : byte) : MachineState =
         let mem = x.Memory
-        Array.set mem addr value
+//        mem.[addr] = value
+//        Map.remove addr mem
+//        Array.set mem addr value
         { x with Memory = mem }
 
-let InitMachineState : MachineState =
+    member x.setRunState state =
+        { x with RunState = state }
+
+let InitMachineState mem : MachineState =
     {
-        PC = 0
-        Registers = Array.zeroCreate 32
-        Memory =  Array.zeroCreate (1024*1024)
+        PC           = 0x8000000
+        Registers    = Array.zeroCreate 32
+        Memory       = mem
+        Verbosity    = 0uy
+        RunState     = RunMachineState.NotRun
     }
