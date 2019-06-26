@@ -50,43 +50,43 @@ let combineBytes (x : byte array) : int64 =
     Array.fold (fun acc (x : (int*byte)) -> acc ||| (int64(snd x) <<< (fst x)*8 )) 0L xz
 
 // Load from Memory 1 byte
-let loadByte (mem : Map<int32, byte>) (addr : int32) : byte option =
+let loadByte (mem : Map<uint32, byte>) (addr : uint32) : byte option =
     if Map.containsKey addr mem then
         Some(mem.[addr])
     else
         None
 
 // Load from Memory 2 bytes
-let loadHalfWord (mem : Map<int32, byte>) (addr : int32) : int16 option =
+let loadHalfWord (mem : Map<uint32, byte>) (addr : uint32) : int16 option =
     if Map.containsKey addr mem &&
-       Map.containsKey (addr+1) mem then
-        let halfWord = [| mem.[addr]; mem.[addr+1] |]
+       Map.containsKey (addr+1u) mem then
+        let halfWord = [| mem.[addr]; mem.[addr+1u] |]
         Some(int16(combineBytes halfWord))
     else
         None
 
 // Load from Memory 4 bytes
-let loadWord (mem : Map<int32, byte>) (addr : int32) : int32 option =
+let loadWord (mem : Map<uint32, byte>) (addr : uint32) : int32 option =
     if Map.containsKey addr mem &&
-       Map.containsKey (addr+1) mem &&
-       Map.containsKey (addr+2) mem &&
-       Map.containsKey (addr+3) mem then
-        let word = [| mem.[addr]; mem.[addr+1]; mem.[addr+2]; mem.[addr+3] |]
+       Map.containsKey (addr+1u) mem &&
+       Map.containsKey (addr+2u) mem &&
+       Map.containsKey (addr+3u) mem then
+        let word = [| mem.[addr]; mem.[addr+1u]; mem.[addr+2u]; mem.[addr+3u] |]
         Some(int32(combineBytes word))
     else
         None
 
 // Load from Memory 8 bytes
-let loadDouble (mem : Map<int32, byte>) (addr : int32) : int64 option =
+let loadDouble (mem : Map<uint32, byte>) (addr : uint32) : int64 option =
     if Map.containsKey addr mem &&
-       Map.containsKey (addr+1) mem &&
-       Map.containsKey (addr+2) mem &&
-       Map.containsKey (addr+3) mem &&
-       Map.containsKey (addr+4) mem &&
-       Map.containsKey (addr+5) mem &&
-       Map.containsKey (addr+6) mem &&
-       Map.containsKey (addr+7) mem then
-        let dWord = [| mem.[addr]; mem.[addr+1]; mem.[addr+2]; mem.[addr+3]; mem.[addr+4]; mem.[addr+5]; mem.[addr+6]; mem.[addr+7] |]
+       Map.containsKey (addr+1u) mem &&
+       Map.containsKey (addr+2u) mem &&
+       Map.containsKey (addr+3u) mem &&
+       Map.containsKey (addr+4u) mem &&
+       Map.containsKey (addr+5u) mem &&
+       Map.containsKey (addr+6u) mem &&
+       Map.containsKey (addr+7u) mem then
+        let dWord = [| mem.[addr]; mem.[addr+1u]; mem.[addr+2u]; mem.[addr+3u]; mem.[addr+4u]; mem.[addr+5u]; mem.[addr+6u]; mem.[addr+7u] |]
         Some(int64(combineBytes dWord))
     else
         None

@@ -10,7 +10,7 @@ type RunMachineState =
     | Trap of TrapErrors
 
 type MachineState = {
-        PC:         int32
+        PC:         uint32
         Registers:  Register array
         Memory:     Map<uint32, byte>
         Verbosity:  uint8
@@ -24,16 +24,16 @@ type MachineState = {
         Array.set registers reg value
         { x with Registers = registers }
 
-    member x.setPC (pc : int32) : MachineState =
+    member x.setPC (pc : uint32) : MachineState =
         { x with PC = pc }
 
-    member x.getMemory(addr : int32) : byte =
+    member x.getMemory(addr : uint32) : byte =
         if Map.containsKey addr x.Memory then
             x.Memory.[addr]
         else
             0uy
 
-    member x.setMemory (addr : int32) (value : byte) : MachineState =
+    member x.setMemory (addr : uint32) (value : byte) : MachineState =
         let mem = x.Memory
 //        mem.[addr] = value
 //        Map.remove addr mem
@@ -45,7 +45,7 @@ type MachineState = {
 
 let InitMachineState mem : MachineState =
     {
-        PC           = 0x8000000
+        PC           = 0x8000000u
         Registers    = Array.zeroCreate 32
         Memory       = mem
         Verbosity    = 0uy
