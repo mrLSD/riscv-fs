@@ -18,24 +18,31 @@ type AppConfig = {
             Files     = [||]
         }
 
-type CliOptions<'T> = {
+type CliResult =
+    | Result of AppConfig
+    | Error
+    | NotFound
+
+type CliOptions = {
         Key:         string option
         LongKey:     string option
         Value:       string option
         Multiple:    bool
         HelpMessage: string
         Required:    bool
+        IsFound:     bool
         Handler:     (string -> AppConfig -> AppConfig)
     } with
     static member Default =
         {
-            Key =  None
-            LongKey = None
-            Value = None
-            Multiple = false
+            Key         = None
+            LongKey     = None
+            Value       = None
+            Multiple    = false
             HelpMessage = ""
-            Required = false
-            Handler = fun _ cfg -> cfg
+            Required    = false
+            IsFound     = false
+            Handler     = fun _ cfg -> cfg
         }
     member x.printHelpMessage =
         let msg = if x.Key.IsSome && x.LongKey.IsSome then
@@ -50,15 +57,15 @@ type CliOptions<'T> = {
                     ""
         printfn "%s" (String.Format("{0,-5}{1,-20} {2}", "", msg, x.HelpMessage))
 
-let CliUsage (cliArgs : CliOptions<_> []) =
+let CliUsage (cliArgs : CliOptions []) =
     printfn "%s" about
     printfn "%s" (String.Format("USAGE:\n{0,-5}risc-v [OPTIONS] file...\nOPTIONS", ""))
     for arg in cliArgs do
         arg.printHelpMessage
 
-let InitCLI<'T> (argv : string[]) =
+let InitCLI (argv : string[]) =
     let opts = [|
-        { CliOptions<string>.Default with
+        { CliOptions.Default with
             Key =  Some("A");
             LongKey = Some("arch");
             HelpMessage = "RISC-V architecture. Available: rv32i. Default: rv32i"
@@ -68,7 +75,7 @@ let InitCLI<'T> (argv : string[]) =
                     AppConfig.Arch = arg
                 }
         };
-        { CliOptions<bool>.Default with
+        { CliOptions.Default with
             Key =  Some("v");
             HelpMessage = "Verbosity output"
             Handler =
@@ -77,7 +84,7 @@ let InitCLI<'T> (argv : string[]) =
                     AppConfig.Verbosity = Some(true)
                 }
         };
-        { CliOptions<_>.Default with
+        { CliOptions.Default with
             Key =  Some("h");
             LongKey = Some("help");
             HelpMessage = "Print help message"
@@ -85,7 +92,7 @@ let InitCLI<'T> (argv : string[]) =
                 fun arg cfg ->
                     cfg
         };
-        { CliOptions<_>.Default with
+        { CliOptions.Default with
             Key =  Some("V");
             LongKey = Some("version");
             HelpMessage = "Application version"
@@ -116,41 +123,72 @@ let rec fetchArgs (argv : string[]) cl cfg =
     else
         let arg = argv.[0]
         let res =
-            if cl.Key.IsSome && sprintf "-%s" cl.Key.Value = arg then
-                if cl.Value.IsSome then
-                    if argv.Length < 2 then
-                        let arg2 = argv.[1]
-                        let cfg = cl.Handler arg2 cfg
+            if cl.Key.IsSome then
+                if  sprintf "-%s" cl.Key.Value = arg then
+                    if cl.Value.IsSome then
+                        if argv.Length < 2 then
+                            let arg2 = argv.[1]
+                            // Check is value not argument parameter
+                            if "-" = arg2.[..0] then
+                                (Error, 0)
+                            else
+                                let cfg = cl.Handler arg2 cfg
+                                (Result(cfg), 2)
+                        else
+                            (Error, 0)
+                    else
+                        let cfg = cl.Handler arg cfg
                         printfn "Key: %s | %A" cl.Key.Value cfg
-                        (Some(cfg), 2)
+                        (Result(cfg), 1)
+                else if cl.LongKey.IsSome && sprintf "-%s" cl.Key.Value = arg then
+                    if cl.Value.IsSome then
+                        if argv.Length < 2 then
+                            let arg2 = argv.[1]
+                            if "-" = arg2.[..0] then
+                                (Error, 0)
+                            else
+                                let cfg = cl.Handler arg2 cfg
+                                printfn "LongKey: %s | %A" cl.LongKey.Value cfg
+                                (Result(cfg), 2)
+                        else
+                            (Error, 0)
                     else
-                        (None, 0)
-                else
-                    let cfg = cl.Handler arg cfg
-                    printfn "Key: %s | %A" cl.Key.Value cfg
-                    (Some(cfg), 11)
-            else if cl.LongKey.IsSome && sprintf "-%s" cl.Key.Value = arg then
-                if cl.Value.IsSome then
-                    if argv.Length < 2 then
-                        let arg2 = argv.[1]
-                        let cfg = cl.Handler arg2 cfg
+                        let cfg = cl.Handler arg cfg
                         printfn "LongKey: %s | %A" cl.LongKey.Value cfg
-                        (Some(cfg), 2)
-                    else
-                        (None, 0)
+                        (Result(cfg), 1)
                 else
-                    let cfg = cl.Handler arg cfg
-                    printfn "LongKey: %s | %A" cl.LongKey.Value cfg
-                    (Some(cfg), 1)
+                    (NotFound, 0)
+
+            else if cl.LongKey.IsSome then
+                if sprintf "-%s" cl.LongKey.Value = arg then
+                    if cl.Value.IsSome then
+                        if argv.Length < 2 then
+                            let arg2 = argv.[1]
+                            if "-" = arg2.[..0] then
+                                (Error, 0)
+                            else
+                                let cfg = cl.Handler arg2 cfg
+                                printfn "LongKey: %s | %A" cl.LongKey.Value cfg
+                                (Result(cfg), 2)
+                        else
+                            (Error, 0)
+                    else
+                        let cfg = cl.Handler arg cfg
+                        printfn "LongKey: %s | %A" cl.LongKey.Value cfg
+                        (Result(cfg), 1)
+                else
+                    (NotFound, 0)
+
             else if cl.Value.IsSome then
                 let cfg = cl.Handler arg cfg
                 printfn "Value: %s | %A" cl.Value.Value cfg
-                (Some(cfg), 1)
+                (Result(cfg), 1)
             else
-                (None, 0)
+                (NotFound, 0)
 
-        let (cfg, index) = res
-        if argv.Length - index < 1 || cfg.IsNone then
-            cfg
-        else
-            fetchArgs argv.[index..] cl cfg.Value
+        let (cfgRes, resIndex) = res
+        match cfgRes with
+        | Result(res) when cl.Multiple && argv.Length - resIndex > 0 -> fetchArgs argv.[resIndex..] cl res
+        | NotFound when argv.Length - resIndex > 0 -> fetchArgs argv.[resIndex..] cl cfg
+        | _ -> Some(cfg)
+
