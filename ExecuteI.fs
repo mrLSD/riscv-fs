@@ -82,6 +82,21 @@ let execLBU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mach
 let execLHU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     mstate
 
+//=================================================
+// SB
+let execSB (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SH
+let execSH (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SW
+let execSW (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    mstate
+
 // Execute I-instructions
 let ExecuteI (instr : InstructionI) (mstate : MachineState) =
     match instr with
@@ -115,4 +130,10 @@ let ExecuteI (instr : InstructionI) (mstate : MachineState) =
         execLBU i.rd i.rs1 i.imm12 mstate
     | LHU i ->
         execLHU i.rd i.rs1 i.imm12 mstate
+    | SB i ->
+        execSB i.rs1 i.rs2 i.imm12 mstate
+    | SH i ->
+        execSH i.rs1 i.rs2 i.imm12 mstate
+    | SW i ->
+        execSW i.rs1 i.rs2 i.imm12 mstate
     | _ -> mstate
