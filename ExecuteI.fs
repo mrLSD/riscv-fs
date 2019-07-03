@@ -97,6 +97,36 @@ let execSH (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : Mach
 let execSW (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     mstate
 
+//=================================================
+// ADDI
+let execADDI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SLTI
+let execSLTI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SLTIU
+let execSLTIU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// XORI
+let execXORI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// ORI
+let execORI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// ANDI
+let execANDI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    mstate
+
 // Execute I-instructions
 let ExecuteI (instr : InstructionI) (mstate : MachineState) =
     match instr with
@@ -136,4 +166,16 @@ let ExecuteI (instr : InstructionI) (mstate : MachineState) =
         execSH i.rs1 i.rs2 i.imm12 mstate
     | SW i ->
         execSW i.rs1 i.rs2 i.imm12 mstate
+    | ADDI i ->
+        execADDI i.rd i.rs1 i.imm12 mstate
+    | SLTI i ->
+        execSLTI i.rd i.rs1 i.imm12 mstate
+    | SLTIU i ->
+        execSLTIU i.rd i.rs1 i.imm12 mstate
+    | XORI i ->
+        execXORI i.rd i.rs1 i.imm12 mstate
+    | ORI i ->
+        execORI i.rd i.rs1 i.imm12 mstate
+    | ANDI i ->
+        execANDI i.rd i.rs1 i.imm12 mstate
     | _ -> mstate
