@@ -6,7 +6,7 @@ open ISA.RISCV
 let main argv =
     let cfg = CLI.parseCli argv CLI.InitCLI CLI.AppConfig.Default
     match cfg with
-    | CLI.Failed -> failwith "Failed parse CLI params. Print --help"
+    | CLI.Failed -> printfn "Failed parse CLI params. Print --help"
     | CLI.Stopped -> ()
     | CLI.Success(x) ->
         if not x.CheckRequired then

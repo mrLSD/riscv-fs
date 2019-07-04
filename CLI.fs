@@ -74,7 +74,7 @@ let CliUsage (cliArgs : CliOptions []) =
 
 let rec fetchArgs (argv : string[]) (opts : CliOptions) (cfg : AppConfig) =
     if argv.Length < 1 then
-        NotFound(cfg)
+        (NotFound(cfg), argv)
     else
         let arg = argv.[0]
         let (cfgRes, resIndex) =
@@ -141,12 +141,17 @@ let rec fetchArgs (argv : string[]) (opts : CliOptions) (cfg : AppConfig) =
             // If NotFound for that branch loop -
             // redeclare to Result type
             let resValue = match cfgRes with
-                           | NotFound(x) -> Result(x)
+                           | (NotFound(x), newArgs) -> (Result(x), newArgs)
                            | _ -> cfgRes
             resValue
         | NotFound(res) when argv.Length > 0 ->
-            fetchArgs argv.[1..] opts res
-        | _ -> cfgRes
+            let (cfgRes, changedArgs) = fetchArgs argv.[1..] opts res
+            (cfgRes, Array.append [|arg|] changedArgs)
+        | _ ->
+            if argv.Length - resIndex > 0 then
+                (cfgRes, argv.[resIndex..])
+            else
+                (cfgRes, [||])
 
 // Parse CLI with specific params
 let rec parseCli (argv : string[]) (opts : CliOptions[]) (cfg : AppConfig) =
@@ -155,17 +160,17 @@ let rec parseCli (argv : string[]) (opts : CliOptions[]) (cfg : AppConfig) =
     else
         let opt = opts.[0]
         let opts = if opts.Length > 1 then opts.[1..] else [||]
-        let resCfg = fetchArgs argv opt cfg
+        let (resCfg, newArgv) = fetchArgs argv opt cfg
         match resCfg with
         | Error ->
             Failed
         | NotFound(cfg) ->
-            parseCli argv opts cfg
+            parseCli newArgv opts cfg
         | Result(cfg) ->
             if opt.StopExecution then
                 Stopped
             else
-                parseCli argv opts cfg
+                parseCli newArgv opts cfg
 
 // Init CLI options and arguments
 let rec InitCLI =
