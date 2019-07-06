@@ -12,5 +12,6 @@ let main argv =
         if not x.CheckRequired then
             printfn "Wrong parameters put --help to get more information"
         else
-            printfn "CFG: %A" cfg
+            let res = Run.Run x
+            printfn "Result: %A" res
     0 // return an integer exit code

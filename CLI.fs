@@ -14,7 +14,7 @@ type AppConfig = {
     } with
     static member Default =
         {
-            Verbosity = None
+            Verbosity = Some(false)
             Arch      = None
             Files     = None
         }

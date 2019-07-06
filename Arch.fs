@@ -11,3 +11,4 @@ type Architecture =
 
 type TrapErrors =
     | InstructionFetch
+    | InstructionDecode

@@ -6,6 +6,8 @@ open ELFSharp.ELF.Sections
 open ISA.RISCV.MachineState
 open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
+open ISA.RISCV.CLI
+open ISA.RISCV.Decode
 
 // Help function for fetch Elf data
 let getSectionContent (section : ProgBitsSection<uint32>) =
@@ -19,9 +21,10 @@ let getSectionContent (section : ProgBitsSection<uint32>) =
 
 
 /// Read Elf data content to Map data with format: [address, dataByte]
-let readElfFile =
+let readElfFile file =
 //    let elf = ELFReader.Load "add32.elf"
-    let elf = ELFReader.Load "and32.elf"
+//    let elf = ELFReader.Load "and32.elf"
+    let elf = ELFReader.Load file
     Map.ofArray (Array.concat [| for s in elf.GetSections() -> getSectionContent s |])
 
 let fetchInstruction (mstate : MachineState) : InstrField option =
@@ -29,13 +32,22 @@ let fetchInstruction (mstate : MachineState) : InstrField option =
 
 let rec runCycle (mstate : MachineState) =
     let instr = fetchInstruction mstate
-    let mstate = match instr with
-                    | None -> mstate.setRunState (Trap TrapErrors.InstructionFetch)
-                    | _ -> mstate
-//    let decodedInstr = I.DecodeI instr
-//    printfn "%A\t | 0x%x\t" mstate.PC instr
-    mstate
+    let mstate =
+        match instr with
+        | None -> mstate.setRunState (Trap TrapErrors.InstructionFetch)
+        | _ ->
+            let decodedInstr = I.DecodeI instr.Value
+            printfn "0x%x\t | %A" mstate.PC decodedInstr
+            match decodedInstr with
+            | I.InstructionI.None -> mstate.setRunState (Trap TrapErrors.InstructionDecode)
+            | _ -> mstate
+    match mstate.RunState with
+    | Trap _ -> mstate
+    | _ ->
+        let mstate = mstate.incPC 4u
+        runCycle mstate
 
-let Run =
-    let data = readElfFile
-    InitMachineState data
+let Run (cfg : AppConfig) =
+    let data = readElfFile cfg.Files.Value.[0]
+    let mstate = InitMachineState data cfg.Verbosity.Value
+    runCycle mstate

@@ -1,5 +1,6 @@
 module ISA.RISCV.MachineState
 
+open System
 open Microsoft.FSharp.Collections
 open ISA.RISCV.Arch
 
@@ -13,7 +14,7 @@ type MachineState = {
         PC:         uint32
         Registers:  Register array
         Memory:     Map<uint32, byte>
-        Verbosity:  uint8
+        Verbosity:  bool
         RunState:   RunMachineState
     } with
     member x.getRegister(reg: int32) : Register =
@@ -26,6 +27,9 @@ type MachineState = {
 
     member x.setPC (pc : uint32) : MachineState =
         { x with PC = pc }
+
+    member x.incPC (pc : uint32) : MachineState =
+        { x with PC = x.PC + pc }
 
     member x.getMemory(addr : uint32) : byte =
         if Map.containsKey addr x.Memory then
@@ -43,11 +47,11 @@ type MachineState = {
     member x.setRunState state =
         { x with RunState = state }
 
-let InitMachineState mem : MachineState =
+let InitMachineState mem verbosity : MachineState =
     {
-        PC           = 0x8000000u
+        PC           = 0x80000000u
         Registers    = Array.zeroCreate 32
         Memory       = mem
-        Verbosity    = 0uy
+        Verbosity    = verbosity
         RunState     = RunMachineState.NotRun
     }
