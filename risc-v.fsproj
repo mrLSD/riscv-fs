@@ -16,6 +16,7 @@
         <Compile Include="MachineState.fs" />
         <Compile Include="DecodeI.fs" />
         <Compile Include="Decoder.fs" />
+        <Compile Include="ExecuteI.fs" />
         <Compile Include="CLI.fs" />
         <Compile Include="Run.fs" />        
         <Compile Include="Program.fs" />        

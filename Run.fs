@@ -3,6 +3,7 @@ module ISA.RISCV.Run
 open ELFSharp.ELF
 open ELFSharp.ELF.Sections
 
+open ISA.RISCV
 open ISA.RISCV.MachineState
 open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
@@ -40,12 +41,11 @@ let rec runCycle (mstate : MachineState) =
             printfn "0x%x\t | %A" mstate.PC decodedInstr
             match decodedInstr with
             | I.InstructionI.None -> mstate.setRunState (Trap TrapErrors.InstructionDecode)
-            | _ -> mstate
+            | _ ->
+                ExecuteI.ExecuteI decodedInstr mstate
     match mstate.RunState with
     | Trap _ -> mstate
-    | _ ->
-        let mstate = mstate.incPC 4u
-        runCycle mstate
+    | _ -> runCycle mstate
 
 let Run (cfg : AppConfig) =
     let data = readElfFile cfg.Files.Value.[0]

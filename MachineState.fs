@@ -20,7 +20,7 @@ type MachineState = {
     member x.getRegister(reg: int32) : Register =
         x.Registers.[reg]
 
-    member x.setRegister (reg: int32) (value: Register) : MachineState =
+    member x.setRegister (reg: Register) (value: MachineInt) : MachineState =
         let registers = x.Registers
         Array.set registers reg value
         { x with Registers = registers }
@@ -28,8 +28,8 @@ type MachineState = {
     member x.setPC (pc : uint32) : MachineState =
         { x with PC = pc }
 
-    member x.incPC (pc : uint32) : MachineState =
-        { x with PC = x.PC + pc }
+    member x.incPC : MachineState =
+        { x with PC = x.PC + 4u }
 
     member x.getMemory(addr : uint32) : byte =
         if Map.containsKey addr x.Memory then
