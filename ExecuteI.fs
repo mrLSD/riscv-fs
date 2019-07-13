@@ -123,6 +123,21 @@ let execORI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mach
     mstate
 
 //=================================================
+// SLLI
+let execSLLI (rd : Register) (rs1 : Register) (shamt : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SRLI
+let execSRLI (rd : Register) (rs1 : Register) (shamt : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SRAI
+let execSRAI (rd : Register) (rs1 : Register) (shamt : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
 // ANDI
 let execANDI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     mstate
@@ -178,4 +193,10 @@ let ExecuteI (instr : InstructionI) (mstate : MachineState) =
         execORI i.rd i.rs1 i.imm12 mstate
     | ANDI i ->
         execANDI i.rd i.rs1 i.imm12 mstate
+    | SLLI i ->
+        execSLLI i.rd i.rs1 i.shamt mstate
+    | SRLI i ->
+        execSRLI i.rd i.rs1 i.shamt mstate
+    | SRAI i ->
+        execSRAI i.rd i.rs1 i.shamt mstate
     | _ -> mstate
