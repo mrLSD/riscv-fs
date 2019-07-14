@@ -142,6 +142,56 @@ let execSRAI (rd : Register) (rs1 : Register) (shamt : MachineInt) (mstate : Mac
 let execANDI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     mstate
 
+//=================================================
+// ADD
+let execADD (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SUB
+let execSUB (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SLL
+let execSLL (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SLT
+let execSLT (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SLTU
+let execSLTU (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// XOR
+let execXOR (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SRL
+let execSRL (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// SRA
+let execSRA (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// OR
+let execOR (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+    mstate
+
+//=================================================
+// AND
+let execAND (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+    mstate
+
 // Execute I-instructions
 let ExecuteI (instr : InstructionI) (mstate : MachineState) =
     match instr with
@@ -199,4 +249,24 @@ let ExecuteI (instr : InstructionI) (mstate : MachineState) =
         execSRLI i.rd i.rs1 i.shamt mstate
     | SRAI i ->
         execSRAI i.rd i.rs1 i.shamt mstate
+    | ADD i ->
+        execADD i.rd i.rs1 i.rs2 mstate
+    | SUB i ->
+        execSUB i.rd i.rs1 i.rs2 mstate
+    | SLL i ->
+        execSLL i.rd i.rs1 i.rs2 mstate
+    | SLT i ->
+        execSLT i.rd i.rs1 i.rs2 mstate
+    | SLTU i ->
+        execSLTU i.rd i.rs1 i.rs2 mstate
+    | XOR i ->
+        execXOR i.rd i.rs1 i.rs2 mstate
+    | SRL i ->
+        execSRL i.rd i.rs1 i.rs2 mstate
+    | SRA i ->
+        execSRA i.rd i.rs1 i.rs2 mstate
+    | OR i ->
+        execOR i.rd i.rs1 i.rs2 mstate
+    | AND i ->
+        execAND i.rd i.rs1 i.rs2 mstate
     | _ -> mstate
