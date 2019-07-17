@@ -1,29 +1,29 @@
 module ISA.RISCV.Utils.Bits
 
-type System.Int32 with
+type System.Int64 with
     member x.bitSlice endBit startBit = // get Bit slice from range
-        (x >>> startBit) &&& ~~~(-1 <<< (endBit - startBit + 1))
+        (x >>> startBit) &&& ~~~(-1L <<< (endBit - startBit + 1))
     member x.signExtend n = // Sign extend bits for x32
         let bitOffset = 32 - n
         (x <<< bitOffset) >>> bitOffset
     member x.align32bitMask = // get x32 mask with all `1` bits
         -1
     member x.flip i = // change bit
-        (x ^^^ (1 <<< i))
+        (x ^^^ (1L <<< i))
     member x.isSet i = // test if bit set at a specified position
-        x &&& (1 <<< i) <> 0
+        x &&& (1L <<< i) <> 0L
     member x.rotateLeft r =
-        (x<<<r) ||| (x>>>(32-r))
+        (x <<< r) ||| (x >>> (32 - r))
     member x.rotateRight r =
-        (x>>>r) ||| (x<<<(32-r))
+        (x >>> r) ||| (x <<< (32 - r))
 
     (* bit coersion methods *)
     member x.toHex = sprintf "0x%x" x   // to hexadecimal
     member x.toBin = // to binary string
-        System.Convert.ToString(x, 2).PadLeft(32, '0')
+        System.Convert.ToString(x, 2).PadLeft(64, '0')
     member x.toResizeArray = // to Resizable array of positions set to 1
         let array = ResizeArray()
-        for i=0 to 31 do
+        for i=0 to 63 do
             if x.isSet i then array.Add(i)
         array
     member x.toArray = // to array of positions set to 1
@@ -66,12 +66,12 @@ let loadHalfWord (mem : Map<uint32, byte>) (addr : uint32) : int16 option =
         None
 
 // Load from Memory 4 bytes
-let loadWord (mem : Map<uint32, byte>) (addr : uint32) : int32 option =
+let loadWord (mem : Map<int64, byte>) (addr : int64) : int64 option =
     if Map.containsKey addr mem &&
-       Map.containsKey (addr+1u) mem &&
-       Map.containsKey (addr+2u) mem &&
-       Map.containsKey (addr+3u) mem then
-        let word = [| mem.[addr]; mem.[addr+1u]; mem.[addr+2u]; mem.[addr+3u] |]
+       Map.containsKey (addr+1L) mem &&
+       Map.containsKey (addr+2L) mem &&
+       Map.containsKey (addr+3L) mem then
+        let word = [| mem.[addr]; mem.[addr+1L]; mem.[addr+2L]; mem.[addr+3L] |]
         Some(int32(combineBytes word))
     else
         None

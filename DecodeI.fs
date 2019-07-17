@@ -59,100 +59,100 @@ type InstructionI =
 
 //================================================================ -- \begin_latex{Major_Opcodes}
 // Major Opcodes
-let opcode_LUI       = 0b0110111
-let opcode_AUIPC     = 0b0010111
-let opcode_JAL       = 0b1101111
-let opcode_JALR      = 0b1100111
-let opcode_BRANCH    = 0b1100011
-let opcode_LOAD      = 0b0000011
-let opcode_STORE     = 0b0100011
-let opcode_OP_IMM    = 0b0010011
-let opcode_OP        = 0b0110011
-let opcode_MISC_MEM  = 0b0001111
-let opcode_SYSTEM    = 0b1110011
+let opcode_LUI       = 0b0110111L
+let opcode_AUIPC     = 0b0010111L
+let opcode_JAL       = 0b1101111L
+let opcode_JALR      = 0b1100111L
+let opcode_BRANCH    = 0b1100011L
+let opcode_LOAD      = 0b0000011L
+let opcode_STORE     = 0b0100011L
+let opcode_OP_IMM    = 0b0010011L
+let opcode_OP        = 0b0110011L
+let opcode_MISC_MEM  = 0b0001111L
+let opcode_SYSTEM    = 0b1110011L
 
 //================================================================
 // Sub-opcodes for 'I' instructions
 
 // opcode_JALR sub-opcodes
-let funct3_JALR      = 0b000
+let funct3_JALR      = 0b000L
 
 // opcode_BRANCH sub-opcodes
-let funct3_BEQ       = 0b000
-let funct3_BNE       = 0b001
-let funct3_BLT       = 0b100
-let funct3_BGE       = 0b101
-let funct3_BLTU      = 0b110
-let funct3_BGEU      = 0b111
+let funct3_BEQ       = 0b000L
+let funct3_BNE       = 0b001L
+let funct3_BLT       = 0b100L
+let funct3_BGE       = 0b101L
+let funct3_BLTU      = 0b110L
+let funct3_BGEU      = 0b111L
 
 // opcode_LOAD sub-opcodes
-let funct3_LB        = 0b000
-let funct3_LH        = 0b001
-let funct3_LW        = 0b010
-let funct3_LD        = 0b011
-let funct3_LBU       = 0b100
-let funct3_LHU       = 0b101
+let funct3_LB        = 0b000L
+let funct3_LH        = 0b001L
+let funct3_LW        = 0b010L
+let funct3_LD        = 0b011L
+let funct3_LBU       = 0b100L
+let funct3_LHU       = 0b101L
 
 // opcode_STORE sub-opcodes
-let funct3_SB        = 0b000
-let funct3_SH        = 0b001
-let funct3_SW        = 0b010
+let funct3_SB        = 0b000L
+let funct3_SH        = 0b001L
+let funct3_SW        = 0b010L
 
  // opcode_OP_IMM sub-opcodes
-let funct3_ADDI      = 0b000
-let funct3_SLTI      = 0b010
-let funct3_SLTIU     = 0b011
-let funct3_XORI      = 0b100
-let funct3_ORI       = 0b110
-let funct3_ANDI      = 0b111
+let funct3_ADDI      = 0b000L
+let funct3_SLTI      = 0b010L
+let funct3_SLTIU     = 0b011L
+let funct3_XORI      = 0b100L
+let funct3_ORI       = 0b110L
+let funct3_ANDI      = 0b111L
 
-let funct3_SLLI      = 0b001
-let funct3_SRLI      = 0b101
-let funct3_SRAI      = 0b101
+let funct3_SLLI      = 0b001L
+let funct3_SRLI      = 0b101L
+let funct3_SRAI      = 0b101L
 
 // opcode_OP_IMM.SLLI/SRLI/SRAI - 32 & 64 bit
-let msbs6_SLLI      = 0b000000
-let msbs6_SRLI      = 0b000000
-let msbs6_SRAI      = 0b010000
+let msbs6_SLLI      = 0b000000L
+let msbs6_SRLI      = 0b000000L
+let msbs6_SRAI      = 0b010000L
 
 // opcode_OP sub-opcodes
-let funct3_ADD       = 0b000
-let funct7_ADD       = 0b0000000
+let funct3_ADD       = 0b000L
+let funct7_ADD       = 0b0000000L
 
-let funct3_SUB       = 0b000
-let funct7_SUB       = 0b0100000
+let funct3_SUB       = 0b000L
+let funct7_SUB       = 0b0100000L
 
-let funct3_SLL       = 0b001
-let funct7_SLL       = 0b0000000
+let funct3_SLL       = 0b001L
+let funct7_SLL       = 0b0000000L
 
-let funct3_SLT       = 0b010
-let funct7_SLT       = 0b0000000
+let funct3_SLT       = 0b010L
+let funct7_SLT       = 0b0000000L
 
-let funct3_SLTU      = 0b011
-let funct7_SLTU      = 0b0000000
+let funct3_SLTU      = 0b011L
+let funct7_SLTU      = 0b0000000L
 
-let funct3_XOR       = 0b100
-let funct7_XOR       = 0b0000000
+let funct3_XOR       = 0b100L
+let funct7_XOR       = 0b0000000L
 
-let funct3_SRL       = 0b101
-let funct7_SRL       = 0b0000000
+let funct3_SRL       = 0b101L
+let funct7_SRL       = 0b0000000L
 
-let funct3_SRA       = 0b101
-let funct7_SRA       = 0b0100000
+let funct3_SRA       = 0b101L
+let funct7_SRA       = 0b0100000L
 
-let funct3_OR        = 0b110
-let funct7_OR        = 0b0000000
+let funct3_OR        = 0b110L
+let funct7_OR        = 0b0000000L
 
-let funct3_AND       = 0b111
-let funct7_AND       = 0b0000000
+let funct3_AND       = 0b111L
+let funct7_AND       = 0b0000000L
 
 // opcode_MISC_MEM sub-opcodes
-let funct3_FENCE         = 0b000
+let funct3_FENCE         = 0b000L
 
 // opcode_SYSTEM sub-opcodes
-let funct3_PRIV      = 0b000
-let funct12_ECALL    = 0b000000000000
-let funct12_EBREAK   = 0b000000000001
+let funct3_PRIV      = 0b000L
+let funct12_ECALL    = 0b000000000000L
+let funct12_EBREAK   = 0b000000000001L
 
 /// Decode 'I' instructions
 let DecodeI (instr: InstrField) : InstructionI =
@@ -171,7 +171,7 @@ let DecodeI (instr: InstrField) : InstructionI =
     let shamt_ok = true
 
     let imm12_I = instr.bitSlice 31 20
-    let imm20_U = instr.bitSlice 31 12
+    let imm20_U = ((instr.bitSlice 31 12) <<< 12).signExtend 32
 
     let imm11_S =
                 ((instr.bitSlice 31 25) <<< 5) |||
@@ -244,9 +244,9 @@ let DecodeI (instr: InstrField) : InstructionI =
     | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_OR    -> OR   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
     | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_AND   -> AND  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
 
-    | (op) when op = opcode_MISC_MEM && rd = 0 && rs1 = 0 && funct3 = funct3_FENCE -> FENCE {| fm = fm; pred = pred; succ = succ  |}
+    | (op) when op = opcode_MISC_MEM && rd = 0L && rs1 = 0L && funct3 = funct3_FENCE -> FENCE {| fm = fm; pred = pred; succ = succ  |}
 
-    | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_ECALL  -> ECALL
-    | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> EBREAK
+    | (op) when op = opcode_SYSTEM && rd = 0L && rs1 = 0L && funct3 = funct3_PRIV && imm12_I = funct12_ECALL  -> ECALL
+    | (op) when op = opcode_SYSTEM && rd = 0L && rs1 = 0L && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> EBREAK
 
     | _ -> None

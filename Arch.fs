@@ -1,7 +1,7 @@
 module ISA.RISCV.Arch
 
-type MachineInt   = int32
-type Register     = int32
+type MachineInt   = int64
+type Register     = int64
 type Opcode       = MachineInt
 type InstrField   = MachineInt
 
@@ -12,3 +12,4 @@ type Architecture =
 type TrapErrors =
     | InstructionFetch
     | InstructionDecode
+    | JumpAddress

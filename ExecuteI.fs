@@ -8,24 +8,34 @@ open ISA.RISCV.Utils.Bits
 //=================================================
 // LUI
 let execLUI (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
-    let imm = (imm20 <<< 12).signExtend 32
-    let mstate = mstate.setRegister rd imm
+    let mstate = mstate.setRegister rd imm20
     mstate.incPC
 
 //=================================================
 // AUIPC
 let execAUIPC (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
-    mstate
+    let mstate = mstate.setRegister rd (imm20 + int32(mstate.PC))
+    mstate.incPC
 
 //=================================================
 // JALR
 let execJALR (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    let newPC = ((mstate.getRegister rs1) + imm12) &&& (~~~1)
+    if newPC % 4 <> 0 then
+        mstate.setRunState (Trap JumpAddress)
+    else
+        let mstate = mstate.setRegister rd (int32(mstate.PC + 4u))
+        mstate.setPC (uint32(newPC))
 
 //=================================================
 // JAL
 let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
-    mstate
+    let newPC = mstate.PC + uint32(imm20)
+    if newPC % 4u <> 0u then
+        mstate.setRunState (Trap JumpAddress)
+    else
+        let mstate = mstate.setRegister rd (int32(mstate.PC + 4u))
+        mstate.setPC newPC
 
 //=================================================
 // BEQ
