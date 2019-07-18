@@ -72,7 +72,7 @@ let loadWord (mem : Map<int64, byte>) (addr : int64) : int64 option =
        Map.containsKey (addr+2L) mem &&
        Map.containsKey (addr+3L) mem then
         let word = [| mem.[addr]; mem.[addr+1L]; mem.[addr+2L]; mem.[addr+3L] |]
-        Some(int32(combineBytes word))
+        Some(int64(combineBytes word))
     else
         None
 

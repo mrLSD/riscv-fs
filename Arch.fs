@@ -1,7 +1,8 @@
 module ISA.RISCV.Arch
 
 type MachineInt   = int64
-type Register     = int64
+type Register     = int32
+type RegisterVal  = MachineInt
 type Opcode       = MachineInt
 type InstrField   = MachineInt
 

@@ -13,7 +13,7 @@ open ISA.RISCV.Decode
 // Help function for fetch Elf data
 let getSectionContent (section : ProgBitsSection<int64>) =
     let fetchIndexAddr (data : byte array) (index : int64) =
-        Array.zip [| index .. index + int64(data.Length) - 1u |] data
+        Array.zip [| index .. index + int64(data.Length) - 1L |] data
 
     if section.Flags.HasFlag SectionFlags.Executable then
         fetchIndexAddr (section.GetContents()) section.LoadAddress

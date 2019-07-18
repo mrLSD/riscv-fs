@@ -157,10 +157,10 @@ let funct12_EBREAK   = 0b000000000001L
 /// Decode 'I' instructions
 let DecodeI (instr: InstrField) : InstructionI =
     let opcode = instr.bitSlice 6   0
-    let rd     = instr.bitSlice 11  7
+    let rd     = int32(instr.bitSlice 11  7)
     let funct3 = instr.bitSlice 14 12
-    let rs1    = instr.bitSlice 19 15
-    let rs2    = instr.bitSlice 24 20
+    let rs1    = int32(instr.bitSlice 19 15)
+    let rs2    = int32(instr.bitSlice 24 20)
     let funct7 = instr.bitSlice 31 25
 
     // Shamt funcs
@@ -244,9 +244,9 @@ let DecodeI (instr: InstrField) : InstructionI =
     | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_OR    -> OR   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
     | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_AND   -> AND  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
 
-    | (op) when op = opcode_MISC_MEM && rd = 0L && rs1 = 0L && funct3 = funct3_FENCE -> FENCE {| fm = fm; pred = pred; succ = succ  |}
+    | (op) when op = opcode_MISC_MEM && rd = 0 && rs1 = 0 && funct3 = funct3_FENCE -> FENCE {| fm = fm; pred = pred; succ = succ  |}
 
-    | (op) when op = opcode_SYSTEM && rd = 0L && rs1 = 0L && funct3 = funct3_PRIV && imm12_I = funct12_ECALL  -> ECALL
-    | (op) when op = opcode_SYSTEM && rd = 0L && rs1 = 0L && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> EBREAK
+    | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_ECALL  -> ECALL
+    | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> EBREAK
 
     | _ -> None

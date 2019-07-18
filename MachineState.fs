@@ -12,15 +12,15 @@ type RunMachineState =
 
 type MachineState = {
         PC:         MachineInt
-        Registers:  Register array
+        Registers:  RegisterVal array
         Memory:     Map<int64, byte>
         Verbosity:  bool
         RunState:   RunMachineState
     } with
-    member x.getRegister(reg: int32) : Register =
+    member x.getRegister(reg: Register) : MachineInt =
         x.Registers.[reg]
 
-    member x.setRegister (reg: int32) (value: MachineInt) : MachineState =
+    member x.setRegister (reg: Register) (value: MachineInt) : MachineState =
         let registers = x.Registers
         Array.set registers reg value
         { x with Registers = registers }
@@ -31,13 +31,13 @@ type MachineState = {
     member x.incPC : MachineState =
         { x with PC = x.PC + 4L }
 
-    member x.getMemory(addr : uint32) : byte =
+    member x.getMemory(addr : int64) : byte =
         if Map.containsKey addr x.Memory then
             x.Memory.[addr]
         else
             0uy
 
-    member x.setMemory (addr : uint32) (value : byte) : MachineState =
+    member x.setMemory (addr : int64) (value : byte) : MachineState =
         let mem = x.Memory
 //        mem.[addr] = value
 //        Map.remove addr mem

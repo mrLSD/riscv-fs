@@ -14,27 +14,27 @@ let execLUI (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
 //=================================================
 // AUIPC
 let execAUIPC (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
-    let mstate = mstate.setRegister rd (imm20 + int32(mstate.PC))
+    let mstate = mstate.setRegister rd (imm20 + mstate.PC)
     mstate.incPC
 
 //=================================================
 // JALR
 let execJALR (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let newPC = ((mstate.getRegister rs1) + imm12) &&& (~~~1)
-    if newPC % 4 <> 0 then
+    let newPC = (int64(mstate.getRegister rs1) + imm12) &&& (~~~1L)
+    if newPC % 4L <> 0L then
         mstate.setRunState (Trap JumpAddress)
     else
-        let mstate = mstate.setRegister rd (int32(mstate.PC + 4u))
-        mstate.setPC (uint32(newPC))
+        let mstate = mstate.setRegister rd (mstate.PC + 4L)
+        mstate.setPC (int64(newPC))
 
 //=================================================
 // JAL
 let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
-    let newPC = mstate.PC + uint32(imm20)
-    if newPC % 4u <> 0u then
+    let newPC = mstate.PC + int64(imm20)
+    if newPC % 4L <> 0L then
         mstate.setRunState (Trap JumpAddress)
     else
-        let mstate = mstate.setRegister rd (int32(mstate.PC + 4u))
+        let mstate = mstate.setRegister rd (mstate.PC + 4L)
         mstate.setPC newPC
 
 //=================================================
@@ -154,52 +154,52 @@ let execANDI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mac
 
 //=================================================
 // ADD
-let execADD (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+let execADD (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate
 
 //=================================================
 // SUB
-let execSUB (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+let execSUB (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate
 
 //=================================================
 // SLL
-let execSLL (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+let execSLL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate
 
 //=================================================
 // SLT
-let execSLT (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+let execSLT (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate
 
 //=================================================
 // SLTU
-let execSLTU (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+let execSLTU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate
 
 //=================================================
 // XOR
-let execXOR (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+let execXOR (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate
 
 //=================================================
 // SRL
-let execSRL (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+let execSRL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate
 
 //=================================================
 // SRA
-let execSRA (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+let execSRA (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate
 
 //=================================================
 // OR
-let execOR (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+let execOR (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate
 
 //=================================================
 // AND
-let execAND (rd : Register) (rs1 : Register) (rs2 : MachineInt) (mstate : MachineState) =
+let execAND (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate
 
 // Execute I-instructions
