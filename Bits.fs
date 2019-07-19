@@ -3,11 +3,11 @@ module ISA.RISCV.Utils.Bits
 type System.Int64 with
     member x.bitSlice endBit startBit = // get Bit slice from range
         (x >>> startBit) &&& ~~~(-1L <<< (endBit - startBit + 1))
-    member x.signExtend n = // Sign extend bits for x32
-        let bitOffset = 32 - n
+    member x.signExtend n = // Sign extend bits for x64
+        let bitOffset = 64 - n
         (x <<< bitOffset) >>> bitOffset
-    member x.align32bitMask = // get x32 mask with all `1` bits
-        -1
+    member x.align = // get x64 mask with all `1` bits
+        x &&& (-1L)
     member x.flip i = // change bit
         (x ^^^ (1L <<< i))
     member x.isSet i = // test if bit set at a specified position
@@ -44,6 +44,10 @@ type System.Int64 with
     (* misc methods *)
     member x.abs = // fast math.abs
         (x ^^^ (x >>> 31)) - (x >>> 31)
+
+type System.Int32 with
+    member x.align = // get x32 mask with all `1` bits
+        x &&& (-1)
 
 let combineBytes (x : byte array) : int64 =
     let xz = Array.zip [|0..x.Length-1|] x

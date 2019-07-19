@@ -20,12 +20,12 @@ let execAUIPC (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
 //=================================================
 // JALR
 let execJALR (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let newPC = (int64(mstate.getRegister rs1) + imm12) &&& (~~~1L)
+    let newPC = ((mstate.getRegister rs1) + imm12) &&& (~~~1L)
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap JumpAddress)
     else
         let mstate = mstate.setRegister rd (mstate.PC + 4L)
-        mstate.setPC (int64(newPC))
+        mstate.setPC newPC
 
 //=================================================
 // JAL
@@ -40,6 +40,7 @@ let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
 //=================================================
 // BEQ
 let execBEQ (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    let x = rs1.ali
     mstate
 
 //=================================================

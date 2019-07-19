@@ -170,12 +170,14 @@ let DecodeI (instr: InstrField) : InstructionI =
     // TODO: x32/64 check for Shamt
     let shamt_ok = true
 
-    let imm12_I = instr.bitSlice 31 20
+    let imm12_I = (instr.bitSlice 31 20).signExtend 12
     let imm20_U = ((instr.bitSlice 31 12) <<< 12).signExtend 32
 
     let imm11_S =
+            (
                 ((instr.bitSlice 31 25) <<< 5) |||
                 ( instr.bitSlice 11  7)
+            ).signExtend 12
 
     let imm12_B =
             (
@@ -183,7 +185,7 @@ let DecodeI (instr: InstrField) : InstructionI =
                ((instr.bitSlice 30  25) <<< 5 ) |||
                ((instr.bitSlice 11   8) <<< 1 ) |||
                ((instr.bitSlice  7   7) <<< 11)
-            ).signExtend 21
+            ).signExtend 13
 
     let imm20_J =
             (
