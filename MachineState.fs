@@ -1,6 +1,5 @@
 module ISA.RISCV.MachineState
 
-open System
 open Microsoft.FSharp.Collections
 open ISA.RISCV.Arch
 
@@ -15,6 +14,7 @@ type MachineState = {
         Registers:  RegisterVal array
         Memory:     Map<int64, byte>
         Verbosity:  bool
+        Arch:       Architecture
         RunState:   RunMachineState
     } with
     member x.getRegister(reg: Register) : MachineInt =
@@ -22,36 +22,42 @@ type MachineState = {
 
     member x.setRegister (reg: Register) (value: MachineInt) : MachineState =
         let registers = x.Registers
-        Array.set registers reg value
+        Array.set registers reg (x.alignByArch value)
         { x with Registers = registers }
 
     member x.setPC (pc : MachineInt) : MachineState =
-        { x with PC = pc }
+        { x with PC = x.alignByArch pc }
 
     member x.incPC : MachineState =
-        { x with PC = x.PC + 4L }
+        { x with PC = x.alignByArch (x.PC + 4L) }
 
-    member x.getMemory(addr : int64) : byte =
+    member x.getMemory(addr : int64) =
+        let addr = x.alignByArch addr
         if Map.containsKey addr x.Memory then
-            x.Memory.[addr]
+            Some(x.Memory.[addr])
         else
-            0uy
+            None
 
     member x.setMemory (addr : int64) (value : byte) : MachineState =
-        let mem = x.Memory
-//        mem.[addr] = value
-//        Map.remove addr mem
-//        Array.set mem addr value
+        let addr = x.alignByArch addr
+        let mem = Map.add addr value x.Memory
         { x with Memory = mem }
 
     member x.setRunState state =
         { x with RunState = state }
+    member x.alignByArch (value : int64) =
+        // if x32 Arch - align it to x32
+        // and then convert again to int64
+        match x.Arch.archBits with
+        | Architecture.RV32 -> int64( int32(value) )
+        | _ -> value
 
-let InitMachineState mem verbosity : MachineState =
+let InitMachineState mem arch verbosity : MachineState =
     {
         PC           = 0x80000000L
         Registers    = Array.zeroCreate 32
         Memory       = mem
+        Arch         = arch
         Verbosity    = verbosity
         RunState     = RunMachineState.NotRun
     }

@@ -9,7 +9,7 @@ let about = sprintf "RISC-V Simulator for Formal RISC-V ISA implementation\n%s %
 
 type AppConfig = {
         Verbosity: bool option
-        Arch:      string option
+        Arch:      Arch.Architecture option
         Files:     string[] option
     } with
     static member Default =
@@ -66,12 +66,14 @@ type CliOptions = {
                       ""
         printfn "%s" (String.Format("{0,-5}{1,-20} {2}", "", msg, x.HelpMessage))
 
+// Helper for print Usage info
 let CliUsage (cliArgs : CliOptions []) =
     printfn "%s" about
     printfn "%s" (String.Format("USAGE:\n{0,-5}risc-v [OPTIONS] file...\nOPTIONS", ""))
     for arg in cliArgs do
         arg.printHelpMessage
 
+// Fetch arguments to App config data
 let rec fetchArgs (argv : string[]) (opts : CliOptions) (cfg : AppConfig) =
     if argv.Length < 1 then
         (NotFound(cfg), argv)
@@ -183,7 +185,7 @@ let rec InitCLI =
             Handler =
                 fun arg cfg ->
                     { cfg with
-                        AppConfig.Arch = Some(arg)
+                        AppConfig.Arch = Arch.Architecture.fromString arg
                     }
         };
         { CliOptions.Default with

@@ -13,5 +13,5 @@ let main argv =
             printfn "Wrong parameters put --help to get more information"
         else
             let res = Run.Run x
-            printfn "Result: %A" res
+            printfn "Result state: %A" res.RunState
     0 // return an integer exit code

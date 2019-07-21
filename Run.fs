@@ -49,5 +49,5 @@ let rec runCycle (mstate : MachineState) =
 
 let Run (cfg : AppConfig) =
     let data = readElfFile cfg.Files.Value.[0]
-    let mstate = InitMachineState data cfg.Verbosity.Value
+    let mstate = InitMachineState data cfg.Arch.Value cfg.Verbosity.Value
     runCycle mstate

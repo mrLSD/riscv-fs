@@ -40,8 +40,13 @@ let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
 //=================================================
 // BEQ
 let execBEQ (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let x = rs1.ali
-    mstate
+    let x = rs1.align
+    let y = rs2.align
+    let newPC = mstate.PC + imm12
+    if (x = y) then
+        mstate.setPC newPC
+    else
+        mstate.incPC
 
 //=================================================
 // BNE
