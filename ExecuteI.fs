@@ -37,41 +37,45 @@ let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
         let mstate = mstate.setRegister rd (mstate.PC + 4L)
         mstate.setPC newPC
 
+let branch (branchCheck : bool) (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    let newPC = mstate.PC + imm12
+    if newPC % 4L <> 0L then
+        mstate.setRunState (Trap BreakAddress)
+    else
+        if branchCheck then
+            mstate.setPC newPC
+        else
+            mstate.incPC
+
 //=================================================
 // BEQ
 let execBEQ (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let x = rs1.align
-    let y = rs2.align
-    let newPC = mstate.PC + imm12
-    if (x = y) then
-        mstate.setPC newPC
-    else
-        mstate.incPC
+    branch (rs1 = rs2) rs1 rs2 imm12 mstate
 
 //=================================================
 // BNE
 let execBNE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    branch (rs1 <> rs2) rs1 rs2 imm12 mstate
 
 //=================================================
 // BLT
 let execBLT (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+        branch (rs1 < rs2) rs1 rs2 imm12 mstate
 
 //=================================================
 // BGE
 let execBGE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+        branch (rs1 >= rs2) rs1 rs2 imm12 mstate
 
 //=================================================
 // BLTU
 let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    branch (uint64(rs1) < uint64(rs2)) rs1 rs2 imm12 mstate
 
 //=================================================
 // BGEU
 let execBGEU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    branch (uint64(rs1) >= uint64(rs2)) rs1 rs2 imm12 mstate
 
 //=================================================
 // LB

@@ -27,3 +27,4 @@ type TrapErrors =
     | InstructionFetch
     | InstructionDecode
     | JumpAddress
+    | BreakAddress
