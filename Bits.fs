@@ -54,17 +54,17 @@ let combineBytes (x : byte array) : int64 =
     Array.fold (fun acc (x : (int*byte)) -> acc ||| (int64(snd x) <<< (fst x)*8 )) 0L xz
 
 // Load from Memory 1 byte
-let loadByte (mem : Map<uint32, byte>) (addr : uint32) : byte option =
+let loadByte (mem : Map<int64, byte>) (addr : int64) : byte option =
     if Map.containsKey addr mem then
         Some(mem.[addr])
     else
         None
 
 // Load from Memory 2 bytes
-let loadHalfWord (mem : Map<uint32, byte>) (addr : uint32) : int16 option =
+let loadHalfWord (mem : Map<int64, byte>) (addr : int64) : int16 option =
     if Map.containsKey addr mem &&
-       Map.containsKey (addr+1u) mem then
-        let halfWord = [| mem.[addr]; mem.[addr+1u] |]
+       Map.containsKey (addr+1L) mem then
+        let halfWord = [| mem.[addr]; mem.[addr+1L] |]
         Some(int16(combineBytes halfWord))
     else
         None

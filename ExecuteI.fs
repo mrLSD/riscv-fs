@@ -80,27 +80,54 @@ let execBGEU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : Ma
 //=================================================
 // LB
 let execLB (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    let addr = (mstate.getRegister rs1)  + imm12
+    let memResult = loadByte mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else
+        mstate.setRegister rd (int64(memResult.Value))
 
 //=================================================
 // LH
 let execLH (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    let addr = (mstate.getRegister rs1)  + imm12
+    let memResult = loadHalfWord mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else
+        mstate.setRegister rd (int64(memResult.Value))
 
 //=================================================
 // LW
 let execLW (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    let addr = (mstate.getRegister rs1)  + imm12
+    let memResult = loadWord mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else
+        mstate.setRegister rd (int64(memResult.Value))
 
 //=================================================
 // LBU
 let execLBU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    let addr = (mstate.getRegister rs1)  + imm12
+    let memResult = loadByte mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else
+        let memVal = uint8(memResult.Value)
+        mstate.setRegister rd (int64(memVal))
 
 //=================================================
 // LHU
 let execLHU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    let addr = (mstate.getRegister rs1)  + imm12
+    let memResult = loadHalfWord mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else
+        let memVal = uint16(memResult.Value)
+        mstate.setRegister rd (int64(memVal))
 
 //=================================================
 // SB
