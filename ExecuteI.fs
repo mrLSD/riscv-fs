@@ -6,19 +6,19 @@ open ISA.RISCV.MachineState
 open ISA.RISCV.Utils.Bits
 
 //=================================================
-// LUI
+// LUI - Load Upper immediate
 let execLUI (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
     let mstate = mstate.setRegister rd imm20
     mstate.incPC
 
 //=================================================
-// AUIPC
+// AUIPC - Add Upper immediate PC
 let execAUIPC (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
     let mstate = mstate.setRegister rd (imm20 + mstate.PC)
     mstate.incPC
 
 //=================================================
-// JALR
+// JALR - Jump Relative immediately
 let execJALR (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     let newPC = ((mstate.getRegister rs1) + imm12) &&& (~~~1L)
     if newPC % 4L <> 0L then
@@ -28,7 +28,7 @@ let execJALR (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mac
         mstate.setPC newPC
 
 //=================================================
-// JAL
+// JAL - Jump immediately
 let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
     let newPC = mstate.PC + int64(imm20)
     if newPC % 4L <> 0L then
@@ -37,6 +37,7 @@ let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
         let mstate = mstate.setRegister rd (mstate.PC + 4L)
         mstate.setPC newPC
 
+// Basic branch flow
 let branch (branchCheck : bool) (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     let newPC = mstate.PC + imm12
     if newPC % 4L <> 0L then
@@ -48,37 +49,37 @@ let branch (branchCheck : bool) (rs1 : Register) (rs2 : Register) (imm12 : Machi
             mstate.incPC
 
 //=================================================
-// BEQ
+// BEQ - Branch if Equal
 let execBEQ (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     branch (rs1 = rs2) rs1 rs2 imm12 mstate
 
 //=================================================
-// BNE
+// BNE - Branch if Not Equal
 let execBNE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     branch (rs1 <> rs2) rs1 rs2 imm12 mstate
 
 //=================================================
-// BLT
+// BLT - Branch if Less Then
 let execBLT (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
         branch (rs1 < rs2) rs1 rs2 imm12 mstate
 
 //=================================================
-// BGE
+// BGE - Branch if Greater or Equal
 let execBGE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
         branch (rs1 >= rs2) rs1 rs2 imm12 mstate
 
 //=================================================
-// BLTU
+// BLTU - Branch if Less Then (Unsigned)
 let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     branch (uint64(rs1) < uint64(rs2)) rs1 rs2 imm12 mstate
 
 //=================================================
-// BGEU
+// BGEU - Branch If Greater or Equal (Unsigned)
 let execBGEU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     branch (uint64(rs1) >= uint64(rs2)) rs1 rs2 imm12 mstate
 
 //=================================================
-// LB
+// LB - Load Byte from Memory
 let execLB (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1)  + imm12
     let memResult = loadByte mstate.Memory addr
@@ -88,7 +89,7 @@ let execLB (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Machi
         mstate.setRegister rd (int64(memResult.Value))
 
 //=================================================
-// LH
+// LH - Load Half-word (2 bytes)  from Memory
 let execLH (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1)  + imm12
     let memResult = loadHalfWord mstate.Memory addr
@@ -98,7 +99,7 @@ let execLH (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Machi
         mstate.setRegister rd (int64(memResult.Value))
 
 //=================================================
-// LW
+// LW - Load Word (4 bytes) from Memory
 let execLW (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1)  + imm12
     let memResult = loadWord mstate.Memory addr
@@ -108,7 +109,7 @@ let execLW (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Machi
         mstate.setRegister rd (int64(memResult.Value))
 
 //=================================================
-// LBU
+// LBU - Load Byte Unsigned from Memory
 let execLBU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1)  + imm12
     let memResult = loadByte mstate.Memory addr
@@ -119,7 +120,7 @@ let execLBU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mach
         mstate.setRegister rd (int64(memVal))
 
 //=================================================
-// LHU
+// LHU - Load Half-word (2 bytes) Unsigned from Memory
 let execLHU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1)  + imm12
     let memResult = loadHalfWord mstate.Memory addr
@@ -130,9 +131,10 @@ let execLHU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mach
         mstate.setRegister rd (int64(memVal))
 
 //=================================================
-// SB
+// SB - Store Byte to Memory
 let execSB (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    let addr = (mstate.getRegister rs1)  + imm12
+    mstate.setMemoryByte addr (byte rs2)
 
 //=================================================
 // SH

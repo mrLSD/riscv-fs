@@ -38,9 +38,9 @@ type MachineState = {
         else
             None
 
-    member x.setMemory (addr : int64) (value : byte) : MachineState =
+    member x.setMemoryByte (addr : int64) (value : byte) : MachineState =
         let addr = x.alignByArch addr
-        let mem = Map.add addr value x.Memory
+        let mem = Map.add addr (byte value) x.Memory
         { x with Memory = mem }
 
     member x.setRunState state =

@@ -94,3 +94,8 @@ let loadDouble (mem : Map<uint32, byte>) (addr : uint32) : int64 option =
         Some(int64(combineBytes dWord))
     else
         None
+
+let SplitBytes (data : byte[]) =
+    let nBytes = data.Length
+    let arr = Array.zip [| 0..nBytes-1 |] data
+    Array.fold (fun acc (i : int32, n : byte) -> acc ||| ((int64 n) <<< i*8) ) 0L arr
