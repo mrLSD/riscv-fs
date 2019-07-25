@@ -71,12 +71,12 @@ let execBGE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : Mac
 //=================================================
 // BLTU - Branch if Less Then (Unsigned)
 let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    branch (uint64(rs1) < uint64(rs2)) rs1 rs2 imm12 mstate
+    branch (uint64 rs1 < uint64 rs2) rs1 rs2 imm12 mstate
 
 //=================================================
 // BGEU - Branch If Greater or Equal (Unsigned)
 let execBGEU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    branch (uint64(rs1) >= uint64(rs2)) rs1 rs2 imm12 mstate
+    branch (uint64 rs1 >= uint64 rs2) rs1 rs2 imm12 mstate
 
 //=================================================
 // LB - Load Byte from Memory
@@ -86,7 +86,8 @@ let execLB (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Machi
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
-        mstate.setRegister rd (int64(memResult.Value))
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
 //=================================================
 // LH - Load Half-word (2 bytes)  from Memory
@@ -96,7 +97,8 @@ let execLH (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Machi
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
-        mstate.setRegister rd (int64(memResult.Value))
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
 //=================================================
 // LW - Load Word (4 bytes) from Memory
@@ -106,7 +108,8 @@ let execLW (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Machi
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
-        mstate.setRegister rd (int64(memResult.Value))
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
 //=================================================
 // LBU - Load Byte Unsigned from Memory
@@ -116,8 +119,9 @@ let execLBU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mach
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
-        let memVal = uint8(memResult.Value)
-        mstate.setRegister rd (int64(memVal))
+        let memVal = uint8 memResult.Value
+        let mstate = mstate.setRegister rd (int64 memVal)
+        mstate.incPC
 
 //=================================================
 // LHU - Load Half-word (2 bytes) Unsigned from Memory
@@ -127,24 +131,36 @@ let execLHU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mach
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
-        let memVal = uint16(memResult.Value)
-        mstate.setRegister rd (int64(memVal))
+        let memVal = uint16 memResult.Value
+        let mstate = mstate.setRegister rd (int64 memVal)
+        mstate.incPC
 
 //=================================================
 // SB - Store Byte to Memory
 let execSB (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1)  + imm12
-    mstate.setMemoryByte addr (byte rs2)
+    let nBytes = 1
+    let rs2Val = mstate.getRegister rs2
+    Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
+        [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (rs2Val.bitSlice (i*8+7) (i*8) )) |]
 
 //=================================================
 // SH
 let execSH (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    let addr = (mstate.getRegister rs1)  + imm12
+    let nBytes = 2
+    let rs2Val = mstate.getRegister rs2
+    Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
+        [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (rs2Val.bitSlice (i*8+7) (i*8) )) |]
 
 //=================================================
 // SW
 let execSW (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    mstate
+    let addr = (mstate.getRegister rs1)  + imm12
+    let nBytes = 4
+    let rs2Val = mstate.getRegister rs2
+    Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
+        [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (rs2Val.bitSlice (i*8+7) (i*8) )) |]
 
 //=================================================
 // ADDI

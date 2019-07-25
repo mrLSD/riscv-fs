@@ -51,7 +51,7 @@ type System.Int32 with
 
 let combineBytes (x : byte array) : int64 =
     let xz = Array.zip [|0..x.Length-1|] x
-    Array.fold (fun acc (x : (int*byte)) -> acc ||| (int64(snd x) <<< (fst x)*8 )) 0L xz
+    Array.fold (fun acc (i, n) -> acc ||| (int64(n) <<< i*8 )) 0L xz
 
 // Load from Memory 1 byte
 let loadByte (mem : Map<int64, byte>) (addr : int64) : byte option =
@@ -94,8 +94,3 @@ let loadDouble (mem : Map<uint32, byte>) (addr : uint32) : int64 option =
         Some(int64(combineBytes dWord))
     else
         None
-
-let SplitBytes (data : byte[]) =
-    let nBytes = data.Length
-    let arr = Array.zip [| 0..nBytes-1 |] data
-    Array.fold (fun acc (i : int32, n : byte) -> acc ||| ((int64 n) <<< i*8) ) 0L arr

@@ -1,8 +1,6 @@
 ﻿module main
 
-open System
 open ISA.RISCV
-open ISA.RISCV.Utils.Bits
 
 [<EntryPoint>]
 let main argv =
