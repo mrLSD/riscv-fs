@@ -49,7 +49,7 @@ type MachineState = {
         // if x32 Arch - align it to x32
         // and then convert again to int64
         match x.Arch.archBits with
-        | Architecture.RV32 -> int64( int32(value) )
+        | Architecture.RV32 -> int64( uint32(value) )
         | _ -> value
 
 let InitMachineState mem arch verbosity : MachineState =

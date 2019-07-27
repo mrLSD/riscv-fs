@@ -24,7 +24,7 @@ type Architecture =
         | Architecture.RV64 | Architecture.RV64i -> RV64
 
 type TrapErrors =
-    | InstructionFetch
+    | InstructionFetch of MachineInt
     | InstructionDecode
     | JumpAddress
     | BreakAddress

@@ -11,12 +11,12 @@ open ISA.RISCV.CLI
 open ISA.RISCV.Decode
 
 // Help function for fetch Elf data
-let getSectionContent (section : ProgBitsSection<int64>) =
+let getSectionContent (section : ProgBitsSection<uint32>) =
     let fetchIndexAddr (data : byte array) (index : int64) =
         Array.zip [| index .. index + int64(data.Length) - 1L |] data
 
     if section.Flags.HasFlag SectionFlags.Executable then
-        fetchIndexAddr (section.GetContents()) section.LoadAddress
+        fetchIndexAddr (section.GetContents()) (int64 section.LoadAddress)
     else
         [||]
 
@@ -35,7 +35,7 @@ let rec runCycle (mstate : MachineState) =
     let instr = fetchInstruction mstate
     let mstate =
         match instr with
-        | None -> mstate.setRunState (Trap TrapErrors.InstructionFetch)
+        | None -> mstate.setRunState (Trap (InstructionFetch mstate.PC))
         | _ ->
             let decodedInstr = I.DecodeI instr.Value
             printfn "0x%x\t | %A" mstate.PC decodedInstr
