@@ -11,35 +11,25 @@ open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
 open ISA.RISCV.CLI
 open ISA.RISCV.Decode
-open ISA.RISCV.Decode
-open ISA.RISCV.Decode
-open ISA.RISCV.Decode
-open ISA.RISCV.Decode
-open ISA.RISCV.Decode
-open ISA.RISCV.Decode
-open ISA.RISCV.Decode
-open ISA.RISCV.Decode
-open ISA.RISCV.Decode
-open ISA.RISCV.Decode
-open ISA.RISCV.Decode
 
 let verbosityMessage (instr : InstrField) (decodedInstr : I.InstructionI) (mstate : MachineState) =
-    let opcode = instr.bitSlice 6 0
-    let opcodeType = match (opcode) with
-                     | (op) when op = I.opcode_LUI -> "opcode_LUI"
-                     | (op) when op = I.opcode_AUIPC -> "opcode_AUIPC"
-                     | (op) when op = I.opcode_JALR -> "opcode_JALR"
-                     | (op) when op = I.opcode_JAL -> "opcode_JAL"
-                     | (op) when op = I.opcode_BRANCH -> "opcode_BRANCH"
-                     | (op) when op = I.opcode_LOAD -> "opcode_LOAD"
-                     | (op) when op = I.opcode_STORE -> "opcode_STORE"
-                     | (op) when op = I.opcode_OP_IMM -> "opcode_OP_IMM"
-                     | (op) when op = I.opcode_OP -> "opcode_OP"
-                     | (op) when op = I.opcode_MISC_MEM -> "opcode_MISC_MEM"
-                     | (op) when op = I.opcode_SYSTEM -> "opcode_SYSTEM"
-                     | _ -> "Undef"
-    printfn "%s" (String.Format("{0,-5}{1,-20}{2}", mstate.PC, instr, opcodeType))
-    
+    let typeName = decodedInstr.GetType().Name
+    let instrMsg =
+        match (decodedInstr) with
+        | I.LUI x | I.AUIPC x -> sprintf "x%d, 0x%08x" x.rd x.imm20
+        | I.JAL x -> sprintf "x%d, 0x%08x\n" x.rd x.imm20
+        | I.JALR x -> sprintf "x%d, x%d, 0x%08x\n" x.rd x.rs1 x.imm12
+        | I.LB x | I.LH x | I.LW x | I.LBU x | I.LHU x | I.LB x | I.ADDI x | I.SLTI x | I.XORI x | I.ORI x | I.ANDI x -> sprintf "x%d, x%d, %d" x.rd x.rs1 x.imm12
+        | I.BEQ x | I.BNE x | I.BLT x | I.BGE x | I.BLTU x | I.BGEU x | I.SB x | I.SH x | I.SW x -> sprintf "x%d, x%d, 0x%08x" x.rs1 x.rs2 x.imm12
+        | I.SLLI x | I.SRLI x | I.SRAI x -> sprintf "x%d, x%d, %d" x.rd x.rs1 x.shamt
+        | I.ADD x | I.SUB x | I.SLL x | I.SLT x | I.SLTU x | I.XOR x | I.SRL x | I.SRA x | I.OR x | I.AND x -> sprintf "x%d, x%d, x%d" x.rd x.rs1 x.rs2
+        | I.FENCE _ | I.EBREAK | I.ECALL -> ""
+        | _ -> "Undef"
+    let pc = sprintf "%08x:" mstate.PC
+    let instr = sprintf "%08x" instr
+    let instrMsg = String.Format("{0,-7}{1}", typeName, instrMsg)
+    printfn "%s" (String.Format("{0,-12}{1,-12}{2}", pc, instr, instrMsg))
+
 // Help function for fetch Elf data
 let getSectionContent (section : ProgBitsSection<uint32>) =
     let fetchIndexAddr (data : byte array) (index : int64) =
@@ -68,10 +58,13 @@ let rec runCycle (mstate : MachineState) =
         | None -> mstate.setRunState (Trap (InstructionFetch mstate.PC))
         | _ ->
             let decodedInstr = I.DecodeI instr.Value
-            printfn "0x%x\t | %A" mstate.PC decodedInstr
+
             match decodedInstr with
             | I.InstructionI.None -> mstate.setRunState (Trap TrapErrors.InstructionDecode)
             | _ ->
+                if mstate.Verbosity then
+                    verbosityMessage instr.Value decodedInstr mstate
+
                 ExecuteI.ExecuteI decodedInstr mstate
     match mstate.RunState with
     | Trap _ -> mstate
