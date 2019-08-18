@@ -1,5 +1,7 @@
 module ISA.RISCV.Run
 
+open System
+
 open ELFSharp.ELF
 open ELFSharp.ELF.Sections
 
@@ -9,7 +11,35 @@ open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
 open ISA.RISCV.CLI
 open ISA.RISCV.Decode
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
+open ISA.RISCV.Decode
 
+let verbosityMessage (instr : InstrField) (decodedInstr : I.InstructionI) (mstate : MachineState) =
+    let opcode = instr.bitSlice 6 0
+    let opcodeType = match (opcode) with
+                     | (op) when op = I.opcode_LUI -> "opcode_LUI"
+                     | (op) when op = I.opcode_AUIPC -> "opcode_AUIPC"
+                     | (op) when op = I.opcode_JALR -> "opcode_JALR"
+                     | (op) when op = I.opcode_JAL -> "opcode_JAL"
+                     | (op) when op = I.opcode_BRANCH -> "opcode_BRANCH"
+                     | (op) when op = I.opcode_LOAD -> "opcode_LOAD"
+                     | (op) when op = I.opcode_STORE -> "opcode_STORE"
+                     | (op) when op = I.opcode_OP_IMM -> "opcode_OP_IMM"
+                     | (op) when op = I.opcode_OP -> "opcode_OP"
+                     | (op) when op = I.opcode_MISC_MEM -> "opcode_MISC_MEM"
+                     | (op) when op = I.opcode_SYSTEM -> "opcode_SYSTEM"
+                     | _ -> "Undef"
+    printfn "%s" (String.Format("{0,-5}{1,-20}{2}", mstate.PC, instr, opcodeType))
+    
 // Help function for fetch Elf data
 let getSectionContent (section : ProgBitsSection<uint32>) =
     let fetchIndexAddr (data : byte array) (index : int64) =
