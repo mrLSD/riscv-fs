@@ -59,6 +59,7 @@ let fetchInstruction (mstate : MachineState) : InstrField option =
 
 let rec runCycle (mstate : MachineState) =
     let instr = fetchInstruction mstate
+
     let mstate =
         match instr with
         | None -> mstate.setRunState (Trap (InstructionFetch mstate.PC))
