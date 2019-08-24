@@ -4,6 +4,17 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp2.2</TargetFramework>
         <RootNamespace>ISA.RISCV</RootNamespace>
+        <PackageId>ISA.RISC-V</PackageId>
+        <PackageVersion>0.1.0</PackageVersion>
+        <Title>RISC-V CPU</Title>
+        <Authors>mrLSD (Evgeny Ukhanov)</Authors>
+        <Description>RISC-V CPU formal implementation that implement basic RISC-V ISA: rv32i
+
+Additionally it's possible to operate with CLI, reading ELF files and set verbosity output.</Description>
+        <Copyright>Evgeny Ukhanov</Copyright>
+        <PackageProjectUrl>https://github.com/mrLSD/riscv-fs</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/mrLSD/riscv-fs</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>
