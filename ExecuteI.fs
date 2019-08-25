@@ -185,7 +185,10 @@ let execSLTI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mac
 //=================================================
 // SLTIU - Set to 1 if Less Then Unsign Immediate
 let execSLTIU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let rdVal = if uint64(mstate.getRegister rs1) < uint64 imm12 then 1L else 0L
+    let rdVal =
+        match mstate.Arch with
+        | RV32 -> if uint32(mstate.getRegister rs1) < uint32 imm12 then 1L else 0L
+        | _ -> if uint64(mstate.getRegister rs1) < uint64 imm12 then 1L else 0L
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
