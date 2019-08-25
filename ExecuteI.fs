@@ -23,6 +23,8 @@ let execJALR (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mac
     let newPC = ((mstate.getRegister rs1) + imm12) &&& (~~~1L)
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap JumpAddress)
+    else if newPC = mstate.PC then
+        mstate.setRunState Stopped
     else
         let mstate = mstate.setRegister rd (mstate.PC + 4L)
         mstate.setPC newPC
@@ -33,6 +35,8 @@ let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
     let newPC = mstate.PC + int64(imm20)
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap JumpAddress)
+    else if newPC = mstate.PC then
+        mstate.setRunState Stopped
     else
         let mstate = mstate.setRegister rd (mstate.PC + 4L)
         mstate.setPC newPC
@@ -42,6 +46,8 @@ let branch (branchCheck : bool) (rs1 : Register) (rs2 : Register) (imm12 : Machi
     let newPC = mstate.PC + imm12
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap BreakAddress)
+    else if newPC = mstate.PC then
+        mstate.setRunState Stopped
     else
         if branchCheck then
             mstate.setPC newPC

@@ -12,6 +12,7 @@ open ISA.RISCV.Arch
 open ISA.RISCV.CLI
 open ISA.RISCV.Decode
 
+// Print log message for current instruction step
 let verbosityMessage (instr : InstrField) (decodedInstr : I.InstructionI) (mstate : MachineState) =
     let typeName = decodedInstr.GetType().Name
     let instrMsg =
@@ -30,6 +31,14 @@ let verbosityMessage (instr : InstrField) (decodedInstr : I.InstructionI) (mstat
     let instrMsg = String.Format("{0,-7}{1}", typeName, instrMsg)
     printfn "%s" (String.Format("{0,-12}{1,-12}{2}", pc, instr, instrMsg))
 
+// Get registers state
+let verbosityMessageRegisters (mstate : MachineState) =
+    printfn "Not zero Registers: "
+    for x in 0..31 do
+        if mstate.Registers.[x] <> 0L then
+            let value = sprintf "0x%x" mstate.Registers.[x]
+            printfn "%s" (String.Format("\tx{0, -3}{1}", x, value))
+
 // Help function for fetch Elf data
 let getSectionContent (section : ProgBitsSection<uint32>) =
     let fetchIndexAddr (data : byte array) (index : int64) =
@@ -40,11 +49,8 @@ let getSectionContent (section : ProgBitsSection<uint32>) =
     else
         [||]
 
-
 /// Read Elf data content to Map data with format: [address, dataByte]
 let readElfFile file =
-//    let elf = ELFReader.Load "add32.elf"
-//    let elf = ELFReader.Load "and32.elf"
     let elf = ELFReader.Load file
     Map.ofArray (Array.concat [| for s in elf.GetSections() -> getSectionContent s |])
 
@@ -68,6 +74,9 @@ let rec runCycle (mstate : MachineState) =
                 ExecuteI.ExecuteI decodedInstr mstate
     match mstate.RunState with
     | Trap _ -> mstate
+    | RunMachineState.Stopped ->
+        verbosityMessageRegisters mstate
+        mstate
     | _ -> runCycle mstate
 
 let Run (cfg : AppConfig) =

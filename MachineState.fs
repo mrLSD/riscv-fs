@@ -18,10 +18,15 @@ type MachineState = {
         RunState:   RunMachineState
     } with
     member x.getRegister(reg: Register) : MachineInt =
-        x.Registers.[reg]
+        if reg = 0 then
+            0L // x0 always 0
+        else
+            x.Registers.[reg]
 
     member x.setRegister (reg: Register) (value: MachineInt) : MachineState =
         let registers = x.Registers
+        // Check x0 register that always 0
+        let value = if reg = 0 then 0L else value
         Array.set registers reg (x.alignByArch value)
         { x with Registers = registers }
 
