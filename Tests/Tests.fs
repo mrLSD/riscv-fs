@@ -27,3 +27,31 @@ let ALUimmediate instr x2 x3 =
 [<InlineData(-10, -5)>]
 let ``ADDI: x3 = x2 + 5`` (x2, x3) =
     ALUimmediate 0x00510193L x2 x3
+
+[<Theory>]
+[<InlineData(5, 0)>]
+[<InlineData(10, 0)>]
+[<InlineData(4, 1)>]
+[<InlineData(0, 1)>]
+[<InlineData(-4, 1)>]
+[<InlineData(-5, 1)>]
+[<InlineData(-10, 1)>]
+let ``SLTI: x3 = x2 < 5`` (x2, x3) =
+    ALUimmediate 0x00512193L x2 x3
+
+[<Theory>]
+//[<InlineData(5, 0)>]
+//[<InlineData(10, 0)>]
+//[<InlineData(4, 1)>]
+//[<InlineData(0, 1)>]
+[<InlineData(-4, 1)>]
+//[<InlineData(-5, 0)>]
+//[<InlineData(-10, 0)>]
+let ``SLTIU: x3 = unsign x2 < 5`` (x2, x3) =
+    ALUimmediate 0x00512193L x2 x3
+
+[<Theory>]
+[<InlineData(0b101, 0)>]
+[<InlineData(0b010, 0b111)>]
+let ``XORI: x3 = x2 ^ 5 (b101)`` (x2, x3) =
+    ALUimmediate 0x00514193L x2 x3
