@@ -12,4 +12,8 @@
         <Compile Include="Program.fs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Include="Decode\I.fs" />
+    </ItemGroup>
+
 </Project>
