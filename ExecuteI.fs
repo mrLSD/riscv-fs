@@ -186,7 +186,7 @@ let execSLTI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mac
 // SLTIU - Set to 1 if Less Then Unsign Immediate
 let execSLTIU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
     let rdVal =
-        match mstate.Arch with
+        match mstate.Arch.archBits with
         | RV32 -> if uint32(mstate.getRegister rs1) < uint32 imm12 then 1L else 0L
         | _ -> if uint64(mstate.getRegister rs1) < uint64 imm12 then 1L else 0L
     let mstate = mstate.setRegister rd rdVal
@@ -216,7 +216,10 @@ let execSLLI (rd : Register) (rs1 : Register) (shamt : MachineInt) (mstate : Mac
 //=================================================
 // SRLI - Shift Right Logical Immediate
 let execSRLI (rd : Register) (rs1 : Register) (shamt : MachineInt) (mstate : MachineState) =
-    let rdVal = int64(uint64(mstate.getRegister rs1) >>> int32 shamt)
+    let rdVal =
+        match mstate.Arch.archBits with
+        | RV32 -> int64(uint32(mstate.getRegister rs1) >>> int32 shamt)
+        | _ ->  int64(uint64(mstate.getRegister rs1) >>> int32 shamt)
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 

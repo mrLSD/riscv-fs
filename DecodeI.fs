@@ -68,9 +68,9 @@ let opcode_OP        = 0b0110011L
 let funct3_JALR      = 0b000L
 
 // Sub opcode_OP_IMM.SLLI/SRLI/SRAI - 32 & 64 bit
-let msbs6_SLLI      = 0b000000L
-let msbs6_SRLI      = 0b000000L
-let msbs6_SRAI      = 0b010000L
+let msbs6_SLLI      = 0b0000000L
+let msbs6_SRLI      = 0b0000000L
+let msbs6_SRAI      = 0b0100000L
 
 // opcode_MISC_MEM sub-opcodes
 let funct3_FENCE         = 0b000L
