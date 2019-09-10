@@ -28,5 +28,21 @@ let Branch instr x1 x2 resultAddr =
 [<InlineData(0x02208863, 5, -5, 0x80000004L)>]
 [<InlineData(0x02208863, 5,  5, 0x80000030L)>]
 [<InlineData(0x02208863, -5, -5, 0x80000030L)>]
+[<InlineData(0xfe208ee3, 5, 10, 0x80000004L)>]
+[<InlineData(0xfe208ee3, 5, -5, 0x80000004L)>]
+[<InlineData(0xfe208ee3, 5,  5, 0x7ffffffcL)>]
+[<InlineData(0xfe208ee3, -5, -5, 0x7ffffffcL)>]
 let ``BEQ: x1 == x2`` (instr, x1, x2, addrRes) =
+    Branch instr x1 x2 addrRes
+
+[<Theory>]
+[<InlineData(0x02209463, 5, 10, 0x80000028L)>]
+[<InlineData(0x02209463, 5, -5, 0x80000028L)>]
+[<InlineData(0x02209463, 5,  5, 0x80000004L)>]
+[<InlineData(0x02209463, -5, -5, 0x80000004L)>]
+[<InlineData(0xfe209ae3, 5, 10, 0x7ffffff4L)>]
+[<InlineData(0xfe209ae3, 5, -5, 0x7ffffff4L)>]
+[<InlineData(0xfe209ae3, 5,  5, 0x80000004L)>]
+[<InlineData(0xfe209ae3, -5, -5, 0x80000004L)>]
+let ``BNE: x1 <> x2`` (instr, x1, x2, addrRes) =
     Branch instr x1 x2 addrRes

@@ -46,8 +46,8 @@ let branch (branchCheck : MachineInt -> MachineInt -> bool) (rs1 : Register) (rs
     let x1 = mstate.getRegister rs1
     let x2 = mstate.getRegister rs2
     let newPC = mstate.PC + imm12
-    //printfn "%A == %A" x1 x2
-    //printfn "%x + %x = %A" mstate.PC imm12 branchCheck
+//    printfn "%A == %A" x1 x2
+//    printfn "%x + %x = %x" mstate.PC imm12 newPC
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap BreakAddress)
     else if newPC = mstate.PC then
