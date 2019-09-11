@@ -11,7 +11,7 @@ open ISA.RISCV.MachineState
 let System instr trap =
     // Init MachineState
     let addr = 0x80000000L
-    let mstate = MachineState.InitMachineState Map.empty RV32i true
+    let mstate = MachineState.InitMachineState Map.empty RV64i true
     let mstate = mstate.setPC addr
     let newmstate = mstate.incPC
 

@@ -11,7 +11,7 @@ open ISA.RISCV.MachineState
 let Jump instr x2 x3 resultAddr =
     // Init MachineState
     let addr = 0x80000000L
-    let mstate = MachineState.InitMachineState Map.empty RV32i true
+    let mstate = MachineState.InitMachineState Map.empty RV64i true
     let mstate = mstate.setPC addr
     let mstate = mstate.setRegister 2 x2
     let resMstate = mstate.incPC
@@ -20,7 +20,7 @@ let Jump instr x2 x3 resultAddr =
     Assert.NotEqual(executor, None)
     let mstate = executor.Value mstate
 
-    Assert.Equal(int64 (int32 x2), mstate.getRegister 2)
+    Assert.Equal(x2, mstate.getRegister 2)
     let pcs = mstate.setPC (mstate.getRegister 3)
     Assert.Equal(resMstate.PC, pcs.PC)
     Assert.Equal(resultAddr, mstate.PC)
