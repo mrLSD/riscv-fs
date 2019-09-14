@@ -46,3 +46,41 @@ let ``BEQ: x1 == x2`` (instr, x1, x2, addrRes) =
 [<InlineData(0xfe209ae3, -5, -5, 0x80000004L)>]
 let ``BNE: x1 <> x2`` (instr, x1, x2, addrRes) =
     Branch instr x1 x2 addrRes
+
+[<Theory>]
+[<InlineData(0x0220c063, 5, 10, 0x80000020L)>]
+[<InlineData(0x0220c063, -5, 10, 0x80000020L)>]
+[<InlineData(0x0220c063, 5, -5, 0x80000004L)>]
+[<InlineData(0x0220c063, 5,  5, 0x80000004L)>]
+[<InlineData(0x0220c063, -5, -5, 0x80000004L)>]
+[<InlineData(0x0220c063, -5, -1, 0x80000020L)>]
+[<InlineData(0x0220c063, -5, -10, 0x80000004L)>]
+[<InlineData(0xfe20c6e3, 5, 10, 0x7fffffecL)>]
+[<InlineData(0xfe20c6e3, -5, 10, 0x7fffffecL)>]
+[<InlineData(0xfe20c6e3, 5, -5, 0x80000004L)>]
+[<InlineData(0xfe20c6e3, 5,  5, 0x80000004L)>]
+[<InlineData(0xfe20c6e3, -5, -5, 0x80000004L)>]
+[<InlineData(0xfe20c6e3, -5, -1, 0x7fffffecL)>]
+[<InlineData(0xfe20c6e3, -5, -10, 0x80000004L)>]
+let ``BLT: x1 < x2`` (instr, x1, x2, addrRes) =
+    Branch instr x1 x2 addrRes
+
+[<Theory>]
+[<InlineData(0x0020dc63, 5, 10, 0x80000004L)>]
+[<InlineData(0x0020dc63, -5, 10, 0x80000004L)>]
+[<InlineData(0x0020dc63, 5, -5, 0x80000018L)>]
+[<InlineData(0x0020dc63, 10, 5, 0x80000018L)>]
+[<InlineData(0x0020dc63, 5,  5, 0x80000018L)>]
+[<InlineData(0x0020dc63, -5, -5, 0x80000018L)>]
+[<InlineData(0x0020dc63, -5, -1, 0x80000004L)>]
+[<InlineData(0x0020dc63, -5, -10, 0x80000018L)>]
+[<InlineData(0xfe20d2e3, 5, 10, 0x80000004L)>]
+[<InlineData(0xfe20d2e3, -5, 10, 0x80000004L)>]
+[<InlineData(0xfe20d2e3, 5, -5, 0x7fffffe4L)>]
+[<InlineData(0xfe20d2e3, 10, 5, 0x7fffffe4L)>]
+[<InlineData(0xfe20d2e3, 5,  5, 0x7fffffe4L)>]
+[<InlineData(0xfe20d2e3, -5, -5, 0x7fffffe4L)>]
+[<InlineData(0xfe20d2e3, -5, -1, 0x80000004L)>]
+[<InlineData(0xfe20d2e3, -5, -10, 0x7fffffe4L)>]
+let ``BGE: x1 >= x2`` (instr, x1, x2, addrRes) =
+    Branch instr x1 x2 addrRes
