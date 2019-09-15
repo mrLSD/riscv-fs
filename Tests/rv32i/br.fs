@@ -84,3 +84,15 @@ let ``BLT: x1 < x2`` (instr, x1, x2, addrRes) =
 [<InlineData(0xfe20d2e3, -5, -10, 0x7fffffe4L)>]
 let ``BGE: x1 >= x2`` (instr, x1, x2, addrRes) =
     Branch instr x1 x2 addrRes
+
+[<Theory>]
+[<InlineData(0x0020e863, 5, 10, 0x80000004L)>]
+[<InlineData(0xfc20eee3, 5, 10, 0x80000004L)>]
+let ``BLTU: x1 < x2`` (instr, x1, x2, addrRes) =
+    Branch instr x1 x2 addrRes
+
+[<Theory>]
+[<InlineData(0x0020f463, 5, 10, 0x80000004L)>]
+[<InlineData(0xfc20fae3, 5, 10, 0x80000004L)>]
+let ``BGEU: x1 < x2`` (instr, x1, x2, addrRes) =
+    Branch instr x1 x2 addrRes

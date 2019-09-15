@@ -46,8 +46,6 @@ let branch (branchCheck : MachineInt -> MachineInt -> bool) (rs1 : Register) (rs
     let x1 = mstate.getRegister rs1
     let x2 = mstate.getRegister rs2
     let newPC = mstate.PC + imm12
-//    printfn "%A == %A" x1 x2
-//    printfn "%x + %x = %x" mstate.PC imm12 newPC
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap BreakAddress)
     else if newPC = mstate.PC then
@@ -71,22 +69,55 @@ let execBNE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : Mac
 //=================================================
 // BLT - Branch if Less Then
 let execBLT (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-        branch (<) rs1 rs2 imm12 mstate
+    branch (<) rs1 rs2 imm12 mstate
 
 //=================================================
 // BGE - Branch if Greater or Equal
 let execBGE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-        branch (>=) rs1 rs2 imm12 mstate
+    branch (>=) rs1 rs2 imm12 mstate
 
 //=================================================
 // BLTU - Branch if Less Then (Unsigned)
 let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    branch (<) rs1 rs2 imm12 mstate
+    let x1 = mstate.getRegister rs1
+    let x2 = mstate.getRegister rs2
+    let branchCheck =
+        match mstate.Arch.archBits with
+        | RV32 -> uint32 x1 >= uint32 x2
+        | _ -> uint64 x1 >= uint64 x2
+    let newPC = mstate.PC + imm12
+    if newPC % 4L <> 0L then
+        mstate.setRunState (Trap BreakAddress)
+    else if newPC = mstate.PC then
+        mstate.setRunState Stopped
+    else
+        if branchCheck then
+            mstate.setPC newPC
+        else
+            mstate.incPC
 
 //=================================================
 // BGEU - Branch If Greater or Equal (Unsigned)
-let execBGEU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    branch (>=) rs1 rs2 imm12 mstate
+let execBGEU (rs1 : Register) (rs2: Register) (imm12 : MachineInt) (mstate : MachineState) =
+    let x1 = mstate.getRegister rs1
+    let x2 = mstate.getRegister rs2
+    let branchCheck =
+        match mstate.Arch.archBits with
+        | RV32 -> uint32 x1 >= uint32 x2
+        | _ -> uint64 x1 >= uint64 x2
+
+    let newPC = mstate.PC + imm12
+//    printfn "%A == %A" x1 x2
+//    printfn "%x + %x = %x" mstate.PC imm12 newPC
+    if newPC % 4L <> 0L then
+        mstate.setRunState (Trap BreakAddress)
+    else if newPC = mstate.PC then
+        mstate.setRunState Stopped
+    else
+        if branchCheck then
+            mstate.setPC newPC
+        else
+            mstate.incPC
 
 //=================================================
 // LB - Load Byte from Memory
@@ -272,7 +303,10 @@ let execSLT (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 //=================================================
 // SLTU - Set to 1 if Less Then Unsign Immediate
 let execSLTU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let rdVal = if uint64(mstate.getRegister rs1) < uint64(mstate.getRegister rs2) then 1L else 0L
+    let rdVal =
+        match mstate.Arch.archBits with
+        | RV32 -> if uint32(mstate.getRegister rs1) < uint32(mstate.getRegister rs2) then 1L else 0L
+        | _ -> if uint64(mstate.getRegister rs1) < uint64(mstate.getRegister rs2) then 1L else 0L
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
