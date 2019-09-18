@@ -83,8 +83,8 @@ let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : Ma
     let x2 = mstate.getRegister rs2
     let branchCheck =
         match mstate.Arch.archBits with
-        | RV32 -> uint32 x1 >= uint32 x2
-        | _ -> uint64 x1 >= uint64 x2
+        | RV32 -> uint32 x1 < uint32 x2
+        | _ -> uint64 x1 < uint64 x2
     let newPC = mstate.PC + imm12
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap BreakAddress)
