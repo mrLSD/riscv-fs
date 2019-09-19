@@ -1,4 +1,5 @@
 # RISC-V formal ISA Specification
+[![Build Status](https://travis-ci.org/mrLSD/riscv-fs.svg?branch=master)](https://travis-ci.org/mrLSD/riscv-fs)
 
 Copyright &copy; Evgeny Ukhanov
 
@@ -15,8 +16,14 @@ Technical Group constituted by The RISC-V Foundation
 (https://riscv.org). We welcome your feedback, comments and suggestions. 
 
 ## Content
-* Features & Current status 
-
+* [Features & Current status](#features--current-status) 
+* [Reading the code](#reading-the-code)
+* [How to build and run it on RISC-V binaries](#how-to-build-and-run-it-on-risc-v-binaries)
+  * [Install .NET SDK](#install-.net-sdk)
+  * [Make the application executable](#make-the-application-executable)
+  * [Run the application executable](#run-the-application-executable)
+* [Licence](#licence)
+ 
 ## Features & Current status
 * Supports the following features
   * Base instruction sets: RV32I
@@ -38,13 +45,131 @@ interpretation: one-instruction-at-a-time, sequential
 memory model.
 * Tests passing for RISC-V **under development**:
   * Basic instruction flow
-  * rv32ui-p-*, rv64ui-p-* (Base instruction set)
-  * rv32um-p-*, rv64um-p-* (M extension)
-  * rv32ua-p-*, rv64ua-p-* (A extension)
-  * rv32uc-p-*, rv64uc-p-* (C extension)
+  * `rv32ui-p-*, rv64ui-p-*` (Base instruction set)
+  * `rv32um-p-*, rv64um-p-*` (M extension)
+  * `rv32ua-p-*, rv64ua-p-*` (A extension)
+  * `rv32uc-p-*, rv64uc-p-*` (C extension)
 
 ## Reading the code
-We expect that many people might use this as a reading reference (whether or not they build and execute it) to clarify their understanding of RISC-V ISA semantics.
+We expect that many people might use this as a reading 
+reference (whether or not they build and execute it) to 
+clarify their understanding of RISC-V ISA semantics.
+
+Main part for reading Specification:
+* **Decode\*.fs**
+  
+  Decodes contain decoders for specific instructions set
+  and notified with instruction/extention set symbol. For example `DecodeI.fs`
+* **Execute\*.fs**
+
+  Executes contain executions for specific instructions set
+  and notified with instruction/extention set symbol. For example `ExecuteI.fs`
+  
+* Utilities:
+  * `CLI.fs`
+    
+    Contain helper function and types for
+    building effective CLI commands and options.
+  
+  * `Bits.fs`
+    
+    Basic type specific functions for 
+    manipulations with `bits`.
+  
+  * `Run.fs`
+  
+    Basic Run flow - fetch, decode, execute,
+    logging execution flow.  
+
+* Architecture
+  * `Arch.fs`
+
+    Basic architecture types for RISC-V specification.
+  
+  * `MachineState.fs`
+  
+    Basic type and functions described
+    RISC-V machine state.  
+
+* Main app
+  * `Program.fs`
+  
+  Main application to execute **RISC-V simulator/emulator**.
+  
+* Test
+  * `Test/*.fs`
+  
+    Contain unit-tests for instuctions set
+    and extensions
+    
+  * Test/asm/
+  
+    Contain Assembler test programs for
+    manual testing RISC-V CPI implementation.
+    It depend on **risc-v toolchain** and 
+    it has special auto-build `Make file`.      
+
+## How to build and run it on RISC-V binaries
+Application can be executed as a _sequential RISC-V simulator_ 
+(sequential, one-instruction-at-a-time semantics), by 
+building and executing it as a standard F# program.
+
+Supported OS:
+* Linux
+* Windows
+* MacOS
+
+Supported **.NET SDK**:
+* .NET SDK 2.2
+* .NET SDK 3.0
+
+### Install .NET SDK
+
+For Windows preferred way to use Visual Studio.
+
+Other examples will be for Linux.
+Please follow to instruction https://dotnet.microsoft.com/download
+
+For Ubuntu:
+```
+$ wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+$ sudo dpkg -i packages-microsoft-prod.deb
+$ sudo apt-get update
+$ sudo apt-get install apt-transport-https
+$ sudo apt-get update
+$ sudo apt-get install dotnet-sdk-3.0
+```
+To check installation:
+
+`$ dotnet --version`
+
+will tell you what version of `dotnet` you have.
+
+### Make the application executable
+Then, you can build the application executable with:
+
+`$ dotnet build`
+
+### Run the application executable
+
+Most simple way run immediately `run` (without 
+additional `build` command) to see command-line 
+options on the executable:
+
+`$ dotnet run -- --help`
+
+If you run the application without option, like thet:
+
+`$ dotnet run`
+
+you'll receive error message:
+
+Example to run specific ISA with extentions, verbosity
+output and ELF file for execution in RISC-V CPI simulator:
+
+`$ dotnet run -- -A rv32i -v myapp.elf`
+
+> Wrong parameters put --help to get more information
 
 ## Licence
 **MIT License**
