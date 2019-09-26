@@ -226,54 +226,74 @@ let execANDI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mac
     mstate.incPC
 
 //=================================================
-// ADD
+// ADD - Add operation
 let execADD (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate
+    let rdVal = (mstate.getRegister rs1) + (mstate.getRegister rs2)
+    let mstate = mstate.setRegister rd rdVal
+    mstate.incPC
 
 //=================================================
-// SUB
+// SUB - Sub operation
 let execSUB (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate
+    let rdVal = (mstate.getRegister rs1) - (mstate.getRegister rs2)
+    let mstate = mstate.setRegister rd rdVal
+    mstate.incPC
 
 //=================================================
-// SLL
+// SLL - Shift Logical Left
 let execSLL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate
+    let rdVal = (mstate.getRegister rs1) <<< int32(mstate.getRegister rs2)
+    let mstate = mstate.setRegister rd rdVal
+    mstate.incPC
 
 //=================================================
-// SLT
+// SLT - Set 1 if Less Then
 let execSLT (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate
+    let rdVal = if mstate.getRegister rs1 < mstate.getRegister rs2 then 1L else 0L
+    let mstate = mstate.setRegister rd rdVal
+    mstate.incPC
 
 //=================================================
-// SLTU
+// SLTU - Set to 1 if Less Then Unsign Immediate
 let execSLTU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate
+    let rdVal = if uint64(mstate.getRegister rs1) < uint64(mstate.getRegister rs2) then 1L else 0L
+    let mstate = mstate.setRegister rd rdVal
+    mstate.incPC
 
 //=================================================
-// XOR
+// XOR - Xor operation
 let execXOR (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate
+    let rdVal = (mstate.getRegister rs1) ^^^ (mstate.getRegister rs2)
+    let mstate = mstate.setRegister rd rdVal
+    mstate.incPC
 
 //=================================================
-// SRL
+// SRL - Shift Right Logical
 let execSRL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate
+    let rdVal = int64(uint64(mstate.getRegister rs1) >>> int32(mstate.getRegister rs2))
+    let mstate = mstate.setRegister rd rdVal
+    mstate.incPC
 
 //=================================================
-// SRA
+// SRA - Shift Right Arithmetic
 let execSRA (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate
+    let rdVal = (mstate.getRegister rs1) >>> int32 (mstate.getRegister rs2)
+    let mstate = mstate.setRegister rd rdVal
+    mstate.incPC
 
 //=================================================
-// OR
+// OR - Or operation
 let execOR (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate
+    let rdVal = (mstate.getRegister rs1) ||| (mstate.getRegister rs2)
+    let mstate = mstate.setRegister rd rdVal
+    mstate.incPC
 
 //=================================================
-// AND
+// AND - And operation
 let execAND (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate
+    let rdVal = (mstate.getRegister rs1) &&& (mstate.getRegister rs2)
+    let mstate = mstate.setRegister rd rdVal
+    mstate.incPC
 
 // Execute I-instructions
 let ExecuteI (instr : InstructionI) (mstate : MachineState) =
