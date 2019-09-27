@@ -28,4 +28,6 @@ type TrapErrors =
     | InstructionDecode
     | JumpAddress
     | BreakAddress
+    | ECall
+    | EBreak
     | MemAddress of MachineInt

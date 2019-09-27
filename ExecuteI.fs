@@ -295,6 +295,21 @@ let execAND (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
+//=================================================
+// Fence - Fence operation (no operations)
+let execFENCE (mstate : MachineState) =
+    mstate.incPC
+
+//=================================================
+// ECALL - ECALL operation
+let execECALL (mstate : MachineState) =
+    mstate.setRunState (Trap ECall)
+
+//=================================================
+// execEBREAK - EBREAK operation
+let execEBREAK (mstate : MachineState) =
+    mstate.setRunState (Trap EBreak)
+
 // Execute I-instructions
 let ExecuteI (instr : InstructionI) (mstate : MachineState) =
     match instr with
@@ -372,4 +387,10 @@ let ExecuteI (instr : InstructionI) (mstate : MachineState) =
         execOR i.rd i.rs1 i.rs2 mstate
     | AND i ->
         execAND i.rd i.rs1 i.rs2 mstate
+    | FENCE _ ->
+        execFENCE mstate
+    | ECALL _ ->
+        execECALL mstate
+    | EBREAK _ ->
+        execEBREAK mstate
     | _ -> mstate
