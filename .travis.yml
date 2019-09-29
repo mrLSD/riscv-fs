@@ -1,7 +1,7 @@
 language: fsharp
 solution: risc-v.sln
 mono: none
-dotnet: 2.2.401
+dotnet: 3.0.100
 script:
   - dotnet restore
   - dotnet test
