@@ -1,4 +1,4 @@
-language: fsharp
+language: csharp
 solution: risc-v.sln
 mono: none
 dotnet: 3.0.100
