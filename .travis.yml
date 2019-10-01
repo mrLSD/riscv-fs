@@ -1,0 +1,8 @@
+language: csharp
+solution: risc-v.sln
+mono: none
+dotnet: 3.0.100
+script:
+  - dotnet restore
+  - dotnet build
+  - dotnet test
