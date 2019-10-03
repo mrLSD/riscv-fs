@@ -6,3 +6,6 @@ script:
   - dotnet restore
   - dotnet build
   - dotnet test
+
+notifications:
+  slack: 482solutions:b6NmvIB5VTIFuKF0TUp6deZ9
