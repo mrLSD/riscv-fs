@@ -59,17 +59,7 @@ type InstructionI =
 
 //================================================================ -- \begin_latex{Major_Opcodes}
 // Major Opcodes
-let opcode_LUI       = 0b0110111L
-let opcode_AUIPC     = 0b0010111L
-let opcode_JAL       = 0b1101111L
-let opcode_JALR      = 0b1100111L
-let opcode_BRANCH    = 0b1100011L
-let opcode_LOAD      = 0b0000011L
-let opcode_STORE     = 0b0100011L
-let opcode_OP_IMM    = 0b0010011L
 let opcode_OP        = 0b0110011L
-let opcode_MISC_MEM  = 0b0001111L
-let opcode_SYSTEM    = 0b1110011L
 
 //================================================================
 // Sub-opcodes for 'I' instructions
@@ -77,74 +67,10 @@ let opcode_SYSTEM    = 0b1110011L
 // opcode_JALR sub-opcodes
 let funct3_JALR      = 0b000L
 
-// opcode_BRANCH sub-opcodes
-let funct3_BEQ       = 0b000L
-let funct3_BNE       = 0b001L
-let funct3_BLT       = 0b100L
-let funct3_BGE       = 0b101L
-let funct3_BLTU      = 0b110L
-let funct3_BGEU      = 0b111L
-
-// opcode_LOAD sub-opcodes
-let funct3_LB        = 0b000L
-let funct3_LH        = 0b001L
-let funct3_LW        = 0b010L
-let funct3_LD        = 0b011L
-let funct3_LBU       = 0b100L
-let funct3_LHU       = 0b101L
-
-// opcode_STORE sub-opcodes
-let funct3_SB        = 0b000L
-let funct3_SH        = 0b001L
-let funct3_SW        = 0b010L
-
- // opcode_OP_IMM sub-opcodes
-let funct3_ADDI      = 0b000L
-let funct3_SLTI      = 0b010L
-let funct3_SLTIU     = 0b011L
-let funct3_XORI      = 0b100L
-let funct3_ORI       = 0b110L
-let funct3_ANDI      = 0b111L
-
-let funct3_SLLI      = 0b001L
-let funct3_SRLI      = 0b101L
-let funct3_SRAI      = 0b101L
-
-// opcode_OP_IMM.SLLI/SRLI/SRAI - 32 & 64 bit
+// Sub opcode_OP_IMM.SLLI/SRLI/SRAI - 32 & 64 bit
 let msbs6_SLLI      = 0b000000L
 let msbs6_SRLI      = 0b000000L
 let msbs6_SRAI      = 0b010000L
-
-// opcode_OP sub-opcodes
-let funct3_ADD       = 0b000L
-let funct7_ADD       = 0b0000000L
-
-let funct3_SUB       = 0b000L
-let funct7_SUB       = 0b0100000L
-
-let funct3_SLL       = 0b001L
-let funct7_SLL       = 0b0000000L
-
-let funct3_SLT       = 0b010L
-let funct7_SLT       = 0b0000000L
-
-let funct3_SLTU      = 0b011L
-let funct7_SLTU      = 0b0000000L
-
-let funct3_XOR       = 0b100L
-let funct7_XOR       = 0b0000000L
-
-let funct3_SRL       = 0b101L
-let funct7_SRL       = 0b0000000L
-
-let funct3_SRA       = 0b101L
-let funct7_SRA       = 0b0100000L
-
-let funct3_OR        = 0b110L
-let funct7_OR        = 0b0000000L
-
-let funct3_AND       = 0b111L
-let funct7_AND       = 0b0000000L
 
 // opcode_MISC_MEM sub-opcodes
 let funct3_FENCE         = 0b000L
@@ -201,54 +127,79 @@ let DecodeI (instr: InstrField) : InstructionI =
     let succ  = instr.bitSlice 23 20
 
     match (opcode) with
-    | (op) when op = opcode_LUI   -> LUI   {| rd = rd; imm20 = imm20_U |}
-    | (op) when op = opcode_AUIPC -> AUIPC {| rd = rd; imm20 = imm20_U |}
+    // Upper Immediate Opcodes
+    | 0b0110111L -> LUI   {| rd = rd; imm20 = imm20_U |}
+    | 0b0010111L -> AUIPC {| rd = rd; imm20 = imm20_U |}
 
-    | (op) when op = opcode_JALR -> JALR {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_JAL  -> JAL  {| rd = rd; imm20 = imm20_J |}
+    // Jump Opcodes
+    | 0b1100111L -> JALR {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    | 0b1101111L -> JAL  {| rd = rd; imm20 = imm20_J |}
 
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BEQ  -> BEQ  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BNE  -> BNE  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BLT  -> BLT  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BGE  -> BGE  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BLTU -> BLTU {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
-    | (op) when op = opcode_BRANCH && funct3 = funct3_BGEU -> BGEU {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+    // Branch Opcodes
+    | 0b1100011L ->
+        match funct3 with
+        | 0b000L -> BEQ  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+        | 0b001L -> BNE  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+        | 0b100L -> BLT  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+        | 0b101L -> BGE  {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+        | 0b110L -> BLTU {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+        | 0b111L -> BGEU {| rs1 = rs1; rs2 = rs2; imm12 = imm12_B |}
+        | _      -> None
 
-    | (op) when op = opcode_LOAD && funct3 = funct3_LB  -> LB  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_LOAD && funct3 = funct3_LH  -> LH  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_LOAD && funct3 = funct3_LW  -> LW  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_LOAD && funct3 = funct3_LBU -> LBU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_LOAD && funct3 = funct3_LHU -> LHU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    // Load Opcodes
+    | 0b0000011L ->
+        match funct3 with
+        | 0b000L -> LB  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b001L -> LH  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b010L -> LW  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b100L -> LBU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b101L -> LHU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | _      -> None
 
-    | (op) when op = opcode_STORE && funct3 = funct3_SB -> SB {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
-    | (op) when op = opcode_STORE && funct3 = funct3_SH -> SH {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
-    | (op) when op = opcode_STORE && funct3 = funct3_SW -> SW {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
+    // Store opcodes
+    | 0b0100011L ->
+        match funct3 with
+        | 0b000L -> SB {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
+        | 0b001L -> SH {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
+        | 0b010L -> SW {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
+        | _      -> None
 
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_ADDI  -> ADDI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLTI  -> SLTI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLTIU -> SLTIU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_XORI  -> XORI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_ORI   -> ORI   {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_ANDI  -> ANDI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+    // Immediate Opcodes
+    | 0b0010011L ->
+        match funct3 with
+        | 0b000L -> ADDI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b010L -> SLTI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b011L -> SLTIU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b100L -> XORI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b110L -> ORI   {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b111L -> ANDI  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
 
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLLI && funct7 = msbs6_SLLI  -> SLLI {| rd = rd; rs1 = rs1; shamt = shamt |}
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLLI && funct7 = msbs6_SRLI  -> SRLI {| rd = rd; rs1 = rs1; shamt = shamt |}
-    | (op) when op = opcode_OP_IMM && funct3 = funct3_SLLI && funct7 = msbs6_SRAI  -> SRAI {| rd = rd; rs1 = rs1; shamt = shamt |}
+        // Shift Immediate Opcodes
+        | 0b001L when funct7 = msbs6_SLLI  -> SLLI {| rd = rd; rs1 = rs1; shamt = shamt |}
+        | 0b101L when funct7 = msbs6_SRLI  -> SRLI {| rd = rd; rs1 = rs1; shamt = shamt |}
+        | 0b101L when funct7 = msbs6_SRAI  -> SRAI {| rd = rd; rs1 = rs1; shamt = shamt |}
+        | _      -> None
 
-    | (op) when op = opcode_OP && funct3 = funct3_ADD && funct7 = funct7_ADD   -> ADD  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-    | (op) when op = opcode_OP && funct3 = funct3_SUB && funct7 = funct7_SUB   -> SUB  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-    | (op) when op = opcode_OP && funct3 = funct3_SLL && funct7 = funct7_SLL   -> SLL  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-    | (op) when op = opcode_OP && funct3 = funct3_SLT && funct7 = funct7_SLT   -> SLT  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-    | (op) when op = opcode_OP && funct3 = funct3_SLTU && funct7 = funct7_SLTU -> SLTU {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-    | (op) when op = opcode_OP && funct3 = funct3_XOR && funct7 = funct7_XOR   -> XOR  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-    | (op) when op = opcode_OP && funct3 = funct3_SRL && funct7 = funct7_SRL   -> SRL  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-    | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_SRA   -> SRA  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-    | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_OR    -> OR   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-    | (op) when op = opcode_OP && funct3 = funct3_SRA && funct7 = funct7_AND   -> AND  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+    // ALU Opcodes
+    | 0b0110011L ->
+        match funct3 with
+        | 0b000L when funct7 = 0b0000000L -> ADD  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b000L when funct7 = 0b0100000L -> SUB  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b001L when funct7 = 0b0000000L -> SLL  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b010L when funct7 = 0b0000000L -> SLT  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b011L when funct7 = 0b0000000L -> SLTU {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b100L when funct7 = 0b0000000L -> XOR  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b101L when funct7 = 0b0000000L -> SRL  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b101L when funct7 = 0b0100000L -> SRA  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b110L when funct7 = 0b0000000L -> OR   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b111L when funct7 = 0b0000000L -> AND  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | _ -> None
 
-    | (op) when op = opcode_MISC_MEM && rd = 0 && rs1 = 0 && funct3 = funct3_FENCE -> FENCE {| fm = fm; pred = pred; succ = succ  |}
+    // Fence Opcode
+    | 0b0001111L when rd = 0 && rs1 = 0 && funct3 = funct3_FENCE -> FENCE {| fm = fm; pred = pred; succ = succ  |}
 
-    | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_ECALL  -> ECALL
-    | (op) when op = opcode_SYSTEM && rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> EBREAK
+    // System opcodes
+    | 0b1110011L when rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_ECALL  -> ECALL
+    | 0b1110011L when rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> EBREAK
 
     | _ -> None
