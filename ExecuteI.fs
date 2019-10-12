@@ -282,7 +282,10 @@ let execXOR (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 //=================================================
 // SRL - Shift Right Logical
 let execSRL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let rdVal = int64(uint64(mstate.getRegister rs1) >>> int32(mstate.getRegister rs2))
+    let rdVal =
+        match mstate.Arch.archBits with
+        | RV32 -> int64(uint32(mstate.getRegister rs1) >>> int32(mstate.getRegister rs2))
+        | _ -> int64(uint64(mstate.getRegister rs1) >>> int32(mstate.getRegister rs2))
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
