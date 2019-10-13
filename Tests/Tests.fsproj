@@ -20,6 +20,7 @@
     <ItemGroup>
       <Compile Include="rv32i\alui.fs" />
       <Compile Include="rv32i\alu.fs" />
+      <Compile Include="rv32i\br.fs" />
 
       <Compile Include="Program.fs" />
     </ItemGroup>

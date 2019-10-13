@@ -42,14 +42,18 @@ let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
         mstate.setPC newPC
 
 // Basic branch flow
-let branch (branchCheck : bool) (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+let branch (branchCheck : MachineInt -> MachineInt -> bool) (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+    let x1 = mstate.getRegister rs1
+    let x2 = mstate.getRegister rs2
     let newPC = mstate.PC + imm12
+    //printfn "%A == %A" x1 x2
+    //printfn "%x + %x = %A" mstate.PC imm12 branchCheck
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap BreakAddress)
     else if newPC = mstate.PC then
         mstate.setRunState Stopped
     else
-        if branchCheck then
+        if branchCheck x1 x2 then
             mstate.setPC newPC
         else
             mstate.incPC
@@ -57,32 +61,32 @@ let branch (branchCheck : bool) (rs1 : Register) (rs2 : Register) (imm12 : Machi
 //=================================================
 // BEQ - Branch if Equal
 let execBEQ (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    branch (rs1 = rs2) rs1 rs2 imm12 mstate
+    branch (=) rs1 rs2 imm12 mstate
 
 //=================================================
 // BNE - Branch if Not Equal
 let execBNE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    branch (rs1 <> rs2) rs1 rs2 imm12 mstate
+    branch (<>) rs1 rs2 imm12 mstate
 
 //=================================================
 // BLT - Branch if Less Then
 let execBLT (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-        branch (rs1 < rs2) rs1 rs2 imm12 mstate
+        branch (<) rs1 rs2 imm12 mstate
 
 //=================================================
 // BGE - Branch if Greater or Equal
 let execBGE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-        branch (rs1 >= rs2) rs1 rs2 imm12 mstate
+        branch (>=) rs1 rs2 imm12 mstate
 
 //=================================================
 // BLTU - Branch if Less Then (Unsigned)
 let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    branch (uint64 rs1 < uint64 rs2) rs1 rs2 imm12 mstate
+    branch (<) rs1 rs2 imm12 mstate
 
 //=================================================
 // BGEU - Branch If Greater or Equal (Unsigned)
 let execBGEU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    branch (uint64 rs1 >= uint64 rs2) rs1 rs2 imm12 mstate
+    branch (>=) rs1 rs2 imm12 mstate
 
 //=================================================
 // LB - Load Byte from Memory

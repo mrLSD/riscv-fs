@@ -86,12 +86,13 @@ let ``XOR: x3 = x2 ^ x1`` (x1, x2, x3) =
 [<InlineData(0b101, 0b11110000111100000000000000001111, 0b00000111100001111000000000000000)>]
 let ``SRL: x3 = x2 >> x1`` (x1, x2, x3) =
     ALU 0x001151b3L x1 x2 x3
-(*
+
 [<Theory>]
-[<InlineData(0b101, 0)>]
+[<InlineData(0b101, 0b1011001101, 0b0000010110)>]
+[<InlineData(0b101, 0b11110000111100000000000000001111, 0b11111111100001111000000000000000)>]
 let ``SRA: x3 = x2 >> x1`` (x1, x2, x3) =
     ALU 0x401151b3L x1 x2 x3
-*)
+
 [<Theory>]
 [<InlineData(0b101, 0b101, 0b101)>]
 [<InlineData(0b101, 0b110, 0b111)>]
@@ -100,9 +101,11 @@ let ``SRA: x3 = x2 >> x1`` (x1, x2, x3) =
 [<InlineData(0b101, 0b1101, 0b1101)>]
 let ``OR: x3 = x2 | x1`` (x1, x2, x3) =
     ALU 0x001161b3L x1 x2 x3
-(*
+
 [<Theory>]
-[<InlineData(0b101, 0)>]
+[<InlineData(0b101, 0b101, 0b101)>]
+[<InlineData(0b101, 0b111, 0b101)>]
+[<InlineData(0b101, 0b110, 0b100)>]
+[<InlineData(0b101, 0b1011, 0b0001)>]
 let ``AND: x3 = x2 & x1`` (x1, x2, x3) =
     ALU 0x001171b3L x1 x2 x3
-*)
