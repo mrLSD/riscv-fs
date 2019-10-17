@@ -101,8 +101,18 @@ let ``BGE: x1 >= x2`` (instr, x1, x2, addrRes) =
 let ``BLTU: x1 < x2`` (instr, x1, x2, addrRes) =
     Branch instr x1 x2 addrRes
 
-//[<Theory>]
-//[<InlineData(0x0020f463, 5, 10, 0x80000004L)>]
-//[<InlineData(0xfc20fae3, 5, 10, 0x80000004L)>]
-//let ``BGEU: x1 < x2`` (instr, x1, x2, addrRes) =
-//    Branch instr x1 x2 addrRes
+[<Theory>]
+[<InlineData(0x0020f463,  5, 10, 0x80000004L)>]
+[<InlineData(0x0020f463, 10,  5, 0x80000008L)>]
+[<InlineData(0x0020f463,  5,  5, 0x80000008L)>]
+[<InlineData(0x0020f463, -1,  5, 0x80000008L)>]
+[<InlineData(0x0020f463, -1, -1, 0x80000008L)>]
+[<InlineData(0x0020f463, -1, -2, 0x80000008L)>]
+[<InlineData(0xfc20fae3,  5, 10, 0x80000004L)>]
+[<InlineData(0xfc20fae3, 10,  5, 0x7fffffd4L)>]
+[<InlineData(0xfc20fae3,  5,  5, 0x7fffffd4L)>]
+[<InlineData(0xfc20fae3, -1,  5, 0x7fffffd4L)>]
+[<InlineData(0xfc20fae3, -1, -1, 0x7fffffd4L)>]
+[<InlineData(0xfc20fae3, -1, -2, 0x7fffffd4L)>]
+let ``BGEU: x1 >= x2`` (instr, x1, x2, addrRes) =
+    Branch instr x1 x2 addrRes
