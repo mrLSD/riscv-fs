@@ -21,6 +21,9 @@
       <Compile Include="rv32i\alui.fs" />
       <Compile Include="rv32i\alu.fs" />
       <Compile Include="rv32i\br.fs" />
+      <Compile Include="rv32i\j.fs" />
+      <Compile Include="rv32i\mem.fs" />
+      <Compile Include="rv32i\ui.fs" />
 
       <Compile Include="Program.fs" />
     </ItemGroup>
