@@ -17,3 +17,4 @@ let Ui instr imm =
     let decodedInstr = I.DecodeI instr
     Assert.NotEqual(decodedInstr, I.None)
     let mstate = ExecuteI.ExecuteI decodedInstr mstate
+    mstate.incPC
