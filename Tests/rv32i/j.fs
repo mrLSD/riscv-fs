@@ -20,11 +20,12 @@ let Jump instr x2 x3 resultAddr =
     Assert.NotEqual(decodedInstr, I.None)
     let mstate = ExecuteI.ExecuteI decodedInstr mstate
     Assert.Equal(x2, mstate.getRegister 2)
-    Assert.Equal(resMstate.PC, mstate.getRegister 3)
+    let pcs = mstate.setPC (mstate.getRegister 3)
+    Assert.Equal(resMstate.PC, pcs.PC)
     Assert.Equal(resultAddr, mstate.PC)
 
 [<Theory>]
-[<InlineData(0x018001ef, 0x80000004L)>]
-[<InlineData(0xff5ff1ef, 0x80000004L)>]
+[<InlineData(0x018001ef, 0x80000018L)>]
+[<InlineData(0xff5ff1ef, 0x7ffffff4L)>]
 let ``JAL: x3, addr`` (instr, addrRes) =
     Jump instr 0L 3L addrRes

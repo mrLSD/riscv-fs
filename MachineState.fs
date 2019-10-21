@@ -54,15 +54,15 @@ type MachineState = {
         // if x32 Arch - align it to x32
         // and then convert again to int64
         match x.Arch.archBits with
-        | Architecture.RV32 -> int64( int32(value) )
+        | Architecture.RV32 -> int64(int32 value)
         | _ -> value
 
     member x.alignByArchUnsign (value : int64) =
         // if x32 Arch - align it to x32
         // and then convert again to int64
         match x.Arch.archBits with
-        | Architecture.RV32 -> int64( uint32(value) )
-        | _ -> int64( uint64(value) )
+        | Architecture.RV32 -> int64(uint32 value)
+        | _ -> int64(uint64 value)
 
 let InitMachineState mem arch verbosity : MachineState =
     {

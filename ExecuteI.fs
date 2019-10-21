@@ -38,7 +38,8 @@ let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
     else if newPC = mstate.PC then
         mstate.setRunState Stopped
     else
-        let mstate = mstate.setRegister rd (mstate.PC + 4L)
+        let newPCstate = mstate.incPC
+        let mstate = mstate.setRegister rd newPCstate.PC
         mstate.setPC newPC
 
 // Basic branch flow
