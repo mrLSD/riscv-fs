@@ -26,7 +26,8 @@ let execJALR (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mac
     else if newPC = mstate.PC then
         mstate.setRunState Stopped
     else
-        let mstate = mstate.setRegister rd (mstate.PC + 4L)
+        let newPCstate = mstate.incPC
+        let mstate = mstate.setRegister rd newPCstate.PC
         mstate.setPC newPC
 
 //=================================================
