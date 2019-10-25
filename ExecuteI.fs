@@ -109,8 +109,6 @@ let execBGEU (rs1 : Register) (rs2: Register) (imm12 : MachineInt) (mstate : Mac
         | _ -> uint64 x1 >= uint64 x2
 
     let newPC = mstate.PC + imm12
-//    printfn "%A == %A" x1 x2
-//    printfn "%x + %x = %x" mstate.PC imm12 newPC
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap BreakAddress)
     else if newPC = mstate.PC then
@@ -163,7 +161,7 @@ let execLBU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mach
         mstate.setRunState (Trap (MemAddress addr))
     else
         let memVal = uint8 memResult.Value
-        let mstate = mstate.setRegister rd (int64 memVal)
+        let mstate = mstate.setRegister rd (int64 (uint8 memVal))
         mstate.incPC
 
 //=================================================
@@ -175,7 +173,7 @@ let execLHU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mach
         mstate.setRunState (Trap (MemAddress addr))
     else
         let memVal = uint16 memResult.Value
-        let mstate = mstate.setRegister rd (int64 memVal)
+        let mstate = mstate.setRegister rd (int64 (uint16 memVal))
         mstate.incPC
 
 //=================================================

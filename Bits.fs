@@ -54,9 +54,9 @@ let combineBytes (x : byte array) : int64 =
     Array.fold (fun acc (i, n) -> acc ||| (int64(n) <<< i*8 )) 0L xz
 
 // Load from Memory 1 byte
-let loadByte (mem : Map<int64, byte>) (addr : int64) : byte option =
+let loadByte (mem : Map<int64, byte>) (addr : int64) : int8 option =
     if Map.containsKey addr mem then
-        Some(mem.[addr])
+        Some(int8(mem.[addr]))
     else
         None
 
