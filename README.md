@@ -10,6 +10,8 @@ an "_extremely elementary_" implementation of F# to make it
 readable and usable by wide audience who do not know F# and who 
 do not plan to learn F#.
 
+![F# RISC-V ISA Formal Specification](https://miro.medium.com/max/2474/1*88Zj-QJq48IZTiCGUo5mSQ.png)
+
 This is a work-in-progress, one of several similar concurrent 
 efforts within the **ISA Formal Specification** 
 Technical Group constituted by The RISC-V Foundation 
