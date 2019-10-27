@@ -5,9 +5,12 @@ open Xunit
 open ISA.RISCV
 open ISA.RISCV.Arch
 open ISA.RISCV.Decode
+open ISA.RISCV.Utils
 
 //===============================================
-// Upper immediate tests
+// Memory tests
+
+// Load from memory instructions
 let loadMemory instr x2 imm nBytes unsign =
     // Init MachineState
     let addr = 0x80000000L
@@ -38,6 +41,34 @@ let loadMemory instr x2 imm nBytes unsign =
     Assert.Equal(x2, mstate.getRegister 2)
     Assert.Equal(resNumber, mstate.getRegister 3)
 
+// Store to memory instructions
+let storeMemory instr x3 x2 imm nBytes =
+    // Init MachineState
+    let addr = 0x80000000L
+    let mstate = MachineState.InitMachineState Map.empty RV32i true
+    let mstate = mstate.setPC addr
+    let mstate = mstate.setRegister 2 x2
+    let mstate = mstate.setRegister 3 x3
+
+    let decodedInstr = I.DecodeI instr
+    Assert.NotEqual(decodedInstr, I.None)
+
+    // Get memory value
+    let memAddr = x2 + imm
+    let mstate = ExecuteI.ExecuteI decodedInstr mstate
+    let memoryRes =
+        match nBytes with
+        | 1 -> // 1 bytes
+            (int64(int8((Bits.loadByte mstate.Memory memAddr).Value)))
+        | 2 -> // 2 bytes
+            int64((Bits.loadHalfWord mstate.Memory memAddr).Value)
+        | _ -> // 4 bytes
+            (int64(int32((Bits.loadWord mstate.Memory memAddr).Value)))
+
+    Assert.Equal(x2, mstate.getRegister 2)
+    Assert.Equal(x3, mstate.getRegister 3)
+    Assert.Equal(memoryRes, x3)
+
 [<Theory>]
 [<InlineData(0x00a10183, 0x1000L,  10L)>]
 [<InlineData(0xff610183, 0x1000L, -10L)>]
@@ -67,3 +98,21 @@ let ``LBU: x3, Imm(x2)`` (instr, x2, imm) =
 [<InlineData(0xff615183, 0x1000L, -10L)>]
 let ``LHU: x3, Imm(x2)`` (instr, x2, imm) =
     loadMemory instr x2 imm 2 true
+
+[<Theory>]
+[<InlineData(0x00310523,  100L, 0x1000L,  10L)>]
+[<InlineData(0xfe310b23, -100L, 0x1000L, -10L)>]
+let ``SB: x3, Imm(x2)`` (instr, x3, x2, imm) =
+    storeMemory instr x3 x2 imm 1
+
+[<Theory>]
+[<InlineData(0x00311523,  100L, 0x1000L,  10L)>]
+[<InlineData(0xfe311b23, -100L, 0x1000L, -10L)>]
+let ``SH: x3, Imm(x2)`` (instr, x3, x2, imm) =
+    storeMemory instr x3 x2 imm 2
+
+[<Theory>]
+[<InlineData(0x00312523,  0x00001ac7L, 0x1000L,  10L)>]
+[<InlineData(0xfe312b23,     -100, 0x1000L, -10L)>]
+let ``SW: x3, Imm(x2)`` (instr, x3, x2, imm) =
+    storeMemory instr x3 x2 imm 4
