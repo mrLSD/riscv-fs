@@ -30,7 +30,7 @@ Technical Group constituted by The RISC-V Foundation
 ## Features & Current status
 * Supports the following features (or _in active development state_)
   - [x] Base instruction sets: RV32I
-  - [ ] Tests RV32I
+  - [x] Tests RV32I
   - [ ] Base instruction sets: RV64I
   - [ ] Tests RV64I
 * Features under development
