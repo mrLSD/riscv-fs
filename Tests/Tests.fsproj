@@ -24,6 +24,7 @@
       <Compile Include="rv32i\j.fs" />
       <Compile Include="rv32i\mem.fs" />
       <Compile Include="rv32i\ui.fs" />
+      <Compile Include="rv32i\sys.fs" />
 
       <Compile Include="Program.fs" />
     </ItemGroup>
