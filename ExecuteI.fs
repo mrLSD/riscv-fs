@@ -1,4 +1,4 @@
-module ISA.RISCV.ExecuteI
+module ISA.RISCV.Execute.I
 
 open ISA.RISCV.Arch
 open ISA.RISCV.Decode.I
@@ -364,7 +364,7 @@ let execEBREAK (mstate : MachineState) =
     mstate.setRunState (Trap EBreak)
 
 // Execute I-instructions
-let ExecuteI (instr : InstructionI) (mstate : MachineState) =
+let Execute (instr : InstructionI) (mstate : MachineState) =
     match instr with
     | LUI i ->
         execLUI i.rd i.imm20 mstate

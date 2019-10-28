@@ -30,9 +30,9 @@ Technical Group constituted by The RISC-V Foundation
  
 ## Features & Current status
 * Supports the following features (or _in active development state_)
-  - [x] Base instruction sets: RV32I
+  - [x] Base instruction set: RV32I
   - [x] Tests RV32I
-  - [ ] Base instruction sets: RV64I
+  - [ ] Base instruction set: RV64I
   - [ ] Tests RV64I
 * Features under development
   * Standard extension M (integer multiply/divide)

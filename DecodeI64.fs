@@ -1,10 +1,12 @@
 module ISA.RISCV.Decode.I64
 
+open System
 open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
+open ISA.RISCV.MachineState
 
 //================================================================ -- \begin_latex{Major_Opcodes}
-// 'I' (Integer x64 instruction set)
+// 'I64' (Integer x64 instruction set)
 type InstructionI64 =
     | LWU   of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
     | LD    of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
@@ -24,7 +26,7 @@ type InstructionI64 =
     | None // Instruction not found
 
 /// Decode 'I64' instructions
-let DecodeI64 (instr: InstrField) : InstructionI64 =
+let Decode (instr: InstrField) : InstructionI64 =
     let opcode = instr.bitSlice 6   0
     // Register number can be: 0-32
     let rd     = int32(instr.bitSlice 11  7)
@@ -78,3 +80,17 @@ let DecodeI64 (instr: InstrField) : InstructionI64 =
         | _      -> None
 
     | _      -> None
+
+// Current ISA print log message for current instruction step
+let verbosityMessage (instr : InstrField) (decodedInstr : InstructionI64) (mstate : MachineState) =
+    let typeName = decodedInstr.GetType().Name
+    let instrMsg =
+        match (decodedInstr) with
+        | LWU x | LD x | SD x | ADDIW x-> sprintf "x%d, x%d, %d" x.rd x.rs1 x.imm12
+        | SLLIW x | SRLIW x | SRAIW x -> sprintf "x%d, x%d, %d" x.rd x.rs1 x.shamt
+        | ADDW x | SUBW x | SLLW x | SRLW x | SRAW x -> sprintf "x%d, x%d, x%d" x.rd x.rs1 x.rs2
+        | _ -> "Undef"
+    let pc = sprintf "%08x:" mstate.PC
+    let instr = sprintf "%08x" instr
+    let instrMsg = String.Format("{0,-7}{1}", typeName, instrMsg)
+    printfn "%s" (String.Format("{0,-12}{1,-12}{2}", pc, instr, instrMsg))

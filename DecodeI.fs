@@ -1,7 +1,9 @@
 module ISA.RISCV.Decode.I
 
+open System
 open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
+open ISA.RISCV.MachineState
 
 //================================================================ -- \begin_latex{Major_Opcodes}
 // 'I' (Integer x32 instruction set)
@@ -74,7 +76,7 @@ let funct12_ECALL    = 0b000000000000L
 let funct12_EBREAK   = 0b000000000001L
 
 /// Decode 'I' instructions
-let DecodeI (instr: InstrField) : InstructionI =
+let Decode (instr: InstrField) : InstructionI =
     let opcode = instr.bitSlice 6   0
     // Register number can be: 0-32
     let rd     = int32(instr.bitSlice 11  7)
@@ -198,3 +200,22 @@ let DecodeI (instr: InstrField) : InstructionI =
     | 0b1110011L when rd = 0 && rs1 = 0 && funct3 = funct3_PRIV && imm12_I = funct12_EBREAK -> EBREAK
 
     | _ -> None
+
+// Current ISA print log message for current instruction step
+let verbosityMessage (instr : InstrField) (decodedInstr : InstructionI) (mstate : MachineState) =
+    let typeName = decodedInstr.GetType().Name
+    let instrMsg =
+        match (decodedInstr) with
+        | LUI x | AUIPC x -> sprintf "x%d, 0x%08x" x.rd x.imm20
+        | JAL x -> sprintf "x%d, 0x%08x\n" x.rd x.imm20
+        | JALR x -> sprintf "x%d, x%d, 0x%08x\n" x.rd x.rs1 x.imm12
+        | LB x | LH x | LW x | LBU x | LHU x | LB x | ADDI x | SLTI x | XORI x | ORI x | ANDI x -> sprintf "x%d, x%d, %d" x.rd x.rs1 x.imm12
+        | BEQ x | BNE x | BLT x | BGE x | BLTU x | BGEU x | SB x | SH x | SW x -> sprintf "x%d, x%d, 0x%08x" x.rs1 x.rs2 x.imm12
+        | SLLI x | SRLI x | SRAI x -> sprintf "x%d, x%d, %d" x.rd x.rs1 x.shamt
+        | ADD x | SUB x | SLL x | SLT x | SLTU x | XOR x | SRL x | SRA x | OR x | AND x -> sprintf "x%d, x%d, x%d" x.rd x.rs1 x.rs2
+        | FENCE _ | EBREAK | ECALL -> ""
+        | _ -> "Undef"
+    let pc = sprintf "%08x:" mstate.PC
+    let instr = sprintf "%08x" instr
+    let instrMsg = String.Format("{0,-7}{1}", typeName, instrMsg)
+    printfn "%s" (String.Format("{0,-12}{1,-12}{2}", pc, instr, instrMsg))
