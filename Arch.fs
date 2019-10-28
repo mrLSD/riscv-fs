@@ -1,7 +1,10 @@
 module ISA.RISCV.Arch
 
+// Basic Machine Int representation - include x32
 type MachineInt   = int64
+// Basic registers: 0-32
 type Register     = int32
+// Value of Register
 type RegisterVal  = MachineInt
 type Opcode       = MachineInt
 type InstrField   = MachineInt

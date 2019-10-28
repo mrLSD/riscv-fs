@@ -4,7 +4,7 @@ open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
 
 //================================================================ -- \begin_latex{Major_Opcodes}
-// 'I' (Base instruction set)
+// 'I' (Integer x32 instruction set)
 type InstructionI =
     | LUI of   {| rd: Register; imm20: MachineInt |}
     | AUIPC of {| rd: Register; imm20: MachineInt |}
@@ -57,15 +57,8 @@ type InstructionI =
 
     | None // Instruction not found
 
-//================================================================ -- \begin_latex{Major_Opcodes}
-// Major Opcodes
-let opcode_OP        = 0b0110011L
-
 //================================================================
 // Sub-opcodes for 'I' instructions
-
-// opcode_JALR sub-opcodes
-let funct3_JALR      = 0b000L
 
 // Sub opcode_OP_IMM.SLLI/SRLI/SRAI - 32 & 64 bit
 let msbs6_SLLI      = 0b0000000L
@@ -83,10 +76,12 @@ let funct12_EBREAK   = 0b000000000001L
 /// Decode 'I' instructions
 let DecodeI (instr: InstrField) : InstructionI =
     let opcode = instr.bitSlice 6   0
+    // Register number can be: 0-32
     let rd     = int32(instr.bitSlice 11  7)
-    let funct3 = instr.bitSlice 14 12
     let rs1    = int32(instr.bitSlice 19 15)
     let rs2    = int32(instr.bitSlice 24 20)
+
+    let funct3 = instr.bitSlice 14 12
     let funct7 = instr.bitSlice 31 25
 
     // Shamt funcs

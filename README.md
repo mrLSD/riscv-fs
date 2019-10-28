@@ -24,6 +24,7 @@ Technical Group constituted by The RISC-V Foundation
   * [Install .NET SDK](#install-.net-sdk)
   * [Make the application executable](#make-the-application-executable)
   * [Run the application executable](#run-the-application-executable)
+* [How to Contribute](#how-to-contribute)
 * [References](#references)  
 * [Licence](#licence)
  
@@ -175,6 +176,10 @@ you'll receive error message:
 output and ELF file for execution in RISC-V CPI simulator:
 
 `$ dotnet run -- -A rv32i -v myapp.elf`
+
+## How to Contribute
+
+Please read file [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## References
 
