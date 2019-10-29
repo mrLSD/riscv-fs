@@ -29,6 +29,7 @@ type Architecture =
 type TrapErrors =
     | InstructionFetch of MachineInt
     | InstructionDecode
+    | InstructionExecute
     | JumpAddress
     | BreakAddress
     | ECall

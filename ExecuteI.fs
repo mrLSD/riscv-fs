@@ -446,4 +446,4 @@ let Execute (instr : InstructionI) (mstate : MachineState) =
         execECALL mstate
     | EBREAK _ ->
         execEBREAK mstate
-    | _ -> mstate
+    | _ -> mstate.setRunState (Trap InstructionExecute)
