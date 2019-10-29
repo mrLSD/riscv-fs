@@ -4,7 +4,6 @@ open Xunit
 
 open ISA.RISCV
 open ISA.RISCV.Arch
-open ISA.RISCV.Decode
 open ISA.RISCV.MachineState
 
 //===============================================
@@ -17,9 +16,9 @@ let Jump instr x2 x3 resultAddr =
     let mstate = mstate.setRegister 2 x2
     let resMstate = mstate.incPC
 
-    let decodedInstr = I.DecodeI instr
-    Assert.NotEqual(decodedInstr, I.None)
-    let mstate = ExecuteI.ExecuteI decodedInstr mstate
+    let executor = Decoder.Decode instr
+    Assert.NotEqual(executor, None)
+    let mstate = executor.Value mstate
 
     Assert.Equal(int64 (int32 x2), mstate.getRegister 2)
     let pcs = mstate.setPC (mstate.getRegister 3)

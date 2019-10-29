@@ -4,7 +4,6 @@ open Xunit
 
 open ISA.RISCV
 open ISA.RISCV.Arch
-open ISA.RISCV.Decode
 open ISA.RISCV.Utils
 
 //===============================================
@@ -35,9 +34,9 @@ let loadMemory instr x2 imm nBytes unsign =
             let mstate = mstate.setMemoryByte (memAddr+2L) 0xb2uy
             (mstate.setMemoryByte (memAddr+3L) 0xc3uy, int64(0xc3b2a10fl))
 
-    let decodedInstr = I.DecodeI instr
-    Assert.NotEqual(decodedInstr, I.None)
-    let mstate = ExecuteI.ExecuteI decodedInstr mstate
+    let executor = Decoder.Decode instr
+    Assert.NotEqual(executor, None)
+    let mstate = executor.Value mstate
     Assert.Equal(x2, mstate.getRegister 2)
     Assert.Equal(resNumber, mstate.getRegister 3)
 
@@ -50,12 +49,12 @@ let storeMemory instr x3 x2 imm nBytes =
     let mstate = mstate.setRegister 2 x2
     let mstate = mstate.setRegister 3 x3
 
-    let decodedInstr = I.DecodeI instr
-    Assert.NotEqual(decodedInstr, I.None)
+    let executor = Decoder.Decode instr
+    Assert.NotEqual(executor, None)
 
     // Get memory value
     let memAddr = x2 + imm
-    let mstate = ExecuteI.ExecuteI decodedInstr mstate
+    let mstate = executor.Value mstate
     let memoryRes =
         match nBytes with
         | 1 -> // 1 bytes

@@ -4,7 +4,6 @@ open Xunit
 
 open ISA.RISCV
 open ISA.RISCV.Arch
-open ISA.RISCV.Decode
 open ISA.RISCV.MachineState
 
 //===============================================
@@ -16,9 +15,9 @@ let System instr trap =
     let mstate = mstate.setPC addr
     let newmstate = mstate.incPC
 
-    let decodedInstr = I.DecodeI instr
-    Assert.NotEqual(decodedInstr, I.None)
-    let mstate = ExecuteI.ExecuteI decodedInstr mstate
+    let executor = Decoder.Decode instr
+    Assert.NotEqual(executor, None)
+    let mstate = executor.Value mstate
 
     if trap then
         Assert.Equal(addr, mstate.PC)

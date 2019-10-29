@@ -15,9 +15,9 @@ let ALUimmediate instr x2 x3 =
     let mstate = mstate.setPC addr
     let mstate = mstate.setRegister 2 x2
 
-    let decodedInstr = I.DecodeI instr
-    Assert.NotEqual(decodedInstr, I.None)
-    let mstate = ExecuteI.ExecuteI decodedInstr mstate
+    let executor = Decoder.Decode instr
+    Assert.NotEqual(executor, None)
+    let mstate = executor.Value mstate
     Assert.Equal(x2, mstate.getRegister 2)
     Assert.Equal(x3, mstate.getRegister 3)
     Assert.Equal(addr + 4L, mstate.PC)

@@ -4,7 +4,6 @@ open Xunit
 
 open ISA.RISCV
 open ISA.RISCV.Arch
-open ISA.RISCV.Decode
 
 //===============================================
 // ALU tests
@@ -16,9 +15,9 @@ let ALU instr x1 x2 x3 =
     let mstate = mstate.setRegister 1 x1
     let mstate = mstate.setRegister 2 x2
 
-    let decodedInstr = I.DecodeI instr
-    Assert.NotEqual(decodedInstr, I.None)
-    let mstate = ExecuteI.ExecuteI decodedInstr mstate
+    let executor = Decoder.Decode instr
+    Assert.NotEqual(executor, None)
+    let mstate = executor.Value mstate
     Assert.Equal(x1, mstate.getRegister 1)
     Assert.Equal(x2, mstate.getRegister 2)
     Assert.Equal(x3, mstate.getRegister 3)

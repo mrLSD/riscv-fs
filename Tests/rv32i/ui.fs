@@ -4,7 +4,6 @@ open Xunit
 
 open ISA.RISCV
 open ISA.RISCV.Arch
-open ISA.RISCV.Decode
 
 //===============================================
 // Upper immediate tests
@@ -14,9 +13,9 @@ let Ui instr x3 =
     let mstate = MachineState.InitMachineState Map.empty RV32i true
     let mstate = mstate.setPC addr
 
-    let decodedInstr = I.DecodeI instr
-    Assert.NotEqual(decodedInstr, I.None)
-    let mstate = ExecuteI.ExecuteI decodedInstr mstate
+    let executor = Decoder.Decode instr
+    Assert.NotEqual(executor, None)
+    let mstate = executor.Value mstate
     Assert.Equal(x3, mstate.getRegister 3)
 
 [<Theory>]
