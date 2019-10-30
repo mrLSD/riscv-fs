@@ -7,7 +7,7 @@ type Register     = int32
 // Value of Register
 type RegisterVal  = MachineInt
 type Opcode       = MachineInt
-type InstrField   = MachineInt
+type InstrField   = int32
 
 // Available RISC-V architectures
 type Architecture =

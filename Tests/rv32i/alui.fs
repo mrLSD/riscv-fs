@@ -27,7 +27,7 @@ let ALUimmediate instr x2 x3 =
 [<InlineData(-5, 0)>]
 [<InlineData(-10, -5)>]
 let ``ADDI: x3 = x2 + 5`` (x2, x3) =
-    ALUimmediate 0x00510193L x2 x3
+    ALUimmediate 0x00510193 x2 x3
 
 [<Theory>]
 [<InlineData(5, 0)>]
@@ -38,7 +38,7 @@ let ``ADDI: x3 = x2 + 5`` (x2, x3) =
 [<InlineData(-5, 1)>]
 [<InlineData(-10, 1)>]
 let ``SLTI: x3 = x2 < 5`` (x2, x3) =
-    ALUimmediate 0x00512193L x2 x3
+    ALUimmediate 0x00512193 x2 x3
 
 [<Theory>]
 [<InlineData(5, 0)>]
@@ -49,7 +49,7 @@ let ``SLTI: x3 = x2 < 5`` (x2, x3) =
 [<InlineData(-5, 0)>]
 [<InlineData(-10, 0)>]
 let ``SLTIU: x3 = unsign x2 < unsign 5`` (x2, x3) =
-    ALUimmediate 0x00513193L x2 x3
+    ALUimmediate 0x00513193 x2 x3
 
 [<Theory>]
 [<InlineData(0b101, 0)>]
@@ -58,7 +58,7 @@ let ``SLTIU: x3 = unsign x2 < unsign 5`` (x2, x3) =
 [<InlineData(0b1000, 0b1101)>]
 [<InlineData(0b1011, 0b1110)>]
 let ``XORI: x3 = x2 ^ 5 (b101)`` (x2, x3) =
-    ALUimmediate 0x00514193L x2 x3
+    ALUimmediate 0x00514193 x2 x3
 
 [<Theory>]
 [<InlineData(0b101, 0b101)>]
@@ -67,7 +67,7 @@ let ``XORI: x3 = x2 ^ 5 (b101)`` (x2, x3) =
 [<InlineData(0b1111, 0b1111)>]
 [<InlineData(0b1101, 0b1101)>]
 let ``ORI: x3 = x2 | 5 (b101)`` (x2, x3) =
-    ALUimmediate 0x00516193L x2 x3
+    ALUimmediate 0x00516193 x2 x3
 
 [<Theory>]
 [<InlineData(0b101, 0b101)>]
@@ -75,23 +75,23 @@ let ``ORI: x3 = x2 | 5 (b101)`` (x2, x3) =
 [<InlineData(0b110, 0b100)>]
 [<InlineData(0b1011, 0b0001)>]
 let ``ANDI: x3 = x2 & 5 (b101)`` (x2, x3) =
-    ALUimmediate 0x00517193L x2 x3
+    ALUimmediate 0x00517193 x2 x3
 
 [<Theory>]
 [<InlineData(0b11001101, 0b1100110100000)>]
 [<InlineData(0b11001110, 0b1100111000000)>]
 let ``SLLI: x3 = x2 << 5 (b101)`` (x2, x3) =
-    ALUimmediate 0x00511193L x2 x3
+    ALUimmediate 0x00511193 x2 x3
 
 [<Theory>]
 [<InlineData(0b1011001101, 0b0000010110)>]
 [<InlineData(0b11001100101, 0b00000110011)>]
 [<InlineData(0b11110000111100000000000000001111, 0b00000111100001111000000000000000)>]
 let ``SRLI: x3 = x2 >> 5 (b101)`` (x2, x3) =
-    ALUimmediate 0x00515193L x2 x3
+    ALUimmediate 0x00515193 x2 x3
 
 [<Theory>]
 [<InlineData(0b1011001101, 0b0000010110)>]
 [<InlineData(0b11110000111100000000000000001111, 0b11111111100001111000000000000000)>]
 let ``SRAI: x3 = x2 >> 5 (b101)`` (x2, x3) =
-    ALUimmediate 0x40515193L x2 x3
+    ALUimmediate 0x40515193 x2 x3

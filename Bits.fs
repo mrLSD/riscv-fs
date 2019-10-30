@@ -46,6 +46,11 @@ type System.Int64 with
         (x ^^^ (x >>> 31)) - (x >>> 31)
 
 type System.Int32 with
+    member x.bitSlice endBit startBit = // get Bit slice from range
+        (x >>> startBit) &&& ~~~(-1 <<< (endBit - startBit + 1))
+    member x.signExtend n = // Sign extend bits for x32
+        let bitOffset = 32 - n
+        (x <<< bitOffset) >>> bitOffset
     member x.align = // get x32 mask with all `1` bits
         x &&& (-1)
 
@@ -70,27 +75,27 @@ let loadHalfWord (mem : Map<int64, byte>) (addr : int64) : int16 option =
         None
 
 // Load from Memory 4 bytes
-let loadWord (mem : Map<int64, byte>) (addr : int64) : int64 option =
+let loadWord (mem : Map<int64, byte>) (addr : int64) : int32 option =
     if Map.containsKey addr mem &&
        Map.containsKey (addr+1L) mem &&
        Map.containsKey (addr+2L) mem &&
        Map.containsKey (addr+3L) mem then
         let word = [| mem.[addr]; mem.[addr+1L]; mem.[addr+2L]; mem.[addr+3L] |]
-        Some(int64(combineBytes word))
+        Some(int32(combineBytes word))
     else
         None
 
 // Load from Memory 8 bytes
-let loadDouble (mem : Map<uint32, byte>) (addr : uint32) : int64 option =
+let loadDouble (mem : Map<int64, byte>) (addr : int64) : int64 option =
     if Map.containsKey addr mem &&
-       Map.containsKey (addr+1u) mem &&
-       Map.containsKey (addr+2u) mem &&
-       Map.containsKey (addr+3u) mem &&
-       Map.containsKey (addr+4u) mem &&
-       Map.containsKey (addr+5u) mem &&
-       Map.containsKey (addr+6u) mem &&
-       Map.containsKey (addr+7u) mem then
-        let dWord = [| mem.[addr]; mem.[addr+1u]; mem.[addr+2u]; mem.[addr+3u]; mem.[addr+4u]; mem.[addr+5u]; mem.[addr+6u]; mem.[addr+7u] |]
+       Map.containsKey (addr+1L) mem &&
+       Map.containsKey (addr+2L) mem &&
+       Map.containsKey (addr+3L) mem &&
+       Map.containsKey (addr+4L) mem &&
+       Map.containsKey (addr+5L) mem &&
+       Map.containsKey (addr+6L) mem &&
+       Map.containsKey (addr+7L) mem then
+        let dWord = [| mem.[addr]; mem.[addr+1L]; mem.[addr+2L]; mem.[addr+3L]; mem.[addr+4L]; mem.[addr+5L]; mem.[addr+6L]; mem.[addr+7L] |]
         Some(int64(combineBytes dWord))
     else
         None

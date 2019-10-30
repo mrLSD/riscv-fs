@@ -8,14 +8,14 @@ open ISA.RISCV.MachineState
 //================================================================ -- \begin_latex{Major_Opcodes}
 // 'I64' (Integer x64 instruction set)
 type InstructionI64 =
-    | LWU   of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
-    | LD    of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
-    | SD    of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
-    | ADDIW of  {| rd: Register; rs1: Register; imm12: MachineInt  |}
+    | LWU   of  {| rd: Register; rs1: Register; imm12: InstrField |}
+    | LD    of  {| rd: Register; rs1: Register; imm12: InstrField |}
+    | SD    of  {| rd: Register; rs1: Register; imm12: InstrField |}
+    | ADDIW of  {| rd: Register; rs1: Register; imm12: InstrField |}
 
-    | SLLIW of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
-    | SRLIW of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
-    | SRAIW of  {| rd: Register; rs1: Register; shamt: MachineInt  |}
+    | SLLIW of  {| rd: Register; rs1: Register; shamt: InstrField |}
+    | SRLIW of  {| rd: Register; rs1: Register; shamt: InstrField |}
+    | SRAIW of  {| rd: Register; rs1: Register; shamt: InstrField |}
 
     | ADDW  of  {| rd: Register; rs1: Register; rs2: Register |}
     | SUBW  of  {| rd: Register; rs1: Register; rs2: Register |}
@@ -49,34 +49,34 @@ let Decode (instr: InstrField) : InstructionI64 =
 
     match (opcode) with
     // Load Opcodes
-    | 0b0000011L ->
+    | 0b0000011 ->
         match funct3 with
-        | 0b110L -> LWU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
-        | 0b011L -> LD  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b110 -> LWU {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b011 -> LD  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
         | _      -> None
 
     // Store opcodes
-    | 0b0100011L ->
+    | 0b0100011 ->
         match funct3 with
-        | 0b011L -> SD  {| rd = rd; rs1 = rs1; imm12 = imm11_S |}
+        | 0b011 -> SD  {| rd = rd; rs1 = rs1; imm12 = imm11_S |}
         | _      -> None
 
-    | 0b0011011L ->
+    | 0b0011011 ->
         match funct3 with
         // Immediate Opcodes
-        | 0b000L -> ADDIW  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
+        | 0b000 -> ADDIW  {| rd = rd; rs1 = rs1; imm12 = imm12_I |}
 
         // Shift Immediate Opcodes
-        | 0b001L when funct7 = 0b0000000L -> SLLIW {| rd = rd; rs1 = rs1; shamt = shamt |}
-        | 0b101L when funct7 = 0b0000000L -> SRLIW {| rd = rd; rs1 = rs1; shamt = shamt |}
-        | 0b101L when funct7 = 0b0100000L -> SRAIW {| rd = rd; rs1 = rs1; shamt = shamt |}
+        | 0b001 when funct7 = 0b0000000 -> SLLIW {| rd = rd; rs1 = rs1; shamt = shamt |}
+        | 0b101 when funct7 = 0b0000000 -> SRLIW {| rd = rd; rs1 = rs1; shamt = shamt |}
+        | 0b101 when funct7 = 0b0100000 -> SRAIW {| rd = rd; rs1 = rs1; shamt = shamt |}
 
         // ALU opcodes
-        | 0b000L when funct7 = 0b0000000L -> ADDW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-        | 0b000L when funct7 = 0b0100000L -> SUBW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-        | 0b001L when funct7 = 0b0000000L -> SLLW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-        | 0b101L when funct7 = 0b0000000L -> SRLW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-        | 0b101L when funct7 = 0b0100000L -> SRAW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b000 when funct7 = 0b0000000 -> ADDW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b000 when funct7 = 0b0100000 -> SUBW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b001 when funct7 = 0b0000000 -> SLLW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b101 when funct7 = 0b0000000 -> SRLW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b101 when funct7 = 0b0100000 -> SRAW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
         | _      -> None
 
     | _      -> None

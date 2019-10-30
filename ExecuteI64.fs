@@ -7,8 +7,8 @@ open ISA.RISCV.Utils.Bits
 
 //=================================================
 // LWU - Load Word (4 bytes) Unsigned from Memory
-let execLWU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
+let execLWU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
     let memResult = loadHalfWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
@@ -19,9 +19,9 @@ let execLWU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mach
 
 //=================================================
 // LD - Load double Word (8 bytes) from Memory
-let execLD (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
-    let memResult = loadHalfWord mstate.Memory addr
+let execLD (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
+    let memResult = loadDouble mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
@@ -31,8 +31,8 @@ let execLD (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Machi
 
 //=================================================
 // SD - Store double Word (8 bytes) to Memory
-let execSD (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
+let execSD (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
     let memResult = loadHalfWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))

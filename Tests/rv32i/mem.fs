@@ -58,11 +58,11 @@ let storeMemory instr x3 x2 imm nBytes =
     let memoryRes =
         match nBytes with
         | 1 -> // 1 bytes
-            (int64(int8((Bits.loadByte mstate.Memory memAddr).Value)))
+            int64(int8((Bits.loadByte mstate.Memory memAddr).Value))
         | 2 -> // 2 bytes
             int64((Bits.loadHalfWord mstate.Memory memAddr).Value)
         | _ -> // 4 bytes
-            (int64(int32((Bits.loadWord mstate.Memory memAddr).Value)))
+            int64((Bits.loadWord mstate.Memory memAddr).Value)
 
     Assert.Equal(x2, mstate.getRegister 2)
     Assert.Equal(x3, mstate.getRegister 3)
