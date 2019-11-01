@@ -161,7 +161,7 @@ let execLBU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Mach
         mstate.setRunState (Trap (MemAddress addr))
     else
         let memVal = uint8 memResult.Value
-        let mstate = mstate.setRegister rd (int64 (uint8 memVal))
+        let mstate = mstate.setRegister rd (int64 memVal)
         mstate.incPC
 
 //=================================================
@@ -173,7 +173,7 @@ let execLHU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Mach
         mstate.setRunState (Trap (MemAddress addr))
     else
         let memVal = uint16 memResult.Value
-        let mstate = mstate.setRegister rd (int64 (uint16 memVal))
+        let mstate = mstate.setRegister rd (int64 memVal)
         mstate.incPC
 
 //=================================================

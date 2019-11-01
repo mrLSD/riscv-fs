@@ -8,10 +8,10 @@ open ISA.RISCV.MachineState
 //================================================================ -- \begin_latex{Major_Opcodes}
 // 'I64' (Integer x64 instruction set)
 type InstructionI64 =
-    | LWU   of  {| rd: Register; rs1: Register; imm12: InstrField |}
-    | LD    of  {| rd: Register; rs1: Register; imm12: InstrField |}
-    | SD    of  {| rd: Register; rs1: Register; imm12: InstrField |}
-    | ADDIW of  {| rd: Register; rs1: Register; imm12: InstrField |}
+    | LWU   of  {| rd:  Register; rs1:                                                        Register; imm12: InstrField |}
+    | LD    of  {| rd:  Register; rs1: Register; imm12: InstrField |}
+    | SD    of  {| rs1: Register; rs2: Register; imm12: InstrField |}
+    | ADDIW of  {| rd:  Register; rs1: Register; imm12: InstrField |}
 
     | SLLIW of  {| rd: Register; rs1: Register; shamt: InstrField |}
     | SRLIW of  {| rd: Register; rs1: Register; shamt: InstrField |}
@@ -58,7 +58,7 @@ let Decode (instr: InstrField) : InstructionI64 =
     // Store opcodes
     | 0b0100011 ->
         match funct3 with
-        | 0b011 -> SD  {| rd = rd; rs1 = rs1; imm12 = imm11_S |}
+        | 0b011 -> SD  {| rs1 = rs1; rs2 = rs2; imm12 = imm11_S |}
         | _      -> None
 
     | 0b0011011 ->
@@ -86,7 +86,8 @@ let verbosityMessage (instr : InstrField) (decodedInstr : InstructionI64) (mstat
     let typeName = decodedInstr.GetType().Name
     let instrMsg =
         match (decodedInstr) with
-        | LWU x | LD x | SD x | ADDIW x-> sprintf "x%d, x%d, %d" x.rd x.rs1 x.imm12
+        | LWU x | LD x | ADDIW x-> sprintf "x%d, x%d, %d" x.rd x.rs1 x.imm12
+        | SD x -> sprintf "x%d, x%d, %d" x.rs1 x.rs2 x.imm12
         | SLLIW x | SRLIW x | SRAIW x -> sprintf "x%d, x%d, %d" x.rd x.rs1 x.shamt
         | ADDW x | SUBW x | SLLW x | SRLW x | SRAW x -> sprintf "x%d, x%d, x%d" x.rd x.rs1 x.rs2
         | _ -> "Undef"
