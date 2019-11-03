@@ -28,9 +28,9 @@ $(BUILDDIR)/%32: $(SRCDIR)/%.S init32.o mmio.ld
 	$(RISCVCC32) -o $(BUILDDIR)/$*32 -Tmmio.ld intermediate32.o init32.o
 	rm intermediate32.o
 
-$(BUILDDIR)/%64: $(SRCDIR)/%.c init64.o mmio64.o  mmio.ld
+$(BUILDDIR)/%64: $(SRCDIR)/%.S init64.o mmio.ld
 	mkdir -p $(BUILDDIR)
-	$(RISCVCC64) -c $(SRCDIR)/$*.c -o intermediate64.o
+	$(RISCVCC64) -c $(SRCDIR)/$*.S -o intermediate64.o
 	$(RISCVCC64) -o $(BUILDDIR)/$*64 -Tmmio.ld intermediate64.o init64.o
 	rm intermediate64.o
 

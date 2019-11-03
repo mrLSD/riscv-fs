@@ -11,4 +11,6 @@ main:
   slli  x3, x2, 5
   srli  x3, x2, 5
   srai  x3, x2, 5
+  # x64 only
+  addiw  x3, x2, 5
   ret
