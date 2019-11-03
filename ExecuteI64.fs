@@ -47,6 +47,7 @@ let execADDIW (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Ma
 
 //=================================================
 // SLLIW - Shift Left Logical Immediate Word
+// Returns sign-extension to 64 bits of lower 32 bits of result.
 let execSLLIW (rd : Register) (rs1 : Register) (shamt : InstrField) (mstate : MachineState) =
     let rdVal = int32(mstate.getRegister rs1) <<< int32 shamt
     let mstate = mstate.setRegister rd (int64 rdVal)
@@ -54,6 +55,7 @@ let execSLLIW (rd : Register) (rs1 : Register) (shamt : InstrField) (mstate : Ma
 
 //=================================================
 // SRLIW - Shift Right Logical Immediate Word
+// Returns sign-extension to 64 bits of lower 32 bits of result.
 let execSRLIW (rd : Register) (rs1 : Register) (shamt : InstrField) (mstate : MachineState) =
     let rdVal = int32(uint32(mstate.getRegister rs1) >>> int32 shamt)
     let mstate = mstate.setRegister rd (int64 rdVal)
@@ -61,6 +63,7 @@ let execSRLIW (rd : Register) (rs1 : Register) (shamt : InstrField) (mstate : Ma
 
 //=================================================
 // SRAIW - Shift Right Arithmetic Immediate Word
+// Returns sign-extension to 64 bits of lower 32 bits of result.
 let execSRAIW (rd : Register) (rs1 : Register) (shamt : InstrField) (mstate : MachineState) =
     let rdVal = int32(mstate.getRegister rs1) >>> int32 shamt
     let mstate = mstate.setRegister rd (int64 rdVal)
@@ -68,6 +71,7 @@ let execSRAIW (rd : Register) (rs1 : Register) (shamt : InstrField) (mstate : Ma
 
 //=================================================
 // ADDW - Add operation Word
+// Returns sign-extension to 64 bits of lower 32 bits of result.
 let execADDW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = int32(mstate.getRegister rs1) + int32(mstate.getRegister rs2)
     let mstate = mstate.setRegister rd (int64 rdVal)
@@ -75,6 +79,7 @@ let execADDW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 
 //=================================================
 // SUBW - Sub operation Word
+// Returns sign-extension to 64 bits of lower 32 bits of result.
 let execSUBW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = int32(mstate.getRegister rs1) - int32(mstate.getRegister rs2)
     let mstate = mstate.setRegister rd (int64 rdVal)
@@ -82,6 +87,7 @@ let execSUBW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 
 //=================================================
 // SLLW - Shift Logical Left Word
+// Returns sign-extension to 64 bits of lower 32 bits of result.
 let execSLLW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = int32(mstate.getRegister rs1) <<< int32(mstate.getRegister rs2)
     let mstate = mstate.setRegister rd (int64 rdVal)
@@ -89,6 +95,7 @@ let execSLLW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 
 //=================================================
 // SRLW - Shift Right Logical Word
+// Returns sign-extension to 64 bits of lower 32 bits of result.
 let execSRLW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = int32(uint32(mstate.getRegister rs1) >>> int32(mstate.getRegister rs2))
     let mstate = mstate.setRegister rd (int64 rdVal)
@@ -96,6 +103,7 @@ let execSRLW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 
 //=================================================
 // SRAW - Shift Right Arithmetic Word
+// Returns sign-extension to 64 bits of lower 32 bits of result.
 let execSRAW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = int32(mstate.getRegister rs1) >>> int32 (mstate.getRegister rs2)
     let mstate = mstate.setRegister rd (int64 rdVal)
