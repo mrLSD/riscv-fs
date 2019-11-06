@@ -9,11 +9,11 @@ open ISA.RISCV.Utils.Bits
 // LWU - Load Word (4 bytes) Unsigned from Memory
 let execLWU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1) + int64 imm12
-    let memResult = loadHalfWord mstate.Memory addr
+    let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
-        let memVal = uint64 memResult.Value
+        let memVal = uint32 memResult.Value
         let mstate = mstate.setRegister rd (int64 memVal)
         mstate.incPC
 

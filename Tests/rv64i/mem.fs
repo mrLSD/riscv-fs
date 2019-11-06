@@ -28,11 +28,21 @@ let loadMemory instr x2 imm nBytes unsign =
             let data = if unsign then int64(0xa10fus) else int64(0xa10fs)
             let mstate = mstate.setMemoryByte memAddr 0x0fuy
             (mstate.setMemoryByte (memAddr+1L) 0xa1uy, data)
-        | _ -> // 4 bytes
+        | 4 ->
+            let data = if unsign then int64(0xc3b2a10fu) else int64(0xc3b2a10fl)
             let mstate = mstate.setMemoryByte memAddr 0x0fuy
             let mstate = mstate.setMemoryByte (memAddr+1L) 0xa1uy
             let mstate = mstate.setMemoryByte (memAddr+2L) 0xb2uy
-            (mstate.setMemoryByte (memAddr+3L) 0xc3uy, int64(0xc3b2a10fl))
+            (mstate.setMemoryByte (memAddr+3L) 0xc3uy, data)
+        | _ -> // 8 bytes
+            let mstate = mstate.setMemoryByte memAddr 0x0fuy
+            let mstate = mstate.setMemoryByte (memAddr+1L) 0xa1uy
+            let mstate = mstate.setMemoryByte (memAddr+2L) 0xb2uy
+            let mstate = mstate.setMemoryByte (memAddr+3L) 0xb3uy
+            let mstate = mstate.setMemoryByte (memAddr+4L) 0xb4uy
+            let mstate = mstate.setMemoryByte (memAddr+5L) 0xb5uy
+            let mstate = mstate.setMemoryByte (memAddr+6L) 0xb6uy
+            (mstate.setMemoryByte (memAddr+7L) 0xc3uy, 0xc3b6b5b4b3b2a10fL)
 
     let executor = Decoder.Decode mstate instr
     Assert.NotEqual(executor, None)
@@ -61,8 +71,10 @@ let storeMemory instr x3 x2 imm nBytes =
             int64(int8((Bits.loadByte mstate.Memory memAddr).Value))
         | 2 -> // 2 bytes
             int64((Bits.loadHalfWord mstate.Memory memAddr).Value)
-        | _ -> // 4 bytes
+        | 4 -> // 4 bytes
             int64((Bits.loadWord mstate.Memory memAddr).Value)
+        | _ -> // 8 bytes
+            int64((Bits.loadDouble mstate.Memory memAddr).Value)
 
     Assert.Equal(x2, mstate.getRegister 2)
     Assert.Equal(x3, mstate.getRegister 3)
@@ -87,6 +99,12 @@ let ``LW: x3, Imm(x2)`` (instr, x2, imm) =
     loadMemory instr x2 imm 4 false
 
 [<Theory>]
+[<InlineData(0x00a13183, 0x1000L,  10L)>]
+[<InlineData(0xff613183, 0x1000L, -10L)>]
+let ``LD: x3, Imm(x2)`` (instr, x2, imm) =
+    loadMemory instr x2 imm 8 false
+
+[<Theory>]
 [<InlineData(0x00a14183, 0x1000L,  10L)>]
 [<InlineData(0xff614183, 0x1000L, -10L)>]
 let ``LBU: x3, Imm(x2)`` (instr, x2, imm) =
@@ -97,6 +115,12 @@ let ``LBU: x3, Imm(x2)`` (instr, x2, imm) =
 [<InlineData(0xff615183, 0x1000L, -10L)>]
 let ``LHU: x3, Imm(x2)`` (instr, x2, imm) =
     loadMemory instr x2 imm 2 true
+
+[<Theory>]
+[<InlineData(0x00a16183, 0x1000L,  10L)>]
+[<InlineData(0xff616183, 0x1000L, -10L)>]
+let ``LWU: x3, Imm(x2)`` (instr, x2, imm) =
+    loadMemory instr x2 imm 4 true
 
 [<Theory>]
 [<InlineData(0x00310523,  100L, 0x1000L,  10L)>]
@@ -115,3 +139,9 @@ let ``SH: x3, Imm(x2)`` (instr, x3, x2, imm) =
 [<InlineData(0xfe312b23,     -100, 0x1000L, -10L)>]
 let ``SW: x3, Imm(x2)`` (instr, x3, x2, imm) =
     storeMemory instr x3 x2 imm 4
+
+[<Theory>]
+[<InlineData(0x00313523,  0x00001ac7L, 0x1000L,  10L)>]
+[<InlineData(0xfe313b23,         -100, 0x1000L, -10L)>]
+let ``SD: x3, Imm(x2)`` (instr, x3, x2, imm) =
+    storeMemory instr x3 x2 imm 8
