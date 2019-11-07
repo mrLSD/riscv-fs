@@ -32,10 +32,11 @@ Technical Group constituted by The RISC-V Foundation
 * Supports the following features (or _in active development state_)
   - [x] Base instruction set: RV32I
   - [x] Tests RV32I
-  - [ ] Base instruction set: RV64I
-  - [ ] Tests RV64I
+  - [x] Base instruction set: RV64I
+  - [x] Tests RV64I
+  - [ ] Standard extension M (integer multiply/divide)
+  - [ ] Tests for Standard extension M RV32/RV64
 * Features under development
-  * Standard extension M (integer multiply/divide)
   * Standard extension A (atomic memory ops)
   * Standard extension C (Compressed 16-bit instructions)
   * Standard extension F (Single-precision floating point)
