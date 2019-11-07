@@ -27,7 +27,7 @@ type InstructionI64 =
 
 /// Decode 'I64' instructions
 let Decode (instr: InstrField) : InstructionI64 =
-    let opcode = instr.bitSlice 6   0
+    let opcode = instr.bitSlice 6 0
     // Register number can be: 0-32
     let rd     = int32(instr.bitSlice 11  7)
     let rs1    = int32(instr.bitSlice 19 15)
@@ -70,8 +70,11 @@ let Decode (instr: InstrField) : InstructionI64 =
         | 0b001 when funct7 = 0b0000000 -> SLLIW {| rd = rd; rs1 = rs1; shamt = shamt |}
         | 0b101 when funct7 = 0b0000000 -> SRLIW {| rd = rd; rs1 = rs1; shamt = shamt |}
         | 0b101 when funct7 = 0b0100000 -> SRAIW {| rd = rd; rs1 = rs1; shamt = shamt |}
+        | _      -> None
 
+    | 0b0111011 ->
         // ALU opcodes
+        match funct3 with
         | 0b000 when funct7 = 0b0000000 -> ADDW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
         | 0b000 when funct7 = 0b0100000 -> SUBW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
         | 0b001 when funct7 = 0b0000000 -> SLLW {| rd = rd; rs1 = rs1; rs2 = rs2 |}
