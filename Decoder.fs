@@ -18,16 +18,15 @@ type execFunc = MachineState -> MachineState
 // Aggregate decoded data
 let Decode (mstate : MachineState) (instr: InstrField) : execFunc option =
     let decI32 = I.Decode mstate instr
-    let decI64 =
-        if decI32 = I.InstructionI.None then
-            I64.Decode instr
-        else
-            I64.InstructionI64.None
+    let decI64 = I64.Decode instr
+    let decM = M.Decode mstate instr
 
     // Set decoded instruction and ISA execution function
     if decI32 <> I.InstructionI.None then
         Some(I.Execute decI32)
     else if decI64 <> I64.InstructionI64.None then
         Some(I64.Execute decI64)
+    else if decM <> M.InstructionM.None then
+        Some(M.Execute decM)
     else
         None
