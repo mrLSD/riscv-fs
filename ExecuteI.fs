@@ -1,4 +1,4 @@
-module ISA.RISCV.ExecuteI
+module ISA.RISCV.Execute.I
 
 open ISA.RISCV.Arch
 open ISA.RISCV.Decode.I
@@ -7,20 +7,20 @@ open ISA.RISCV.Utils.Bits
 
 //=================================================
 // LUI - Load Upper immediate
-let execLUI (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
-    let mstate = mstate.setRegister rd imm20
+let execLUI (rd : Register) (imm20 : InstrField) (mstate : MachineState) =
+    let mstate = mstate.setRegister rd (int64 imm20)
     mstate.incPC
 
 //=================================================
 // AUIPC - Add Upper immediate PC
-let execAUIPC (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
-    let mstate = mstate.setRegister rd (imm20 + mstate.PC)
+let execAUIPC (rd : Register) (imm20 : InstrField) (mstate : MachineState) =
+    let mstate = mstate.setRegister rd ((int64 imm20) + mstate.PC)
     mstate.incPC
 
 //=================================================
 // JALR - Jump Relative immediately
-let execJALR (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let newPC = ((mstate.getRegister rs1) + imm12) &&& (~~~1L)
+let execJALR (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let newPC = ((mstate.getRegister rs1) + (int64 imm12)) &&& (~~~1L)
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap JumpAddress)
     else if newPC = mstate.PC then
@@ -32,8 +32,8 @@ let execJALR (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Mac
 
 //=================================================
 // JAL - Jump immediately
-let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
-    let newPC = mstate.PC + int64(imm20)
+let execJAL (rd : Register) (imm20 : InstrField) (mstate : MachineState) =
+    let newPC = mstate.PC + int64 imm20
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap JumpAddress)
     else if newPC = mstate.PC then
@@ -44,10 +44,10 @@ let execJAL (rd : Register) (imm20 : MachineInt) (mstate : MachineState) =
         mstate.setPC newPC
 
 // Basic branch flow
-let branch (branchCheck : MachineInt -> MachineInt -> bool) (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+let branch (branchCheck : MachineInt -> MachineInt -> bool) (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let x1 = mstate.getRegister rs1
     let x2 = mstate.getRegister rs2
-    let newPC = mstate.PC + imm12
+    let newPC = mstate.PC + int64 imm12
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap BreakAddress)
     else if newPC = mstate.PC then
@@ -60,34 +60,34 @@ let branch (branchCheck : MachineInt -> MachineInt -> bool) (rs1 : Register) (rs
 
 //=================================================
 // BEQ - Branch if Equal
-let execBEQ (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+let execBEQ (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     branch (=) rs1 rs2 imm12 mstate
 
 //=================================================
 // BNE - Branch if Not Equal
-let execBNE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+let execBNE (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     branch (<>) rs1 rs2 imm12 mstate
 
 //=================================================
 // BLT - Branch if Less Then
-let execBLT (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+let execBLT (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     branch (<) rs1 rs2 imm12 mstate
 
 //=================================================
 // BGE - Branch if Greater or Equal
-let execBGE (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+let execBGE (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     branch (>=) rs1 rs2 imm12 mstate
 
 //=================================================
 // BLTU - Branch if Less Then (Unsigned)
-let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let x1 = mstate.getRegister rs1
     let x2 = mstate.getRegister rs2
     let branchCheck =
         match mstate.Arch.archBits with
         | RV32 -> uint32 x1 < uint32 x2
         | _ -> uint64 x1 < uint64 x2
-    let newPC = mstate.PC + imm12
+    let newPC = mstate.PC + int64 imm12
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap BreakAddress)
     else if newPC = mstate.PC then
@@ -100,7 +100,7 @@ let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : Ma
 
 //=================================================
 // BGEU - Branch If Greater or Equal (Unsigned)
-let execBGEU (rs1 : Register) (rs2: Register) (imm12 : MachineInt) (mstate : MachineState) =
+let execBGEU (rs1 : Register) (rs2: Register) (imm12 : InstrField) (mstate : MachineState) =
     let x1 = mstate.getRegister rs1
     let x2 = mstate.getRegister rs2
     let branchCheck =
@@ -108,7 +108,7 @@ let execBGEU (rs1 : Register) (rs2: Register) (imm12 : MachineInt) (mstate : Mac
         | RV32 -> uint32 x1 >= uint32 x2
         | _ -> uint64 x1 >= uint64 x2
 
-    let newPC = mstate.PC + imm12
+    let newPC = mstate.PC + int64 imm12
     if newPC % 4L <> 0L then
         mstate.setRunState (Trap BreakAddress)
     else if newPC = mstate.PC then
@@ -121,8 +121,8 @@ let execBGEU (rs1 : Register) (rs2: Register) (imm12 : MachineInt) (mstate : Mac
 
 //=================================================
 // LB - Load Byte from Memory
-let execLB (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
+let execLB (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
     let memResult = loadByte mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
@@ -132,8 +132,8 @@ let execLB (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Machi
 
 //=================================================
 // LH - Load Half-word (2 bytes)  from Memory
-let execLH (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
+let execLH (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
     let memResult = loadHalfWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
@@ -143,8 +143,8 @@ let execLH (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Machi
 
 //=================================================
 // LW - Load Word (4 bytes) from Memory
-let execLW (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
+let execLW (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
@@ -154,32 +154,32 @@ let execLW (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Machi
 
 //=================================================
 // LBU - Load Byte Unsigned from Memory
-let execLBU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
+let execLBU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
     let memResult = loadByte mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
         let memVal = uint8 memResult.Value
-        let mstate = mstate.setRegister rd (int64 (uint8 memVal))
+        let mstate = mstate.setRegister rd (int64 memVal)
         mstate.incPC
 
 //=================================================
 // LHU - Load Half-word (2 bytes) Unsigned from Memory
-let execLHU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
+let execLHU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
     let memResult = loadHalfWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
         let memVal = uint16 memResult.Value
-        let mstate = mstate.setRegister rd (int64 (uint16 memVal))
+        let mstate = mstate.setRegister rd (int64 memVal)
         mstate.incPC
 
 //=================================================
 // SB - Store Byte to Memory
-let execSB (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
+let execSB (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
     let nBytes = 1
     let rs2Val = mstate.getRegister rs2
     Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
@@ -187,8 +187,8 @@ let execSB (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : Mach
 
 //=================================================
 // SH - Store 2 Bytes (Hald word) to Memory
-let execSH (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
+let execSH (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
     let nBytes = 2
     let rs2Val = mstate.getRegister rs2
     Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
@@ -196,8 +196,8 @@ let execSH (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : Mach
 
 //=================================================
 // SW - Store 4 Bytes (Word) to Memory
-let execSW (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + imm12
+let execSW (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let addr = (mstate.getRegister rs1) + int64 imm12
     let nBytes = 4
     let rs2Val = mstate.getRegister rs2
     Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
@@ -205,21 +205,21 @@ let execSW (rs1 : Register) (rs2 : Register) (imm12 : MachineInt) (mstate : Mach
 
 //=================================================
 // ADDI - Add immediate
-let execADDI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let rdVal = (mstate.getRegister rs1) + imm12
+let execADDI (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let rdVal = (mstate.getRegister rs1) + int64 imm12
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
 //=================================================
 // SLTI - Set to 1 if Less Then Immediate
-let execSLTI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let rdVal = if (mstate.getRegister rs1) < imm12 then 1L else 0L
+let execSLTI (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let rdVal = if (mstate.getRegister rs1) < int64 imm12 then 1L else 0L
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
 //=================================================
 // SLTIU - Set to 1 if Less Then Unsign Immediate
-let execSLTIU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
+let execSLTIU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let rdVal =
         match mstate.Arch.archBits with
         | RV32 -> if uint32(mstate.getRegister rs1) < uint32 imm12 then 1L else 0L
@@ -229,28 +229,28 @@ let execSLTIU (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : Ma
 
 //=================================================
 // XORI - Xor immediately
-let execXORI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let rdVal = (mstate.getRegister rs1) ^^^ imm12
+let execXORI (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let rdVal = (mstate.getRegister rs1) ^^^ int64 imm12
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
 //=================================================
 // ORI - Or immediately
-let execORI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let rdVal = (mstate.getRegister rs1) ||| imm12
-    let mstate = mstate.setRegister rd rdVal
+let execORI (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let rdVal = (mstate.getRegister rs1) ||| int64 imm12
+    let mstate = mstate.setRegister rd (int64 rdVal)
     mstate.incPC
 
 //=================================================
 // SLLI - Shift Left Logical Immediate
-let execSLLI (rd : Register) (rs1 : Register) (shamt : MachineInt) (mstate : MachineState) =
+let execSLLI (rd : Register) (rs1 : Register) (shamt : InstrField) (mstate : MachineState) =
     let rdVal = (mstate.getRegister rs1) <<< int32 shamt
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
 //=================================================
 // SRLI - Shift Right Logical Immediate
-let execSRLI (rd : Register) (rs1 : Register) (shamt : MachineInt) (mstate : MachineState) =
+let execSRLI (rd : Register) (rs1 : Register) (shamt : InstrField) (mstate : MachineState) =
     let rdVal =
         match mstate.Arch.archBits with
         | RV32 -> int64(uint32(mstate.getRegister rs1) >>> int32 shamt)
@@ -260,15 +260,15 @@ let execSRLI (rd : Register) (rs1 : Register) (shamt : MachineInt) (mstate : Mac
 
 //=================================================
 // SRAI - Shift Right Arithmetic Immediate
-let execSRAI (rd : Register) (rs1 : Register) (shamt : MachineInt) (mstate : MachineState) =
+let execSRAI (rd : Register) (rs1 : Register) (shamt : InstrField) (mstate : MachineState) =
     let rdVal = (mstate.getRegister rs1) >>> int32 shamt
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
 //=================================================
 // ANDI - And immediately
-let execANDI (rd : Register) (rs1 : Register) (imm12 : MachineInt) (mstate : MachineState) =
-    let rdVal = (mstate.getRegister rs1) &&& imm12
+let execANDI (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
+    let rdVal = (mstate.getRegister rs1) &&& int64 imm12
     let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
@@ -364,7 +364,7 @@ let execEBREAK (mstate : MachineState) =
     mstate.setRunState (Trap EBreak)
 
 // Execute I-instructions
-let ExecuteI (instr : InstructionI) (mstate : MachineState) =
+let Execute (instr : InstructionI) (mstate : MachineState) =
     match instr with
     | LUI i ->
         execLUI i.rd i.imm20 mstate
@@ -446,4 +446,4 @@ let ExecuteI (instr : InstructionI) (mstate : MachineState) =
         execECALL mstate
     | EBREAK _ ->
         execEBREAK mstate
-    | _ -> mstate
+    | _ -> mstate.setRunState (Trap InstructionExecute)

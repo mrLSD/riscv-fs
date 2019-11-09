@@ -24,17 +24,19 @@ Technical Group constituted by The RISC-V Foundation
   * [Install .NET SDK](#install-.net-sdk)
   * [Make the application executable](#make-the-application-executable)
   * [Run the application executable](#run-the-application-executable)
+* [How to Contribute](#how-to-contribute)
 * [References](#references)  
 * [Licence](#licence)
  
 ## Features & Current status
 * Supports the following features (or _in active development state_)
-  - [x] Base instruction sets: RV32I
+  - [x] Base instruction set: RV32I
   - [x] Tests RV32I
-  - [ ] Base instruction sets: RV64I
-  - [ ] Tests RV64I
+  - [x] Base instruction set: RV64I
+  - [x] Tests RV64I
+  - [ ] Standard extension M (integer multiply/divide)
+  - [ ] Tests for Standard extension M RV32/RV64
 * Features under development
-  * Standard extension M (integer multiply/divide)
   * Standard extension A (atomic memory ops)
   * Standard extension C (Compressed 16-bit instructions)
   * Standard extension F (Single-precision floating point)
@@ -175,6 +177,10 @@ you'll receive error message:
 output and ELF file for execution in RISC-V CPI simulator:
 
 `$ dotnet run -- -A rv32i -v myapp.elf`
+
+## How to Contribute
+
+Please read file [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## References
 

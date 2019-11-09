@@ -11,4 +11,10 @@ main:
   sra   x3, x2, x1
   or    x3, x2, x1
   and   x3, x2, x1
+  # x64
+  addw  x3, x2, x1
+  subw  x3, x2, x1
+  sllw  x3, x2, x1
+  srlw  x3, x2, x1
+  sraw  x3, x2, x1
   ret

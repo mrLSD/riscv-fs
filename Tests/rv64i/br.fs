@@ -1,4 +1,4 @@
-module Tests.rv32i.br
+module Tests.rv64i.br
 
 open Xunit
 
@@ -10,7 +10,7 @@ open ISA.RISCV.Arch
 let Branch instr x1 x2 resultAddr =
     // Init MachineState
     let addr = 0x80000000L
-    let mstate = MachineState.InitMachineState Map.empty RV32i true
+    let mstate = MachineState.InitMachineState Map.empty RV64i true
     let mstate = mstate.setPC addr
     let mstate = mstate.setRegister 1 x1
     let mstate = mstate.setRegister 2 x2

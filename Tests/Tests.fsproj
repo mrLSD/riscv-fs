@@ -26,6 +26,14 @@
       <Compile Include="rv32i\ui.fs" />
       <Compile Include="rv32i\sys.fs" />
 
+      <Compile Include="rv64i\alu.fs" />
+      <Compile Include="rv64i\alui.fs" />
+      <Compile Include="rv64i\ui.fs" />
+      <Compile Include="rv64i\sys.fs" />
+      <Compile Include="rv64i\j.fs" />
+      <Compile Include="rv64i\br.fs" />
+      <Compile Include="rv64i\mem.fs" />
+
       <Compile Include="Program.fs" />
     </ItemGroup>
 

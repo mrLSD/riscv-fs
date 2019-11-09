@@ -10,26 +10,6 @@ open ISA.RISCV.MachineState
 open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
 open ISA.RISCV.CLI
-open ISA.RISCV.Decode
-
-// Print log message for current instruction step
-let verbosityMessage (instr : InstrField) (decodedInstr : I.InstructionI) (mstate : MachineState) =
-    let typeName = decodedInstr.GetType().Name
-    let instrMsg =
-        match (decodedInstr) with
-        | I.LUI x | I.AUIPC x -> sprintf "x%d, 0x%08x" x.rd x.imm20
-        | I.JAL x -> sprintf "x%d, 0x%08x\n" x.rd x.imm20
-        | I.JALR x -> sprintf "x%d, x%d, 0x%08x\n" x.rd x.rs1 x.imm12
-        | I.LB x | I.LH x | I.LW x | I.LBU x | I.LHU x | I.LB x | I.ADDI x | I.SLTI x | I.XORI x | I.ORI x | I.ANDI x -> sprintf "x%d, x%d, %d" x.rd x.rs1 x.imm12
-        | I.BEQ x | I.BNE x | I.BLT x | I.BGE x | I.BLTU x | I.BGEU x | I.SB x | I.SH x | I.SW x -> sprintf "x%d, x%d, 0x%08x" x.rs1 x.rs2 x.imm12
-        | I.SLLI x | I.SRLI x | I.SRAI x -> sprintf "x%d, x%d, %d" x.rd x.rs1 x.shamt
-        | I.ADD x | I.SUB x | I.SLL x | I.SLT x | I.SLTU x | I.XOR x | I.SRL x | I.SRA x | I.OR x | I.AND x -> sprintf "x%d, x%d, x%d" x.rd x.rs1 x.rs2
-        | I.FENCE _ | I.EBREAK | I.ECALL -> ""
-        | _ -> "Undef"
-    let pc = sprintf "%08x:" mstate.PC
-    let instr = sprintf "%08x" instr
-    let instrMsg = String.Format("{0,-7}{1}", typeName, instrMsg)
-    printfn "%s" (String.Format("{0,-12}{1,-12}{2}", pc, instr, instrMsg))
 
 // Get registers state
 let verbosityMessageRegisters (mstate : MachineState) =
@@ -54,9 +34,12 @@ let readElfFile file =
     let elf = ELFReader.Load file
     Map.ofArray (Array.concat [| for s in elf.GetSections() -> getSectionContent s |])
 
+// Get instruction from current Machine State that related to
+// current PC as memory address for loading instruction data for Decoding
 let fetchInstruction (mstate : MachineState) : InstrField option =
     loadWord mstate.Memory mstate.PC
 
+// Basic RISC-V run life cycle. Represent Finite State Machine (FSM)
 let rec runCycle (mstate : MachineState) =
     let instr = fetchInstruction mstate
 
@@ -64,15 +47,20 @@ let rec runCycle (mstate : MachineState) =
         match instr with
         | None -> mstate.setRunState (Trap (InstructionFetch mstate.PC))
         | _ ->
-            let decodedInstr = I.DecodeI instr.Value
+            let instrValue = instr.Value
+            let executor = Decoder.Decode mstate instrValue
 
-            match decodedInstr with
-            | I.InstructionI.None -> mstate.setRunState (Trap TrapErrors.InstructionDecode)
+            match executor with
+            | None -> mstate.setRunState (Trap TrapErrors.InstructionDecode)
             | _ ->
-                if mstate.Verbosity then
-                    verbosityMessage instr.Value decodedInstr mstate
-
-                ExecuteI.ExecuteI decodedInstr mstate
+// TODO: Change that logic
+//                if mstate.Verbosity then
+//                    verbosityMessage instr.Value decodedInstr mstate
+                // Executor for specific Instruction Set
+                // that was detected in Decoder
+                let Executor = executor.Value
+                // Execute current Instruction
+                Executor mstate
     match mstate.RunState with
     | Trap _ -> mstate
     | RunMachineState.Stopped ->
@@ -80,6 +68,7 @@ let rec runCycle (mstate : MachineState) =
         mstate
     | _ -> runCycle mstate
 
+// Main application Run logic
 let Run (cfg : AppConfig) =
     let data = readElfFile cfg.Files.Value.[0]
     let mstate = InitMachineState data cfg.Arch.Value cfg.Verbosity.Value
