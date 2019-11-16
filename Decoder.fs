@@ -10,23 +10,28 @@ open ISA.RISCV.Execute
 // concrete function for specific instruction set
 type execFunc = MachineState -> MachineState
 
-//type Instructions =
-//    | I   of I.InstructionI * execFunc
-//    | I64 of I64.InstructionI64 * execFunc
-//    | None
-
 // Aggregate decoded data
 let Decode (mstate : MachineState) (instr: InstrField) : execFunc option =
-    let decI32 = I.Decode mstate instr
-    let decI64 = I64.Decode instr
-    let decM = M.Decode mstate instr
-
-    // Set decoded instruction and ISA execution function
-    if decI32 <> I.InstructionI.None then
-        Some(I.Execute decI32)
-    else if decI64 <> I64.InstructionI64.None then
-        Some(I64.Execute decI64)
-    else if decM <> M.InstructionM.None then
-        Some(M.Execute decM)
+    // Decoded instruction and execute ISA function
+    if mstate.Arch.archBits = RV32i then
+        let decoded = I.Decode mstate instr
+        match decoded with
+        | I.InstructionI.None -> None
+        | _ -> Some(I.Execute decoded)
+    else if mstate.Arch.archBits = RV64i then
+        let decoded = I64.Decode instr
+        match decoded with
+        | I64.InstructionI64.None -> None
+        | _ -> Some(I64.Execute decoded)
+    else if mstate.Arch.archBits = RV32im then
+        let decoded = M.Decode mstate instr
+        match decoded with
+        | M.InstructionM.None -> None
+        | _ -> Some(M.Execute decoded)
+    else if mstate.Arch.archBits = RV64im then
+        let decoded = M.Decode mstate instr
+        match decoded with
+        | M.InstructionM.None -> None
+        | _ -> Some(M64.Execute decoded)
     else
         None

@@ -15,16 +15,20 @@ type Architecture =
     | RV64
     | RV32i
     | RV64i
+    | RV32im
+    | RV64im
     static member fromString (x : string) =
         match x with
-        | "rv32i" -> Some(RV32i)
-        | "rv64i" -> Some(RV64i)
+        | "rv32i"  -> Some(RV32i)
+        | "rv64i"  -> Some(RV64i)
+        | "rv32im" -> Some(RV32im)
+        | "rv64im" -> Some(RV64im)
         | _ -> None
 
     member x.archBits = // Get architecture bits
         match x with
-        | Architecture.RV32 | Architecture.RV32i -> RV32
-        | Architecture.RV64 | Architecture.RV64i -> RV64
+        | RV32 | RV32i | RV32im -> RV32
+        | RV64 | RV64i | RV64im -> RV64
 
 type TrapErrors =
     | InstructionFetch of MachineInt
