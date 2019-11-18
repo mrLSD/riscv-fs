@@ -122,7 +122,6 @@ let ``AND: x3 = x2 & x1`` (x1, x2, x3) =
 [<InlineData(-40, 20, -20)>]
 [<InlineData(0xFFFFFFFF, 10, 9)>]
 [<InlineData(0xFACFFFFFFFFL, 10, 9)>]
-[<InlineData(0xFACFFFFFFFFL, 10, 9)>]
 [<InlineData(0xFCD3FFA1FFFFFFFEL, 10, 8)>]
 let ``ADDW: x3 = x2 + x1`` (x1, x2, x3) =
     ALU 0x001101bb x1 x2 x3

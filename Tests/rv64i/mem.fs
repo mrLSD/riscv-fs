@@ -54,7 +54,7 @@ let loadMemory instr x2 imm nBytes unsign =
 let storeMemory instr x3 x2 imm nBytes =
     // Init MachineState
     let addr = 0x80000000L
-    let mstate = MachineState.InitMachineState Map.empty RV32i true
+    let mstate = MachineState.InitMachineState Map.empty RV64i true
     let mstate = mstate.setPC addr
     let mstate = mstate.setRegister 2 x2
     let mstate = mstate.setRegister 3 x3
