@@ -3,34 +3,66 @@ module ISA.RISCV.Execute.M
 open ISA.RISCV.Decode.M
 open ISA.RISCV.Arch
 open ISA.RISCV.MachineState
+open ISA.RISCV.Utils.Bits
 
 //=================================================
 // MUL - Multiplication operation - sign * sign
 let execMUL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    // mul  = s*s
+    let rdVal = (mstate.getRegister rs1) * (mstate.getRegister rs2)
+    let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
 //=================================================
 // MULH - Multiplication operation - sign * sign and return high 32 bits
 let execMULH (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    // mulh = s*s -> [63..32]
+    let rdVal = (mstate.getRegister rs1) * (mstate.getRegister rs2)
+    let hRes = rdVal.bitSlice 63 32
+    let mstate = mstate.setRegister rd hRes
     mstate.incPC
 
 //=================================================
 // MULHSU - Multiplication operation - Multiplication operation - sign * unsign and return high 32 bits
 let execMULHSU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    // mulhsu = s*us(32|64) -> [63..32]
+    let rs1Val = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    let rdVal =
+        match mstate.Arch.archBits with
+        | RV32 -> rs1Val * int64(uint32 rs2Val)
+        | _    -> rs1Val * int64(uint64 rs2Val)
+    let hRes = rdVal.bitSlice 63 32
+    let mstate = mstate.setRegister rd hRes
     mstate.incPC
 
 //=================================================
 // MULHU - Multiplication operation - Multiplication operation - unsign * unsign and return high 32 bits
 let execMULHU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    // mulhu = us(32|64)*us(32|64) -> [63..32]
+    let rs1Val = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    let rdVal =
+        match mstate.Arch.archBits with
+        | RV32 -> int64(uint32 rs1Val) * int64(uint32 rs2Val)
+        | _    -> int64(uint64 rs1Val) * int64(uint64 rs2Val)
+    let hRes = rdVal.bitSlice 63 32
+    let mstate = mstate.setRegister rd hRes
     mstate.incPC
 
 //=================================================
 // DIV - Division operation
 let execDIV (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
+    let rs1Val = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    let minSigned =
+        match mstate.Arch.archBits with
+        | RV32 -> 0x80000000L
+        | _    -> 0x8000000000000000L
+    let rdVal =
+        if rs2Val = 0L then
+            -1L
+        else if rs1Val = minSigned && rs2Val = -1L then
+            rs1Val
+        else
+            rs1Val / rs2Val
+    let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
 //=================================================
