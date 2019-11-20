@@ -68,16 +68,62 @@ let execDIV (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 //=================================================
 // DIVU - Division unsign operation
 let execDIVU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
+    let rs1Val = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    let rdVal =
+        match mstate.Arch.archBits with
+        | RV32 ->
+            let maxUnsigned = 0xFFFFFFFFL
+            if rs2Val = 0L then
+                maxUnsigned
+            else
+                int64(uint32 rs1Val / uint32 rs2Val)
+        | _    ->
+            let maxUnsigned = 0xFFFFFFFFFFFFFFFFL
+            if rs2Val = 0L then
+                maxUnsigned
+            else
+                int64(uint64 rs1Val / uint64 rs2Val)
+    let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
 //=================================================
 // REM - Rem operation
 let execREM (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
+    let rs1Val = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    let minSigned =
+        match mstate.Arch.archBits with
+        | RV32 -> 0x80000000L
+        | _    -> 0x8000000000000000L
+    let rdVal =
+        if rs2Val = 0L then
+            rs1Val
+        else if rs1Val = minSigned && rs2Val = -1L then
+            0L
+        else
+            rs1Val % rs2Val
+    let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
 //=================================================
 // REMU - Rem unsign operation
 let execREMU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
+    let rs1Val = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    let rdVal =
+        match mstate.Arch.archBits with
+        | RV32 ->
+            if rs2Val = 0L then
+                rs1Val
+            else
+                int64(uint32 rs1Val % uint32 rs2Val)
+        | _    ->
+            if rs2Val = 0L then
+                rs1Val
+            else
+                int64(uint64 rs1Val % uint64 rs2Val)
+    let mstate = mstate.setRegister rd rdVal
     mstate.incPC
 
 // Execute M-instructions
