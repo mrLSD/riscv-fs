@@ -33,6 +33,8 @@
       <Compile Include="rv64i\j.fs" />
       <Compile Include="rv64i\br.fs" />
       <Compile Include="rv64i\mem.fs" />
+        
+      <Compile Include="rv32m\alu.fs" />
 
       <Compile Include="Program.fs" />
     </ItemGroup>

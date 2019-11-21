@@ -30,7 +30,7 @@ $(BUILDDIR)/%32: $(SRCDIR)/%.S init32.o mmio.ld
 
 $(BUILDDIR)/%64: $(SRCDIR)/%.S init64.o mmio.ld
 	mkdir -p $(BUILDDIR)
-	$(RISCVCC64) -c $(SRCDIR)/$*.S -o intermediate64.o
+	$(RISCVCC64) -c $(SRCDIR)/$*.S -o intermediate64.o -D x64
 	$(RISCVCC64) -o $(BUILDDIR)/$*64 -Tmmio.ld intermediate64.o init64.o
 	rm intermediate64.o
 

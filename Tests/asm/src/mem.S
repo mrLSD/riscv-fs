@@ -7,15 +7,19 @@ main:
   lh    x3, -10(x2)
   lw    x3, 10(x2)
   lw    x3, -10(x2)
+#ifdef x64
   ld    x3, 10(x2)
   ld    x3, -10(x2)
+#endif
 
   lbu   x3, 10(x2)
   lbu   x3, -10(x2)
   lhu   x3, 10(x2)
   lhu   x3, -10(x2)
+#ifdef x64
   lwu   x3, 10(x2)
   lwu   x3, -10(x2)
+#endif
 
   sb    x3, 10(x2)
   sb    x3, -10(x2)
@@ -23,7 +27,8 @@ main:
   sh    x3, -10(x2)
   sw    x3, 10(x2)
   sw    x3, -10(x2)
-  # x64
+#ifdef x64
   sd    x3, 10(x2)
   sd    x3, -10(x2)
+#endif
   ret
