@@ -104,10 +104,44 @@ let ``MULHSU: x3 = half (sign x2 * unsign x1)`` (x3, x2, x1) =
 let ``MULHU: x3 = half (unsign x2 * unsign x1)`` (x3, x1, x2) =
     ALU 0x021131b3 x1 x2 x3
 
-let ``DIV: x3 = x2 / x1`` (x1, x2, x3) =
+[<Theory>]
+[<InlineData(2, 4, 2)>]
+[<InlineData(2, 5, 2)>]
+[<InlineData(3, 6, 2)>]
+[<InlineData(3, 15, 4)>]
+[<InlineData(0, -1, 3)>]
+[<InlineData(0, 1, -3)>]
+[<InlineData(-2, 4, -2)>]
+[<InlineData(-2, -4, 2)>]
+[<InlineData(2, -4, -2)>]
+[<InlineData(0, 0, 2)>]
+[<InlineData(-1, 2, 0)>]
+[<InlineData(0x80000000, 0x80000000, -1)>]
+[<InlineData(0x80000000, 0x80000000, 1)>]
+[<InlineData(-1, 0x80000000, 0)>]
+[<InlineData(-1, 1, 0)>]
+[<InlineData(-1, 0, 0)>]
+let ``DIV: x3 = x2 / x1`` (x3, x2, x1) =
     ALU 0x021141b3 x1 x2 x3
 
-let ``DIVU: x3 = (unsign x2) / (unsign x1)`` (x1, x2, x3) =
+[<Theory>]
+[<InlineData(2, 4, 2)>]
+[<InlineData(2, 5, 2)>]
+[<InlineData(3, 6, 2)>]
+[<InlineData(3, 15, 4)>]
+[<InlineData(0, 1, 3)>]
+[<InlineData(0x55555555, -1, 3)>]
+[<InlineData(0, 1, -3)>]
+[<InlineData(0, 4, -2)>]
+[<InlineData(715827879, -20, 6)>]
+[<InlineData(0, -4, -2)>]
+[<InlineData(0, 0, 2)>]
+[<InlineData(0xFFFFFFFF, 2, 0)>]
+[<InlineData(0x7FFFFFFB, -10, 2)>]
+[<InlineData(0x80000000, 0x80000000, 1)>]
+[<InlineData(0, 0x80000000, -1)>]
+[<InlineData(-1, 0x80000000, 0)>]
+let ``DIVU: x3 = (unsign x2) / (unsign x1)`` (x3, x2, x1) =
     ALU 0x021151b3 x1 x2 x3
 
 let ``REM: x3 = x2 % x1`` (x1, x2, x3) =
