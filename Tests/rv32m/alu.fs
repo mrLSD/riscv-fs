@@ -1,4 +1,4 @@
-module Tests.rvM.alu
+module Tests.rv32m.alu
 
 open Xunit
 
@@ -144,10 +144,30 @@ let ``DIV: x3 = x2 / x1`` (x3, x2, x1) =
 let ``DIVU: x3 = (unsign x2) / (unsign x1)`` (x3, x2, x1) =
     ALU 0x021151b3 x1 x2 x3
 
-let ``REM: x3 = x2 % x1`` (x1, x2, x3) =
+[<Theory>]
+[<InlineData( 2, 20,  6)>]
+[<InlineData(-2,-20,  6)>]
+[<InlineData( 2, 20, -6)>]
+[<InlineData(-2,-20, -6)>]
+[<InlineData( 0, 0x8000000,  1)>]
+[<InlineData( 0, 0x8000000, -1)>]
+[<InlineData(0x8000000, 0x8000000, 0)>]
+[<InlineData(1, 1, 0)>]
+[<InlineData(0, 0, 0)>]
+let ``REM: x3 = x2 % x1`` (x3, x2, x1) =
     ALU 0x021161b3 x1 x2 x3
 
-let ``DIVU: x3 = (unsign x2) % (unsign x1)`` (x1, x2, x3) =
+[<Theory>]
+[<InlineData( 2, 20,  6)>]
+[<InlineData( 2,-20,  6)>]
+[<InlineData( 20, 20, -6)>]
+[<InlineData(-20,-20, -6)>]
+[<InlineData( 0, 0x8000000,  1)>]
+[<InlineData(0x8000000, 0x8000000, -1)>]
+[<InlineData(0x8000000, 0x8000000, 0)>]
+[<InlineData(1, 1, 0)>]
+[<InlineData(0, 0, 0)>]
+let ``REMU: x3 = (unsign x2) % (unsign x1)`` (x3, x2, x1) =
     ALU 0x021171b3 x1 x2 x3
 // 021101bb
 // 021141bb
