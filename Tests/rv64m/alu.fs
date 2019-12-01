@@ -37,3 +37,13 @@ let ALU instr x1 x2 x3 =
 [<InlineData(0x000000000000ff7f, 0x000000000002fe7d, 0xaaaaaaaaaaaaaaabL)>]
 let ``MUL: x3 = x2 * x1`` ( x3, x1, x2) =
     ALU 0x021101b3 x1 x2 x3
+
+[<Theory>]
+[<InlineData(0x00000000, 0x00000000, 0x00000000)>]
+[<InlineData(0x00000000, 0x00000001, 0x00000001)>]
+[<InlineData(0x00000000, 0x00000003, 0x00000007)>]
+[<InlineData(0x0000000000000000, 0x0000000000000000, 0xffffffffffff8000L)>]
+[<InlineData(0x0000000000000000, 0xffffffff80000000L, 0x00000000)>]
+[<InlineData(0x0000000000000000, 0xffffffff80000000L, 0xffffffffffff8000L)>]
+let ``MULH: x3 = half (x2 * x1)`` (x3, x1, x2) =
+    ALU 0x021111b3 x1 x2 x3

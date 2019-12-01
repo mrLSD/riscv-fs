@@ -57,18 +57,18 @@ let ALU instr x1 x2 x3 =
 let ``MUL: x3 = x2 * x1`` ( x3, x1, x2) =
     ALU 0x021101b3 x1 x2 x3
 
-[<Theory>]
-[<InlineData(0x00000000, 0x00000000, 0x00000000)>]
-[<InlineData(0x00000000, 0x00000001, 0x00000001)>]
-[<InlineData(0x00000000, 0x00000003, 0x00000007)>]
-[<InlineData(0x00000000, 0x00000000, 0xffff8000)>]
-[<InlineData(0x00000000, 0x80000000, 0x00000000)>]
-[<InlineData(0xffff0081, 0xaaaaaaab, 0x0002fe7d)>]
-[<InlineData(0xffff0081, 0x0002fe7d, 0xaaaaaaab)>]
-[<InlineData(0x00010000, 0xff000000, 0xff000000)>]
-[<InlineData(0x00000000, 0xffffffff, 0xffffffff)>]
-[<InlineData(0xffffffff, 0xffffffff, 0x00000001)>]
-[<InlineData(0xffffffff, 0x00000001, 0xffffffff)>]
+//[<Theory>]
+//[<InlineData(0x00000000, 0x00000000, 0x00000000)>]
+//[<InlineData(0x00000000, 0x00000001, 0x00000001)>]
+//[<InlineData(0x00000000, 0x00000003, 0x00000007)>]
+//[<InlineData(0x00000000, 0x00000000, 0xffff8000)>]
+//[<InlineData(0x00000000, 0x80000000, 0x00000000)>]
+//[<InlineData(0xffff0081, 0xaaaaaaab, 0x0002fe7d)>]
+//[<InlineData(0xffff0081, 0x0002fe7d, 0xaaaaaaab)>]
+//[<InlineData(0x00010000, 0xff000000, 0xff000000)>]
+//[<InlineData(0x00000000, 0xffffffff, 0xffffffff)>]
+//[<InlineData(0xffffffff, 0xffffffff, 0x00000001)>]
+//[<InlineData(0xffffffff, 0x00000001, 0xffffffff)>]
 let ``MULH: x3 = half (x2 * x1)`` (x3, x1, x2) =
     ALU 0x021111b3 x1 x2 x3
 

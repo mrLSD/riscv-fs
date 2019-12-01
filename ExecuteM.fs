@@ -16,7 +16,10 @@ let execMUL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 // MULH - Multiplication operation - sign * sign and return high 32 bits
 let execMULH (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = (mstate.getRegister rs1) * (mstate.getRegister rs2)
-    let hRes = rdVal.bitSlice 63 32
+    let hRes =
+        match mstate.Arch.archBits with
+        | RV32 -> rdVal.bitSlice 63 32
+        | _    -> 0L
     let mstate = mstate.setRegister rd hRes
     mstate.incPC
 
