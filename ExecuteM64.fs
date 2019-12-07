@@ -1,7 +1,7 @@
 module ISA.RISCV.Execute.M64
 
 open ISA.RISCV.Arch
-open ISA.RISCV.Decode.M
+open ISA.RISCV.Decode.M64
 open ISA.RISCV.MachineState
 
 //=================================================
@@ -72,7 +72,7 @@ let execREMUW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machin
     mstate.incPC
 
 // Execute M64-instructions
-let Execute (instr : InstructionM) (mstate : MachineState) =
+let Execute (instr : InstructionM64) (mstate : MachineState) =
     match instr with
     | MULW i ->
         execMULW i.rd i.rs1 i.rs2 mstate
