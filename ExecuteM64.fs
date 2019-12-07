@@ -15,16 +15,16 @@ let execMULW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 //=================================================
 // DIVW - Division Word operation - sign * sign
 let execDIVW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let rs1Val = mstate.getRegister rs1
-    let rs2Val = mstate.getRegister rs2
-    let minSigned = 0x8000000000000000L
+    let rs1Val = int32(mstate.getRegister rs1)
+    let rs2Val = int32(mstate.getRegister rs2)
+    let minSigned = 0x80000000
     let rdVal =
-        if rs2Val = 0L then
+        if rs2Val = 0 then
             -1
-        else if rs1Val = minSigned && rs2Val = -1L then
-            int32 rs1Val
+        else if rs1Val = minSigned && rs2Val = -1 then
+            rs1Val
         else
-            int32 rs1Val / int32 rs2Val
+            rs1Val / rs2Val
     let mstate = mstate.setRegister rd (int64 rdVal)
     mstate.incPC
 
@@ -45,16 +45,16 @@ let execDIVUW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machin
 //=================================================
 // REMW - Division Unsign Word operation - sign * sign
 let execREMW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let rs1Val = mstate.getRegister rs1
-    let rs2Val = mstate.getRegister rs2
-    let minSigned = 0x8000000000000000L
+    let rs1Val = int32(mstate.getRegister rs1)
+    let rs2Val = int32(mstate.getRegister rs2)
+    let minSigned = 0x80000000
     let rdVal =
-        if rs2Val = 0L then
+        if rs2Val = 0 then
             int32 rs1Val
-        else if rs1Val = minSigned && rs2Val = -1L then
+        else if rs1Val = minSigned && rs2Val = -1 then
             0
         else
-            int32  rs1Val % int32 rs2Val
+            rs1Val % rs2Val
     let mstate = mstate.setRegister rd (int64 rdVal)
     mstate.incPC
 

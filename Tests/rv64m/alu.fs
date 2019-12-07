@@ -22,7 +22,7 @@ let ALU instr x1 x2 x3 =
     Assert.Equal(x2, mstate.getRegister 2)
     Assert.Equal(x3, mstate.getRegister 3)
     Assert.Equal(addr + 4L, mstate.PC)
-(*
+
 [<Theory>]
 [<InlineData(200, 10, 20)>]
 [<InlineData(0x0000000000001200, 0x0000000000007e00, 0x6db6db6db6db6db7L)>]
@@ -38,13 +38,13 @@ let ALU instr x1 x2 x3 =
 let ``MUL: x3 = x2 * x1`` ( x3, x1, x2) =
     ALU 0x021101b3 x1 x2 x3
 
-//[<Theory>]
-//[<InlineData(0x00000000, 0x00000000, 0x00000000)>]
-//[<InlineData(0x00000001, 0x00000001, 0x00000001)>]
-//[<InlineData(0x00000015, 0x00000003, 0x00000007)>]
-//[<InlineData(0x0000000000000000, 0x0000000000000000, 0xffffffffffff8000L)>]
-//[<InlineData(0x0000000000000000, 0xffffffff80000000L, 0x00000000)>]
-//[<InlineData(0x0000000000000000, 0xffffffff80000000L, 0xffffffffffff8000L)>]
+[<Theory>]
+[<InlineData(0x00000000, 0x00000000, 0x00000000)>]
+[<InlineData(0x00000001, 0x00000001, 0x00000001)>]
+[<InlineData(0x00000015, 0x00000003, 0x00000007)>]
+[<InlineData(0x0000000000000000, 0x0000000000000000, 0xffffffffffff8000L)>]
+[<InlineData(0x0000000000000000, 0xffffffff80000000L, 0x00000000)>]
+[<InlineData(0x0000000000000000, 0xffffffff80000000L, 0xffffffffffff8000L)>]
 let ``MULW: x3 = x2 * x1`` (x3, x2, x1) =
     ALU 0x021101bb x1 x2 x3
 
@@ -71,13 +71,13 @@ let ``MULHU: x3 = half (unsign x2 * unsign x1)`` (x3, x1, x2) =
     ALU 0x021131b3 x1 x2 x3
 
 [<Theory>]
-[<InlineData(0x00000000, 0x00000000, 0x00000000)>]
-[<InlineData(0x00000000, 0x00000001, 0x00000001)>]
-[<InlineData(0x00000000, 0x00000003, 0x00000007)>]
-[<InlineData(0x0000000000000000, 0x0000000000000000, 0xffffffffffff8000L)>]
+//[<InlineData(0x00000000, 0x00000000, 0x00000000)>]
+//[<InlineData(0x00000000, 0x00000001, 0x00000001)>]
+//[<InlineData(0x00000000, 0x00000003, 0x00000007)>]
+//[<InlineData(0x0000000000000000, 0x0000000000000000, 0xffffffffffff8000L)>]
 [<InlineData(0x0000000000000000, 0xffffffff80000000L, 0x00000000)>]
 //[<InlineData(0xffffffff80000000L, 0xffffffff80000000L, 0xffffffffffff8000L)>]
-let ``MULHSU: x3 = half (sign x2 * unsign x1)`` (x3, x2, x1) =
+let ``WMULHSU: x3 = half (sign x2 * unsign x1)`` (x3, x2, x1) =
     ALU 0x021121b3 x1 x2 x3
 
 [<Theory>]
@@ -93,16 +93,16 @@ let ``MULHSU: x3 = half (sign x2 * unsign x1)`` (x3, x2, x1) =
 let ``DIV: x3 = x2 / x1`` (x3, x2, x1) =
     ALU 0x021141b3 x1 x2 x3
 
-//[<Theory>]
-//[<InlineData(3, 20, 6)>]
-//[<InlineData(-3, -20, 6)>]
-//[<InlineData(-3, 20, -6)>]
-//[<InlineData(3, -20, -6)>]
-//[<InlineData(0x80000000, 0x80000000, 1)>]
-//[<InlineData(0x80000000, 0x80000000,-1)>]
-//[<InlineData(-1, 0x80000000, 0)>]
-//[<InlineData(-1, 1, 0)>]
-//[<InlineData(-1, 0, 0)>]
+[<Theory>]
+[<InlineData(3, 20, 6)>]
+[<InlineData(-3, -20, 6)>]
+[<InlineData(-3, 20, -6)>]
+[<InlineData(3, -20, -6)>]
+[<InlineData(0x80000000, 0x80000000, 1)>]
+[<InlineData(0x80000000, 0x80000000,-1)>]
+[<InlineData(-1, 0x80000000, 0)>]
+[<InlineData(-1, 1, 0)>]
+[<InlineData(-1, 0, 0)>]
 let ``DIVW: x3 = x2 / x1`` (x3, x2, x1) =
     ALU 0x021141bb x1 x2 x3
 
@@ -119,15 +119,15 @@ let ``DIVW: x3 = x2 / x1`` (x3, x2, x1) =
 let ``DIVU: x3 = (unsign x2) / (unsign x1)`` (x3, x2, x1) =
     ALU 0x021151b3 x1 x2 x3
 
-//[<Theory>]
-//[<InlineData(3, 20, 6)>]
-//[<InlineData(0, 20, -6)>]
-//[<InlineData(0, -20, -6)>]
-//[<InlineData(0x80000000, 0x80000000, 1)>]
-//[<InlineData(0, 0x80000000, -1)>]
-//[<InlineData(-1, 0x80000000, 0)>]
-//[<InlineData(-1, 1, 0)>]
-//[<InlineData(-1, 0, 0)>]
+[<Theory>]
+[<InlineData(3, 20, 6)>]
+[<InlineData(0, 20, -6)>]
+[<InlineData(0, -20, -6)>]
+[<InlineData(0x80000000, 0x80000000, 1)>]
+[<InlineData(0, 0x80000000, -1)>]
+[<InlineData(-1, 0x80000000, 0)>]
+[<InlineData(-1, 1, 0)>]
+[<InlineData(-1, 0, 0)>]
 let ``DIVUW: x3 = unsign x2 / unsign x1`` (x3, x2, x1) =
     ALU 0x021151bb x1 x2 x3
 
@@ -144,20 +144,20 @@ let ``DIVUW: x3 = unsign x2 / unsign x1`` (x3, x2, x1) =
 let ``REM: x3 = x2 % x1`` (x3, x2, x1) =
     ALU 0x021161b3 x1 x2 x3
 
-//[<Theory>]
-//[<InlineData(2, 20, 6)>]
-//[<InlineData(-2, -20, 6)>]
-//[<InlineData(2, 20, -6)>]
-//[<InlineData(-2, -20, -6)>]
-//[<InlineData(0, 0x80000000, 1)>]
-//[<InlineData(0, 0x80000000, -1)>]
-//[<InlineData(0x80000000, 0x80000000, 0)>]
-//[<InlineData(1, 1, 0)>]
-//[<InlineData(0, 0, 0)>]
-//[<InlineData(0xfffffffffffff897L, 0xfffffffffffff897L, 0)>]
+[<Theory>]
+[<InlineData(2, 20, 6)>]
+[<InlineData(-2, -20, 6)>]
+[<InlineData(2, 20, -6)>]
+[<InlineData(-2, -20, -6)>]
+[<InlineData(0, 0x80000000, 1)>]
+[<InlineData(0, 0x80000000, -1)>]
+[<InlineData(0x80000000, 0x80000000, 0)>]
+[<InlineData(1, 1, 0)>]
+[<InlineData(0, 0, 0)>]
+[<InlineData(0xfffffffffffff897L, 0xfffffffffffff897L, 0)>]
 let ``REMW: x3 = x2 % x1`` (x3, x2, x1) =
     ALU 0x021161bb x1 x2 x3
-*)
+
 [<Theory>]
 [<InlineData( 2, 20, 6)>]
 [<InlineData( 2,-20, 6)>]

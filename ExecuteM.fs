@@ -33,6 +33,12 @@ let execMULHSU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machi
         | RV32 -> rs1Val * int64(uint32 rs2Val)
         | _    -> rs1Val * int64(uint64 rs2Val)
     let hRes = rdVal.bitSlice 63 32
+    printfn "%X" (rs1Val * rs2Val)
+    printfn "%X %X" (int32 rs1Val) (int32 rs2Val)
+    printfn "%X %X" (uint64 rs1Val) (uint64 rs2Val)
+    printfn "%X" (rs2Val * int64(uint64 rs1Val))
+    printfn "%X" (rs2Val * rs1Val)
+    printfn "%X" rdVal
     let mstate = mstate.setRegister rd hRes
     mstate.incPC
 
