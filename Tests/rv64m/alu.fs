@@ -35,7 +35,7 @@ let ALU instr x1 x2 x3 =
 [<InlineData(0x0000400000000000L, 0xffffffff80000000L, 0xffffffffffff8000L)>]
 [<InlineData(0x000000000000ff7f, 0xaaaaaaaaaaaaaaabL, 0x000000000002fe7d)>]
 [<InlineData(0x000000000000ff7f, 0x000000000002fe7d, 0xaaaaaaaaaaaaaaabL)>]
-let ``MUL: x3 = x2 * x1`` ( x3, x1, x2) =
+let ``MUL: x3 = x2 * x1`` ( x3, x2, x1) =
     ALU 0x021101b3 x1 x2 x3
 
 [<Theory>]
@@ -55,7 +55,7 @@ let ``MULW: x3 = x2 * x1`` (x3, x2, x1) =
 [<InlineData(0x0000000000000000, 0x0000000000000000, 0xffffffffffff8000L)>]
 [<InlineData(0x0000000000000000, 0xffffffff80000000L, 0x00000000)>]
 [<InlineData(0x0000000000000000, 0xffffffff80000000L, 0xffffffffffff8000L)>]
-let ``MULH: x3 = half (x2 * x1)`` (x3, x1, x2) =
+let ``MULH: x3 = half (x2 * x1)`` (x3, x2, x1) =
     ALU 0x021111b3 x1 x2 x3
 
 [<Theory>]
@@ -64,19 +64,20 @@ let ``MULH: x3 = half (x2 * x1)`` (x3, x1, x2) =
 [<InlineData(0x00000000, 0x00000003, 0x00000007)>]
 [<InlineData(0x0000000000000000, 0x0000000000000000, 0xffffffffffff8000L)>]
 [<InlineData(0x0000000000000000, 0xffffffff80000000L, 0x00000000)>]
-//[<InlineData(0xffffffff7fff8000L, 0xffffffff80000000L, 0xffffffffffff8000L)>]
-//[<InlineData(0x000000000001fefe, 0xaaaaaaaaaaaaaaabL, 0x000000000002fe7d)>]
-//[<InlineData(0x000000000001fefe, 0x000000000002fe7d, 0xaaaaaaaaaaaaaaabL)>]
-let ``MULHU: x3 = half (unsign x2 * unsign x1)`` (x3, x1, x2) =
+[<InlineData(0xffffffff7fff8000L, 0xffffffff80000000L, 0xffffffffffff8000L)>]
+[<InlineData(0x000000000001fefe, 0xaaaaaaaaaaaaaaabL, 0x000000000002fe7d)>]
+[<InlineData(0x000000000001fefe, 0x000000000002fe7d, 0xaaaaaaaaaaaaaaabL)>]
+let ``WMULHU: x3 = half (unsign x2 * unsign x1)`` (x3, x2, x1) =
     ALU 0x021131b3 x1 x2 x3
 
 [<Theory>]
-//[<InlineData(0x00000000, 0x00000000, 0x00000000)>]
-//[<InlineData(0x00000000, 0x00000001, 0x00000001)>]
-//[<InlineData(0x00000000, 0x00000003, 0x00000007)>]
-//[<InlineData(0x0000000000000000, 0x0000000000000000, 0xffffffffffff8000L)>]
+[<InlineData(0x00000000, 0x00000000, 0x00000000)>]
+[<InlineData(0x00000000, 0x00000001, 0x00000001)>]
+[<InlineData(0x00000000, 0x00000003, 0x00000007)>]
+[<InlineData(0x0000000000000000, 0x0000000000000000, 0xffffffffffff8000L)>]
 [<InlineData(0x0000000000000000, 0xffffffff80000000L, 0x00000000)>]
-//[<InlineData(0xffffffff80000000L, 0xffffffff80000000L, 0xffffffffffff8000L)>]
+[<InlineData(0xffffffff80000000L, 0xffffffff80000000L, 0xffffffffffff8000L)>]
+[<InlineData(0xFC, 0xFCCCAAA, 0x100000000000L)>]
 let ``WMULHSU: x3 = half (sign x2 * unsign x1)`` (x3, x2, x1) =
     ALU 0x021121b3 x1 x2 x3
 

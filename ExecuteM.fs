@@ -8,15 +8,17 @@ open ISA.RISCV.Utils.Bits
 let mulhu (x : uint64, y : uint64) : uint64 =
     let x0 = uint64(uint32 x)
     let y0 = uint64(uint32 y)
-    let x1 = uint64(x0 >>> 32)
-    let y1 = uint64(y0 >>> 32)
+    let x1 = x >>> 32
+    let y1 = y >>> 32
 
-    let y2 = x1 * y0 + ((x0 * y0) >>> 32)
-    let y3 = y2 >>> 32
+    let t = x1 * y0 + ((x0 * y0) >>> 32)
+    let y2 = uint64(uint32 t)
+    let y3 = t >>> 32
     let y4 = x0 * y1 + y2
-    let y5 = x1 * y1 + y3 + (y4 >>> 32)
-    let y6 = y5 >>> 32
-    ((uint64 y6) <<< 32) ||| y5
+    let t = x1 * y1 + y3 + (y4 >>> 32)
+    let y5 = uint64(uint32 t)
+    let y6 = (t >>> 32) <<< 32
+    y6 ||| y5
 
 let mulh (x : int64, y : int64) : int64 =
     let neg = (x < 0L) <> (y < 0L)
@@ -60,11 +62,13 @@ let execMULH (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 let execMULHSU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rs1Val = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let rdVal =
+    let hRes =
         match mstate.Arch.archBits with
-        | RV32 -> rs1Val * int64(uint32 rs2Val)
-        | _    -> rs1Val * int64(uint64 rs2Val)
-    let hRes = rdVal.bitSlice 63 32
+        | RV32 ->
+            let rdVal = rs1Val * int64(uint32 rs2Val)
+            rdVal.bitSlice 63 32
+        | _    ->
+            mulhsu(rs1Val, uint64 rs2Val)
     let mstate = mstate.setRegister rd hRes
     mstate.incPC
 
@@ -73,11 +77,13 @@ let execMULHSU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machi
 let execMULHU (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rs1Val = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let rdVal =
+    let hRes =
         match mstate.Arch.archBits with
-        | RV32 -> int64(uint32 rs1Val) * int64(uint32 rs2Val)
-        | _    -> int64(uint64 rs1Val) * int64(uint64 rs2Val)
-    let hRes = rdVal.bitSlice 63 32
+        | RV32 ->
+            let rdVal = int64(uint32 rs1Val) * int64(uint32 rs2Val)
+            rdVal.bitSlice 63 32
+        | _    ->
+            int64(mulhu(uint64 rs1Val, uint64 rs2Val))
     let mstate = mstate.setRegister rd hRes
     mstate.incPC
 
