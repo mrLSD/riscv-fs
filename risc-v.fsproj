@@ -28,6 +28,7 @@ Additionally it's possible to operate with CLI, reading ELF files and set verbos
         <Compile Include="DecodeI.fs" />
         <Compile Include="DecodeI64.fs" />
         <Compile Include="DecodeM.fs" />
+        <Compile Include="DecodeM64.fs" />
         <Compile Include="ExecuteI.fs" />
         <Compile Include="ExecuteI64.fs" />
         <Compile Include="ExecuteM.fs" />

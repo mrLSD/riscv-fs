@@ -15,6 +15,8 @@ let Decode (mstate : MachineState) (instr: InstrField) : execFunc option =
     let decI32 = I.Decode mstate instr
     let decI64 = I64.Decode instr
     let decM = M.Decode mstate instr
+    let decM64 = M64.Decode mstate instr
+
     // Check is instruction should be executed
     let execI32 =
         match mstate.Arch with
@@ -30,8 +32,9 @@ let Decode (mstate : MachineState) (instr: InstrField) : execFunc option =
         | _ -> false
     let execM64 =
         match mstate.Arch with
-        | RV64im when decM <> M.InstructionM.None -> true
+        | RV64im when decM64 <> M64.InstructionM64.None -> true
         | _ -> false
+
     // Decoded instruction and execute ISA function
     if execI32 then
         Some(I.Execute decI32)
@@ -40,6 +43,6 @@ let Decode (mstate : MachineState) (instr: InstrField) : execFunc option =
     else if execM32 then
         Some(M.Execute decM)
     else if execM64 then
-        Some(M64.Execute decM)
+        Some(M64.Execute decM64)
     else
         None
