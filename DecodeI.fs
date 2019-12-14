@@ -5,7 +5,7 @@ open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
 open ISA.RISCV.MachineState
 
-//================================================================ -- \begin_latex{Major_Opcodes}
+//================================================================
 // 'I' (Integer x32 instruction set)
 type InstructionI =
     | LUI of   {| rd: Register; imm20: InstrField |}

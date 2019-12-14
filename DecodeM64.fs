@@ -5,7 +5,7 @@ open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
 open ISA.RISCV.MachineState
 
-//================================================================ -- \begin_latex{Major_Opcodes}
+//================================================================
 // 'M64'  (Integer Multiplication and Division 'M' Standard Extension)
 type InstructionM64 =
     | MULW   of  {| rd: Register; rs1: Register; rs2: Register |}
