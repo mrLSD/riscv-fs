@@ -32,10 +32,26 @@ let Decode (instr: InstrField) : InstructionA =
     let rs2    = int32(instr.bitSlice 24 20)
     
     let funct3 = instr.bitSlice 14 12
-    let funct7 = instr.bitSlice 31 25
+    let funct7 = instr.bitSlice 31 27
+    
+    let rl = instr.bitSlice 25 25
+    let aq = instr.bitSlice 26 26
     
     match (opcode) with
-    | 0b0101111 when funct3 = 0b010 -> None
+    | 0b0101111 when funct3 = 0b010 ->
+        match funct7 with
+        | 00010 -> LR_W      {| rd = rd; rs1 = rs1; aq = aq; rl = rl |}
+        | 00011 -> SC_W      {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}  
+        | 00001 -> AMOSWAP_W {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
+        | 00000 -> AMOADD_W  {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |} 
+        | 00100 -> AMOXOR_W  {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
+        | 01100 -> AMOAND_W  {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
+        | 01000 -> AMOOR_W   {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
+        | 10000 -> AMOMIN_W  {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
+        | 10100 -> AMOMAX_W  {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
+        | 11000 -> AMOMINU_W {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
+        | 11100 -> AMOMAXU_W {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
+        | _ -> None
     
     | _ -> None
 
