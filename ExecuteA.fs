@@ -3,6 +3,7 @@ module ISA.RISCV.Execute.A
 open ISA.RISCV.Arch
 open ISA.RISCV.Decode.A
 open ISA.RISCV.MachineState
+open ISA.RISCV.Utils.Bits
 
 //=================================================
 // LR.W - Load-Reserved Word operation
@@ -18,9 +19,23 @@ let execSC_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 let execAMOSWAP_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate.incPC
 
-// AMOADD_W
+//=================================================
+// AMOADD_W - AMO Add Word
 let execAMOADD_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    let nBytes = 4
+    
+    let memResult = loadWord mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else        
+        let resMemOp = (int64 memResult.Value) + rs2Val
+        let mstate = 
+            Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
+                [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
 // AMOXOR_W
 let execAMOXOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
