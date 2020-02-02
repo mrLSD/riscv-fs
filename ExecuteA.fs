@@ -37,7 +37,8 @@ let execAMOADD_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
-// AMOXOR_W
+//=================================================
+// AMOXOR_W - AMO Xor Word
 let execAMOXOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -54,7 +55,8 @@ let execAMOXOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
-// AMOAND_W
+//=================================================
+// AMOAND_W - AMO And Word
 let execAMOAND_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -71,7 +73,8 @@ let execAMOAND_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
-// AMOOR_W
+//=================================================
+// AMOOR_W - AMO Or Word
 let execAMOOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -88,6 +91,7 @@ let execAMOOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mach
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
+//=================================================
 // AMOMIN_W
 let execAMOMIN_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     mstate.incPC
