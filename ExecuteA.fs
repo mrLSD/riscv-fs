@@ -7,15 +7,35 @@ open ISA.RISCV.Utils.Bits
 
 //=================================================
 // LR.W - Load-Reserved Word operation
+// This acts just like a lw in this implementation (no need for sync)
+// (except there's no immediate)
 let execLR_W (rd : Register) (rs1 : Register) (mstate : MachineState) =
+    let addr = mstate.getRegister rs1
+    let memResult = loadWord mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
+
+//=================================================
+// SC_W - Store Conditional Word
+// This acts just like a sd in this implementation, but it will
+// always set the check register to 0 (indicating load success)
+let execSC_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
+    let addr = mstate.getRegister rs1
+    let resMemOp = mstate.getRegister rs2
+    let nBytes = 4
+    
+    let mstate = 
+        Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
+            [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+    
+    let mstate = mstate.setRegister rd 0L
     mstate.incPC
 
 //=================================================
-// SC_W - 
-let execSC_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
-
-// AMOSWAP_W
+// AMOSWAP_W - AMO Swap word
 let execAMOSWAP_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
