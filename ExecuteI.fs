@@ -180,28 +180,25 @@ let execLHU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Mach
 // SB - Store Byte to Memory
 let execSB (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1) + int64 imm12
-    let nBytes = 1
     let rs2Val = mstate.getRegister rs2
-    Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-        [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (rs2Val.bitSlice (i*8+7) (i*8) )) |]
+    let mstate = mstate.storeMemoryByte addr rs2Val
+    mstate.incPC
 
 //=================================================
 // SH - Store 2 Bytes (Hald word) to Memory
 let execSH (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1) + int64 imm12
-    let nBytes = 2
     let rs2Val = mstate.getRegister rs2
-    Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-        [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (rs2Val.bitSlice (i*8+7) (i*8) )) |]
+    let mstate = mstate.storeMemoryHalfWord addr rs2Val
+    mstate.incPC
 
 //=================================================
 // SW - Store 4 Bytes (Word) to Memory
 let execSW (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1) + int64 imm12
-    let nBytes = 4
     let rs2Val = mstate.getRegister rs2
-    Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-        [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (rs2Val.bitSlice (i*8+7) (i*8) )) |]
+    let mstate = mstate.storeMemoryWord addr rs2Val 
+    mstate.incPC
 
 //=================================================
 // ADDI - Add immediate
