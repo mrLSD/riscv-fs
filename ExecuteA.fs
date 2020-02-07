@@ -25,12 +25,7 @@ let execLR_W (rd : Register) (rs1 : Register) (mstate : MachineState) =
 let execSC_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let resMemOp = mstate.getRegister rs2
-    let nBytes = 4
-    
-    let mstate = 
-        Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-            [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
-    
+    let mstate = mstate.storeMemoryWord addr resMemOp
     let mstate = mstate.setRegister rd 0L
     mstate.incPC
 
@@ -39,16 +34,13 @@ let execSC_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 let execAMOSWAP_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let nBytes = 4
     
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
         let resMemOp = rs2Val
-        let mstate = 
-            Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-                [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+        let mstate = mstate.storeMemoryWord addr resMemOp
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
@@ -57,16 +49,13 @@ let execAMOSWAP_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
 let execAMOADD_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let nBytes = 4
     
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
         let resMemOp = (int64 memResult.Value) + rs2Val
-        let mstate = 
-            Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-                [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+        let mstate = mstate.storeMemoryWord addr resMemOp
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
@@ -75,16 +64,13 @@ let execAMOADD_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
 let execAMOXOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let nBytes = 4
     
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
         let resMemOp = (int64 memResult.Value) ^^^ rs2Val
-        let mstate = 
-            Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-                [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+        let mstate = mstate.storeMemoryWord addr resMemOp
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
@@ -93,16 +79,13 @@ let execAMOXOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
 let execAMOAND_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let nBytes = 4
     
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
         let resMemOp = (int64 memResult.Value) &&& rs2Val
-        let mstate = 
-            Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-                [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+        let mstate = mstate.storeMemoryWord addr resMemOp
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
@@ -111,16 +94,13 @@ let execAMOAND_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
 let execAMOOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let nBytes = 4
     
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
         let resMemOp = (int64 memResult.Value) ||| rs2Val
-        let mstate = 
-            Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-                [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+        let mstate = mstate.storeMemoryWord addr resMemOp
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
@@ -129,7 +109,6 @@ let execAMOOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mach
 let execAMOMIN_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let nBytes = 4
     
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
@@ -140,9 +119,7 @@ let execAMOMIN_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
                 rs2Val
             else
                 int64 memResult.Value
-        let mstate = 
-            Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-                [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+        let mstate = mstate.storeMemoryWord addr resMemOp
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
@@ -151,7 +128,6 @@ let execAMOMIN_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
 let execAMOMAX_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let nBytes = 4
     
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
@@ -162,9 +138,7 @@ let execAMOMAX_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
                 rs2Val
             else
                 int64 memResult.Value
-        let mstate = 
-            Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-                [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+        let mstate = mstate.storeMemoryWord addr resMemOp
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
@@ -173,7 +147,6 @@ let execAMOMAX_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
 let execAMOMINU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let nBytes = 4
     
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
@@ -184,9 +157,7 @@ let execAMOMINU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
                 rs2Val
             else
                 int64 memResult.Value
-        let mstate = 
-            Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-                [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+        let mstate = mstate.storeMemoryWord addr resMemOp
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
@@ -195,7 +166,6 @@ let execAMOMINU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
 let execAMOMAXU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
-    let nBytes = 4
     
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
@@ -206,9 +176,7 @@ let execAMOMAXU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
                 rs2Val
             else
                 int64 memResult.Value
-        let mstate = 
-            Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-                [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (resMemOp.bitSlice (i*8+7) (i*8) )) |]
+        let mstate = mstate.storeMemoryWord addr resMemOp
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
