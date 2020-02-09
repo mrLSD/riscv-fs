@@ -3,27 +3,76 @@ module ISA.RISCV.Execute.A64
 open ISA.RISCV.Arch
 open ISA.RISCV.Decode.A64
 open ISA.RISCV.MachineState
+open ISA.RISCV.Utils.Bits
 
 //=================================================
 // LR.D - Load-Reserved Double Word operation
+// This acts just like a lw in this implementation (no need for sync)
+// (except there's no immediate)
 let execLR_D (rd : Register) (rs1 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let memResult = loadDouble mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
-// SC_D
+//=================================================
+// SC.D - Store Conditional Double Word
+// This acts just like a sd in this implementation, but it will
+// always set the check register to 0 (indicating load success)
 let execSC_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
+    let addr = mstate.getRegister rs1
+    let resMemOp = mstate.getRegister rs2
+    let mstate = mstate.storeMemoryDoubleWord addr resMemOp
+    let mstate = mstate.setRegister rd 0L
     mstate.incPC
 
-// AMOSWAP_D
+//=================================================
+// AMOSWAP.D - AMO Swap Double word
 let execAMOSWAP_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    
+    let memResult = loadDouble mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else        
+        let resMemOp = rs2Val
+        let mstate = mstate.storeMemoryDoubleWord addr resMemOp
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
-// AMOADD_D    
+//=================================================
+// AMOADD.D - AMO Add Double Word    
 let execAMOADD_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    
+    let memResult = loadDouble mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else        
+        let resMemOp = (int64 memResult.Value) + rs2Val
+        let mstate = mstate.storeMemoryDoubleWord addr resMemOp
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
-// AMOXOR_D
+//=================================================
+// AMOXOR.W - AMO Xor Double Word
 let execAMOXOR_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    
+    let memResult = loadDouble mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else        
+        let resMemOp = (int64 memResult.Value) ^^^ rs2Val
+        let mstate = mstate.storeMemoryDoubleWord addr resMemOp
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
 // AMOAND_D
 let execAMOAND_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =

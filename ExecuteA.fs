@@ -19,7 +19,7 @@ let execLR_W (rd : Register) (rs1 : Register) (mstate : MachineState) =
         mstate.incPC
 
 //=================================================
-// SC_W - Store Conditional Word
+// SC.W - Store Conditional Word
 // This acts just like a sd in this implementation, but it will
 // always set the check register to 0 (indicating load success)
 let execSC_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
@@ -30,7 +30,7 @@ let execSC_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
     mstate.incPC
 
 //=================================================
-// AMOSWAP_W - AMO Swap word
+// AMOSWAP.W - AMO Swap word
 let execAMOSWAP_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -45,7 +45,7 @@ let execAMOSWAP_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
         mstate.incPC
 
 //=================================================
-// AMOADD_W - AMO Add Word
+// AMOADD.W - AMO Add Word
 let execAMOADD_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -60,7 +60,7 @@ let execAMOADD_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         mstate.incPC
 
 //=================================================
-// AMOXOR_W - AMO Xor Word
+// AMOXOR.W - AMO Xor Word
 let execAMOXOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -75,7 +75,7 @@ let execAMOXOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         mstate.incPC
 
 //=================================================
-// AMOAND_W - AMO And Word
+// AMOAND.W - AMO And Word
 let execAMOAND_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -90,7 +90,7 @@ let execAMOAND_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         mstate.incPC
 
 //=================================================
-// AMOOR_W - AMO Or Word
+// AMOOR.W - AMO Or Word
 let execAMOOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -105,7 +105,7 @@ let execAMOOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mach
         mstate.incPC
 
 //=================================================
-// AMOMIN_W - AMO Min Word
+// AMOMIN.W - AMO Min Word
 let execAMOMIN_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -124,7 +124,7 @@ let execAMOMIN_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         mstate.incPC
 
 //=================================================
-// AMOMAX_W - AMO Max Word
+// AMOMAX.W - AMO Max Word
 let execAMOMAX_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -143,7 +143,7 @@ let execAMOMAX_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         mstate.incPC
 
 //=================================================
-// AMOMINU_W - AMO Unsigned Min Word
+// AMOMINU.W - AMO Unsigned Min Word
 let execAMOMINU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -162,7 +162,7 @@ let execAMOMINU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
         mstate.incPC
 
 //=================================================
-// AMOMAXU_W - AMO Unsigned Max Word    
+// AMOMAXU.W - AMO Unsigned Max Word    
 let execAMOMAXU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
