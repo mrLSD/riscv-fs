@@ -60,7 +60,7 @@ let execAMOADD_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         mstate.incPC
 
 //=================================================
-// AMOXOR.W - AMO Xor Double Word
+// AMOXOR.D - AMO Xor Double Word
 let execAMOXOR_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
@@ -74,31 +74,114 @@ let execAMOXOR_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
-// AMOAND_D
+//=================================================
+// AMOAND.D - AMO And Double Word
 let execAMOAND_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    
+    let memResult = loadDouble mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else        
+        let resMemOp = (int64 memResult.Value) &&& rs2Val
+        let mstate = mstate.storeMemoryDoubleWord addr resMemOp
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
-// AMOOR_D
+//=================================================
+// AMOOR.D - AMO Or Double Word
 let execAMOOR_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    
+    let memResult = loadDouble mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else        
+        let resMemOp = (int64 memResult.Value) ||| rs2Val
+        let mstate = mstate.storeMemoryDoubleWord addr resMemOp
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
-// AMOMIN_D
+//=================================================
+// AMOMIN.D - AMO Min Double Word
 let execAMOMIN_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    
+    let memResult = loadDouble mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else        
+        let resMemOp =
+            if (int64 memResult.Value) > rs2Val then
+                rs2Val
+            else
+                int64 memResult.Value
+        let mstate = mstate.storeMemoryDoubleWord addr resMemOp
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
-// AMOMAX_D
+//=================================================
+// AMOMAX.D - AMO Max Double Word
 let execAMOMAX_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    
+    let memResult = loadDouble mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else        
+        let resMemOp =
+            if (int64 memResult.Value) < rs2Val then
+                rs2Val
+            else
+                int64 memResult.Value
+        let mstate = mstate.storeMemoryDoubleWord addr resMemOp
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
-// AMOMINU_D
+//=================================================
+// AMOMINU.D - AMO Unsigned Min Double Word
 let execAMOMINU_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    
+    let memResult = loadDouble mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else        
+        let resMemOp =
+            if (uint64 memResult.Value) > (uint64 rs2Val) then
+                rs2Val
+            else
+                int64 memResult.Value
+        let mstate = mstate.storeMemoryDoubleWord addr resMemOp
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
-// AMOMAXU_D
+
+//=================================================
+// AMOMAXU.D - AMO Unsigned Max Double Word
 let execAMOMAXU_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    mstate.incPC
+    let addr = mstate.getRegister rs1
+    let rs2Val = mstate.getRegister rs2
+    
+    let memResult = loadDouble mstate.Memory addr
+    if memResult.IsNone then
+        mstate.setRunState (Trap (MemAddress addr))
+    else        
+        let resMemOp =
+            if (uint64 memResult.Value) < (uint64 rs2Val) then
+                rs2Val
+            else
+                int64 memResult.Value
+        let mstate = mstate.storeMemoryDoubleWord addr resMemOp
+        let mstate = mstate.setRegister rd (int64 memResult.Value)
+        mstate.incPC
 
-// Execute A-instructions
+// Execute A64-instructions
 let Execute (instr : InstructionA64) (mstate : MachineState) =
     match instr with
     | LR_D i ->
