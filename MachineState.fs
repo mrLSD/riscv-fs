@@ -2,6 +2,7 @@ module ISA.RISCV.MachineState
 
 open Microsoft.FSharp.Collections
 open ISA.RISCV.Arch
+open ISA.RISCV.Utils.Bits
 
 type RunMachineState =
     | NotRun
@@ -47,7 +48,27 @@ type MachineState = {
         let addr = x.alignByArchUnsign addr
         let mem = Map.add addr (byte value) x.Memory
         { x with Memory = mem }
+    
+    member x.storeMemoryByte (addr : MachineInt) (value : MachineInt) : MachineState =
+        let nBytes = 1
+        Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) x
+            [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (value.bitSlice (i*8+7) (i*8) )) |]
+    
+    member x.storeMemoryHalfWord (addr : MachineInt) (value : MachineInt) : MachineState =
+        let nBytes = 2
+        Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) x
+            [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (value.bitSlice (i*8+7) (i*8) )) |]
+    
+    member x.storeMemoryWord (addr : MachineInt) (value : MachineInt) : MachineState =
+        let nBytes = 4
+        Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) x
+            [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (value.bitSlice (i*8+7) (i*8) )) |]
 
+    member x.storeMemoryDoubleWord (addr : MachineInt) (value : MachineInt) : MachineState =
+        let nBytes = 8
+        Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) x
+            [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (value.bitSlice (i*8+7) (i*8) )) |]
+        
     member x.setRunState state =
         { x with RunState = state }
     member x.alignByArch (value : int64) =

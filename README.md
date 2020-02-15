@@ -36,7 +36,7 @@ Technical Group constituted by The RISC-V Foundation
   - [x] Tests RV64I
   - [x] Standard extension M (integer multiply/divide)
   - [x] Tests for Standard extension M RV32/RV64
-  - [ ] Standard extension A (atomic memory ops)
+  - [x] Standard extension A (atomic memory ops)
   - [ ] Tests for Standard extension A RV32/RV64
 * Features under development
   * Standard extension C (Compressed 16-bit instructions)

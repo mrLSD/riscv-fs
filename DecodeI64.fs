@@ -5,7 +5,7 @@ open ISA.RISCV.Utils.Bits
 open ISA.RISCV.Arch
 open ISA.RISCV.MachineState
 
-//================================================================ -- \begin_latex{Major_Opcodes}
+//================================================================
 // 'I64' (Integer x64 instruction set)
 type InstructionI64 =
     | LWU   of  {| rd:  Register; rs1:                                                        Register; imm12: InstrField |}

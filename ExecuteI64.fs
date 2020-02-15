@@ -32,10 +32,9 @@ let execLD (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Machi
 // SD - Store double Word (8 bytes) to Memory
 let execSD (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1) + int64 imm12
-    let nBytes = 8
     let rs2Val = mstate.getRegister rs2
-    Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) mstate
-        [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (rs2Val.bitSlice (i*8+7) (i*8) )) |]
+    let mstate = mstate.storeMemoryDoubleWord addr rs2Val
+    mstate.incPC
 
 //=================================================
 // ADDIW - Add immediate Word

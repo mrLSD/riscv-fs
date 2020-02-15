@@ -3,7 +3,7 @@ module ISA.RISCV.CLI
 
 open System
 
-let version = "v0.1.0"
+let version = "v0.4.0"
 let author = "(c) 20019 by Evgeny Ukhanov"
 let about = sprintf "RISC-V Simulator for Formal RISC-V ISA implementation\n%s %s" version author
 
@@ -61,7 +61,7 @@ type CliOptions = {
                   else if x.LongKey.IsSome then
                       sprintf "--%s\t" x.LongKey.Value
                   else if x.Value.IsSome then
-                      sprintf "<%s>\t" x.Value.Value
+                      sprintf "<%s>" x.Value.Value
                   else
                       ""
         printfn "%s" (String.Format("{0,-5}{1,-20} {2}", "", msg, x.HelpMessage))
@@ -181,7 +181,7 @@ let rec InitCLI =
             Key =  Some("A");
             LongKey = Some("arch");
             Value = Some("ARCH")
-            HelpMessage = "RISC-V architecture. Available: rv32i, rv32im, rv64i, rv64im. Default: rv32i"
+            HelpMessage = "RISC-V architecture. Available: rv32i, rv32im, rv32ia, rv32ima, rv64i, rv64im, rv64ia, rv64ima. Default: rv32i"
             Handler =
                 fun arg cfg ->
                     { cfg with
