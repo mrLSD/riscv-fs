@@ -27,6 +27,12 @@ main:
   sh    x3, -10(x2)
   sw    x3, 10(x2)
   sw    x3, -10(x2)
+  
+  auipc	a3,0x1
+  addi	a3,a3,-8
+  sw	a0, 10(a3)
+  addi	a1,a1,-8
+  
 #ifdef x64
   sd    x3, 10(x2)
   sd    x3, -10(x2)
