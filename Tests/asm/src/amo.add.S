@@ -8,8 +8,8 @@ main:
   amoadd.w	a4, a1, 0(a3)
   ret
   
-  .data
-    .bss
-    .align 3
+.data
+  .bss
+  .align 3
 amo_operand:
-    .dword 0    
+  .dword 0    

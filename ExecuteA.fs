@@ -50,12 +50,20 @@ let execAMOADD_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
     let addr = mstate.getRegister rs1
     let rs2Val = mstate.getRegister rs2
     
+    printf "AMOADD_W:\nrs1: %d[%X]\nrs2: %d[%x]\n\n" rs1 addr rs2 rs2Val 
+    
+    printfn "mstate.Memory: %A\n" mstate.Memory
+    
     let memResult = loadWord mstate.Memory addr
+    printfn "memResult: %A" memResult
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
-    else        
+    else
         let resMemOp = (int64 memResult.Value) + rs2Val
+        printf "MemValue: %x + %x\nresMemOp: %X\n" (int64 memResult.Value) rs2Val resMemOp
         let mstate = mstate.storeMemoryWord addr resMemOp
+        printf "storeMemoryWord: %X[%X]" addr resMemOp
+        printf "RD: %d[%x]" rd (int64 memResult.Value) 
         let mstate = mstate.setRegister rd (int64 memResult.Value)
         mstate.incPC
 
