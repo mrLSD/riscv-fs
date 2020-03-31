@@ -9,7 +9,8 @@ ELF=$(addprefix build/,$(TESTS))
 ELF32=$(addsuffix 32,$(ELF))
 ELF64=$(addsuffix 64,$(ELF))
 
-RISCVCC64=riscv64-unknown-elf-gcc -march=rv64ima -mabi=lp64  -static -nostdlib -nostartfiles -mcmodel=medany
+# RISCVCC64=riscv64-unknown-elf-gcc -march=rv64ima -mabi=lp64  -static -nostdlib -nostartfiles -mcmodel=medany
+RISCVCC64=riscv64-unknown-linux-gnu-gcc -march=rv64ima -mabi=lp64  -static -nostdlib -nostartfiles -mcmodel=medany
 RISCVCC32=riscv32-unknown-elf-gcc -march=rv32ima -mabi=ilp32 -static -nostdlib -nostartfiles -mcmodel=medany
 
 build32: $(ELF32)
