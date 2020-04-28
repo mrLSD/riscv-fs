@@ -37,6 +37,8 @@ let Decode (instr: InstrField) : InstructionA =
     let rl = instr.bitSlice 25 25
     let aq = instr.bitSlice 26 26
     
+    printfn "%X[%X] %X" opcode 0b0101111 funct3
+    
     match (opcode) with
     | 0b0101111 when funct3 = 0b010 ->
         match funct7 with

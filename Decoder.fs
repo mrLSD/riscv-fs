@@ -17,7 +17,9 @@ let Decode (mstate : MachineState) (instr: InstrField) : execFunc option =
     let decM = M.Decode mstate instr
     let decM64 = M64.Decode mstate instr
     let decA = A.Decode instr
+    printfn "decA: %A" decA
     let decA64 = A64.Decode instr
+    printfn "decA64: %A" decA64
 
     // Check is instruction should be executed
     let execI32 =

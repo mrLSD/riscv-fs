@@ -10,6 +10,7 @@ open ISA.RISCV.MachineState
 // ALU tests
 let ALU (instrs: InstrField array) (a4 : int64) (a5 : int64)  (a6 : int64)  (a7 : int64)=
     // Init MachineState
+    printfn "ALU tests"
     let addr = 0x80000000L
     let mstate = MachineState.InitMachineState Map.empty RV64ia true
     let mstate = mstate.setPC addr
@@ -18,6 +19,7 @@ let ALU (instrs: InstrField array) (a4 : int64) (a5 : int64)  (a6 : int64)  (a7 
     let m = Array.fold (fun (m : MachineState) i ->
                 let pc = m.PC
                 let executor = Decoder.Decode m i
+                printfn "executor: %A: 0x%X" executor.IsSome  i
                 Assert.NotEqual(executor, None)
                 let m = executor.Value m
                 Assert.Equal(m.RunState, RunMachineState.Run)
@@ -29,6 +31,10 @@ let ALU (instrs: InstrField array) (a4 : int64) (a5 : int64)  (a6 : int64)  (a7 
     let x16 = m.getRegister 16
     let x17 = m.getRegister 17
     
+    printfn "x14 %X = %X" x14 a4
+    printfn "x15 %X = %X" x15 a5
+    printfn "x16 %X = %X" x16 a6
+    printfn "x17 %X = %X\N" x17 a7
     Assert.Equal(x14, a4)
     Assert.Equal(x15, a5)
     Assert.Equal(x16, a6)
@@ -36,7 +42,7 @@ let ALU (instrs: InstrField array) (a4 : int64) (a5 : int64)  (a6 : int64)  (a7 
     
 
 [<Theory>]
-[<InlineData(0xffffffff80000000L, 0x000000007ffff800L, 0x000000007ffff800L, 0xfffffffffffff800L)>]
+[<InlineData(0xffffffff80000002L, 0x000000007ffff800L, 0x000000007ffff800L, 0xfffffffffffff800L)>]
 let ``AMO.ADD`` (a4, a5, a6, a7) =
     let instrSet = [|
             0x80000537
@@ -50,4 +56,22 @@ let ``AMO.ADD`` (a4, a5, a6, a7) =
             0x00b6a82f
             0x0006a883
         |]
-    ALU instrSet a4 a5
+    printfn "ALU AMO.ADD"
+    ALU instrSet a4 a5 a6 a7
+
+[<Theory>]
+[<InlineData(0xffffffff80000000L, 0xffffffff80000000L, 0xffffffff80000000L, 0xffffffff80000000L)>]
+let ``AMO.AND`` (a4, a5, a6, a7) =
+    let instrSet = [|
+            0x80000537
+            0x80000593
+            0x00001697
+            0xff868693
+            0x00a6a023
+            0x60b6a72f
+            0x0006a783
+            0x80000637
+            0x60c6a82f
+            0x0006a883
+        |]
+    ALU instrSet a4 a5 a6 a7
