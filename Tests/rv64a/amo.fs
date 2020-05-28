@@ -29,10 +29,6 @@ let ALU (instrs: InstrField array) (a4 : int64) (a5 : int64)  (a6 : int64)  (a7 
     let x16 = m.getRegister 16
     let x17 = m.getRegister 17
     
-    printfn "x14 %X = %X" x14 a4
-    printfn "x15 %X = %X" x15 a5
-    printfn "x16 %X = %X" x16 a6
-    printfn "x17 %X = %X\N" x17 a7
     Assert.Equal(x14, a4)
     Assert.Equal(x15, a5)
     Assert.Equal(x16, a6)
@@ -48,6 +44,7 @@ let ``AMO.ADD`` (a4, a5, a6, a7) =
             0x00001697
             0xff868693
             0x00a6a023
+            
             0x00b6a72f
             0x0006a783
             0x800005b7
@@ -65,10 +62,29 @@ let ``AMO.AND`` (a4, a5, a6, a7) =
             0x00001697
             0xff868693
             0x00a6a023
+            
             0x60b6a72f
             0x0006a783
             0x80000637
             0x60c6a82f
+            0x0006a883
+        |]
+    ALU instrSet a4 a5 a6 a7
+
+[<Theory>]
+[<InlineData(0xffffffff80000000L, 0xfffffffffffff800L, 0xfffffffffffff800L, 0xfffffffffffff801L)>]
+let ``AMO.OR`` (a4, a5, a6, a7) =
+    let instrSet = [|
+            0x80000537
+            0x80000593
+            0x00001697
+            0xff868693
+            0x00a6a023
+            
+            0x40b6a72f
+            0x0006a783
+            0x00100613
+            0x40c6a82f
             0x0006a883
         |]
     ALU instrSet a4 a5 a6 a7
