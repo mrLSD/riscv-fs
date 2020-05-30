@@ -107,3 +107,21 @@ let ``AMO.XOR`` (a4, a5, a6, a7) =
             0x0006a883
         |]
     ALU instrSet a4 a5 a6 a7
+
+[<Theory>]
+[<InlineData(0xffffffff80000000L, 0xfffffffffffff800L, 0xfffffffffffff800L, 0xffffffff80000000L)>]
+let ``AMO.SWAP`` (a4, a5, a6, a7) =
+    let instrSet = [|
+            0x80000537
+            0x80000593
+            0x00001697
+            0xff868693
+            0x00a6a023
+            
+            0x08b6a72f
+            0x0006a783
+            0x80000637
+            0x08c6a82f
+            0x0006a883
+        |]
+    ALU instrSet a4 a5 a6 a7
