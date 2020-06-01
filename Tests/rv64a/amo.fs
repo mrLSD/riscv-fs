@@ -144,3 +144,22 @@ let ``AMO.MAX`` (a4, a5, a6, a7) =
             0x0006a883
         |]
     ALU instrSet a4 a5 a6 a7
+
+[<Theory>]
+[<InlineData(0xffffffff80000000L, 0xfffffffffffff800L, 0L, 0xffffffffffffffffL)>]
+let ``AMO.MAXU`` (a4, a5, a6, a7) =
+    let instrSet = [|
+            0x80000537
+            0x80000593
+            0x00001697
+            0xff868693
+            0x00a6a023
+            
+            0xe0b6a72f
+            0x0006a783
+            0xfff00613
+            0x0006a023
+            0xe0c6a82f
+            0x0006a883
+        |]
+    ALU instrSet a4 a5 a6 a7
