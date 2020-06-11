@@ -53,7 +53,7 @@ let execAMOADD_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
     let memResult = loadWord mstate.Memory addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
-    else        
+    else
         let resMemOp = (int64 memResult.Value) + rs2Val
         let mstate = mstate.storeMemoryWord addr resMemOp
         let mstate = mstate.setRegister rd (int64 memResult.Value)

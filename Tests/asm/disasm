@@ -1,0 +1,78 @@
+
+build/amo_w32:     file format elf32-littleriscv
+
+
+Disassembly of section .text.init:
+
+80000000 <_start>:
+80000000:	000010ef          	jal	ra,80001000 <main>
+80000004:	0000006f          	j	80000004 <_start+0x4>
+
+Disassembly of section .text:
+
+80001000 <main>:
+; Common
+80001000:	80000537          	lui	a0,0x80000
+80001004:	80000593          	li	a1,-2048
+80001008:	00001697          	auipc	a3,0x1
+8000100c:	ff868693          	addi	a3,a3,-8 # 80002000 <amo_operand>
+80001010:	00a6a023          	sw	a0,0(a3)
+; AMD.ADD
+80001014:	00b6a72f          	amoadd.w	a4,a1,(a3)
+80001018:	0006a783          	lw	a5,0(a3)
+8000101c:	80000637          	lui	a2,0x80000
+80001020:	00c6a82f          	amoadd.w	a6,a2,(a3)
+80001024:	0006a883          	lw	a7,0(a3)
+; AMD.AND
+80001028:	60b6a72f          	amoand.w	a4,a1,(a3)
+8000102c:	0006a783          	lw	a5,0(a3)
+80001030:	80000637          	lui	a2,0x80000
+80001034:	60c6a82f          	amoand.w	a6,a2,(a3)
+80001038:	0006a883          	lw	a7,0(a3)
+; AMO.OR
+8000103c:	40b6a72f          	amoor.w	a4,a1,(a3)
+80001040:	0006a783          	lw	a5,0(a3)
+80001044:	00100613          	li	a2,1
+80001048:	40c6a82f          	amoor.w	a6,a2,(a3)
+8000104c:	0006a883          	lw	a7,0(a3)
+; AMO.XOR
+80001050:	20b6a72f          	amoxor.w	a4,a1,(a3)
+80001054:	0006a783          	lw	a5,0(a3)
+80001058:	c0000637          	lui	a2,0xc0000
+8000105c:	00160613          	addi	a2,a2,1 # c0000001 <_end+0x3fffdff9>
+80001060:	20c6a82f          	amoxor.w	a6,a2,(a3)
+80001064:	0006a883          	lw	a7,0(a3)
+; AMO.SWAP
+80001068:	08b6a72f          	amoswap.w	a4,a1,(a3)
+8000106c:	0006a783          	lw	a5,0(a3)
+80001070:	80000637          	lui	a2,0x80000
+80001074:	08c6a82f          	amoswap.w	a6,a2,(a3)
+80001078:	0006a883          	lw	a7,0(a3)
+; AMO.MAX
+8000107c:	a0b6a72f          	amomax.w	a4,a1,(a3)
+80001080:	0006a783          	lw	a5,0(a3)
+80001084:	00100613          	li	a2,1
+80001088:	0006a023          	sw	zero,0(a3)
+8000108c:	a0c6a82f          	amomax.w	a6,a2,(a3)
+80001090:	0006a883          	lw	a7,0(a3)
+; AMO.MAXU
+80001094:	e0b6a72f          	amomaxu.w	a4,a1,(a3)
+80001098:	0006a783          	lw	a5,0(a3)
+8000109c:	fff00613          	li	a2,-1
+800010a0:	0006a023          	sw	zero,0(a3)
+800010a4:	e0c6a82f          	amomaxu.w	a6,a2,(a3)
+800010a8:	0006a883          	lw	a7,0(a3)
+; AMO.MIN
+800010ac:	80b6a72f          	amomin.w	a4,a1,(a3)
+800010b0:	0006a783          	lw	a5,0(a3)
+800010b4:	fff00613          	li	a2,-1
+800010b8:	0006a023          	sw	zero,0(a3)
+800010bc:	80c6a82f          	amomin.w	a6,a2,(a3)
+800010c0:	0006a883          	lw	a7,0(a3)
+; AMO.MINU
+800010c4:	c0b6a72f          	amominu.w	a4,a1,(a3)
+800010c8:	0006a783          	lw	a5,0(a3)
+800010cc:	fff00613          	li	a2,-1
+800010d0:	0006a023          	sw	zero,0(a3)
+800010d4:	c0c6a82f          	amominu.w	a6,a2,(a3)
+800010d8:	0006a883          	lw	a7,0(a3)

@@ -197,7 +197,7 @@ let execSH (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : Mach
 let execSW (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let addr = (mstate.getRegister rs1) + int64 imm12
     let rs2Val = mstate.getRegister rs2
-    let mstate = mstate.storeMemoryWord addr rs2Val 
+    let mstate = mstate.storeMemoryWord addr rs2Val
     mstate.incPC
 
 //=================================================
