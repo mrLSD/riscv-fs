@@ -439,8 +439,8 @@ let Execute (instr : InstructionI) (mstate : MachineState) =
         execAND i.rd i.rs1 i.rs2 mstate
     | FENCE _ ->
         execFENCE mstate
-    | ECALL _ ->
+    | ECALL ->
         execECALL mstate
-    | EBREAK _ ->
+    | EBREAK ->
         execEBREAK mstate
     | _ -> mstate.setRunState (Trap InstructionExecute)
