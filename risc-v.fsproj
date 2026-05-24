@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <RootNamespace>ISA.RISCV</RootNamespace>
         <PackageId>ISA.RISC-V</PackageId>
         <PackageVersion>1.0.0</PackageVersion>
@@ -19,7 +19,7 @@ Additionally it's possible to operate with CLI, reading ELF files and set verbos
 
     <ItemGroup>
         <PackageReference Include="ELFSharp" Version="2.17.3" />
-        <PackageReference Update="FSharp.Core" Version="9.0.100-beta.24422.2" />
+        <PackageReference Update="FSharp.Core" Version="10.0.107" />
     </ItemGroup>
 
     <ItemGroup>
