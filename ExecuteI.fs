@@ -288,8 +288,10 @@ let execSUB (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 let execSLL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = 
         match mstate.Arch.archBits with
-        | RV32 -> (mstate.getRegister rs1) <<< int32(mstate.getRegister rs2)
-        | _ -> 
+        | RV32 ->
+            let shamt = (mstate.getRegister rs2) &&& 0x1f
+            int64(int32(uint32(mstate.getRegister rs1) <<< int32(shamt)))
+        | _ ->
             let shamt = (mstate.getRegister rs2) &&& 0x3f
             (mstate.getRegister rs1) <<< int32(shamt)
     let mstate = mstate.setRegister rd rdVal
@@ -330,8 +332,10 @@ let execXOR (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 let execSRL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal =
         match mstate.Arch.archBits with
-        | RV32 -> int64(uint32(mstate.getRegister rs1) >>> int32(mstate.getRegister rs2))
-        | _ -> 
+        | RV32 ->
+            let shamt = (mstate.getRegister rs2) &&& 0x1f
+            int64(int32(uint32(mstate.getRegister rs1) >>> int32(shamt)))
+        | _ ->
             let shamt = (mstate.getRegister rs2) &&& 0x3f
             int64(uint64(mstate.getRegister rs1) >>> int32(shamt))
     let mstate = mstate.setRegister rd rdVal
@@ -345,8 +349,10 @@ let execSRL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 let execSRA (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = 
         match mstate.Arch.archBits with
-        | RV32 -> (mstate.getRegister rs1) >>> int32 (mstate.getRegister rs2)
-        | _ -> 
+        | RV32 ->
+            let shamt = (mstate.getRegister rs2) &&& 0x1f
+            int64(int32(mstate.getRegister rs1) >>> int32(shamt))
+        | _ ->
             let shamt = (mstate.getRegister rs2) &&& 0x3f
             (mstate.getRegister rs1) >>> int32 (shamt)
     let mstate = mstate.setRegister rd rdVal
