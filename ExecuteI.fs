@@ -285,6 +285,9 @@ let execSUB (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 
 //=================================================
 // SLL - Shift Logical Left
+// SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in register
+// rs1 by the shift amount held in register rs2. In RV32I, only the low 5 bits of rs2 are considered for the
+// shift amount. In RV64I, only the low 6 bits of rs2 are considered for the shift amount.
 let execSLL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = 
         match mstate.Arch.archBits with
@@ -299,9 +302,6 @@ let execSLL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 
 //=================================================
 // SLT - Set 1 if Less Then
-// SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in register
-// rs1 by the shift amount held in register rs2. In RV64I, only the low 6 bits of rs2 are considered for the
-// shift amount.
 let execSLT (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = if mstate.getRegister rs1 < mstate.getRegister rs2 then 1L else 0L
     let mstate = mstate.setRegister rd rdVal
@@ -327,8 +327,8 @@ let execXOR (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 //=================================================
 // SRL - Shift Right Logical
 // SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in register
-// rs1 by the shift amount held in register rs2. In RV64I, only the low 6 bits of rs2 are considered for the
-// shift amount.
+// rs1 by the shift amount held in register rs2. In RV32I, only the low 5 bits of rs2 are considered for the
+// shift amount. In RV64I, only the low 6 bits of rs2 are considered for the shift amount.
 let execSRL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal =
         match mstate.Arch.archBits with
@@ -344,8 +344,8 @@ let execSRL (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
 //=================================================
 // SRA - Shift Right Arithmetic
 // SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in register
-// rs1 by the shift amount held in register rs2. In RV64I, only the low 6 bits of rs2 are considered for the
-// shift amount.
+// rs1 by the shift amount held in register rs2. In RV32I, only the low 5 bits of rs2 are considered for the
+// shift amount. In RV64I, only the low 6 bits of rs2 are considered for the shift amount.
 let execSRA (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let rdVal = 
         match mstate.Arch.archBits with
