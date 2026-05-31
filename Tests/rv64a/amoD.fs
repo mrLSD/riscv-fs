@@ -36,10 +36,18 @@ let ``LR.D loads the doubleword`` () =
     Assert.Equal(0x1122334455667788L, mem)
 
 [<Fact>]
-let ``SC.D stores rs2 and writes 0 to rd`` () =
-    let (rd, mem) = runD 0b00011 0x1111L 0x2222L
-    Assert.Equal(0L, rd)
-    Assert.Equal(0x2222L, mem)
+let ``SC.D after LR.D stores rs2 and writes 0 to rd`` () =
+    let addr = 0x1000L
+    let mstate = MachineState.InitMachineState Map.empty RV64ia false
+    let mstate = mstate.setPC 0x80000000L
+    let mstate = mstate.setRunState RunMachineState.Run
+    let mstate = mstate.setRegister 10 addr
+    let mstate = mstate.setRegister 11 0x2222L
+    let mstate = mstate.storeMemoryDoubleWord addr 0x1111L
+    let mstate = (Decoder.Decode mstate (encodeD 0b00010)).Value mstate
+    let mstate = (Decoder.Decode mstate (encodeD 0b00011)).Value mstate
+    Assert.Equal(0L, mstate.getRegister 12)
+    Assert.Equal(0x2222L, (loadDouble mstate.Memory addr).Value)
 
 [<Fact>]
 let ``AMOSWAP.D swaps memory and rs2`` () =

@@ -16,6 +16,7 @@ let execLR_D (rd : Register) (rs1 : Register) (mstate : MachineState) =
         mstate.setRunState (Trap (MemAddress addr))
     else
         let mstate = mstate.setRegister rd (int64 memResult.Value)
+        let mstate = mstate.setReservation addr
         mstate.incPC
 
 //=================================================
@@ -24,10 +25,15 @@ let execLR_D (rd : Register) (rs1 : Register) (mstate : MachineState) =
 // always set the check register to 0 (indicating load success)
 let execSC_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
-    let resMemOp = mstate.getRegister rs2
-    let mstate = mstate.storeMemoryDoubleWord addr resMemOp
-    let mstate = mstate.setRegister rd 0L
-    mstate.incPC
+    if mstate.Reservation = Some addr then
+        let mstate = mstate.storeMemoryDoubleWord addr (mstate.getRegister rs2)
+        let mstate = mstate.setRegister rd 0L
+        let mstate = mstate.clearReservation
+        mstate.incPC
+    else
+        let mstate = mstate.setRegister rd 1L
+        let mstate = mstate.clearReservation
+        mstate.incPC
 
 //=================================================
 // AMOSWAP.D - AMO Swap Double word
@@ -183,6 +189,15 @@ let execAMOMAXU_D (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
 
 // Execute A64-instructions
 let Execute (instr : InstructionA64) (mstate : MachineState) =
+    let addr =
+        match instr with
+        | LR_D i -> mstate.getRegister i.rs1
+        | SC_D i | AMOSWAP_D i | AMOADD_D i | AMOXOR_D i | AMOAND_D i | AMOOR_D i
+        | AMOMIN_D i | AMOMAX_D i | AMOMINU_D i | AMOMAXU_D i -> mstate.getRegister i.rs1
+        | InstructionA64.None -> 0L
+    if instr <> InstructionA64.None && addr % 8L <> 0L then
+        mstate.setRunState (Trap (MemAddress addr))
+    else
     match instr with
     | LR_D i ->
         execLR_D i.rd i.rs1 mstate

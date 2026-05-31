@@ -17,6 +17,7 @@ type MachineState = {
         Verbosity:  bool
         Arch:       Architecture
         RunState:   RunMachineState
+        Reservation: int64 option
     } with
     member x.getRegister(reg: Register) : MachineInt =
         if reg = 0 then
@@ -71,6 +72,10 @@ type MachineState = {
         
     member x.setRunState state =
         { x with RunState = state }
+    member x.setReservation (addr : MachineInt) : MachineState =
+        { x with Reservation = Some addr }
+    member x.clearReservation : MachineState =
+        { x with Reservation = None }
     member x.alignByArch (value : int64) =
         // if x32 Arch - align it to x32
         // and then convert again to int64
@@ -93,4 +98,5 @@ let InitMachineState mem arch verbosity : MachineState =
         Arch         = arch
         Verbosity    = verbosity
         RunState     = RunMachineState.NotRun
+        Reservation  = None
     }
