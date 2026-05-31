@@ -40,17 +40,17 @@ let Decode (instr: InstrField) : InstructionA64 =
     match (opcode) with
     | 0b0101111 when funct3 = 0b011 ->
         match funct7 with
-        | 00010 -> LR_D      {| rd = rd; rs1 = rs1; aq = aq; rl = rl |}
-        | 00011 -> SC_D      {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}  
-        | 00001 -> AMOSWAP_D {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
-        | 00000 -> AMOADD_D  {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |} 
-        | 00100 -> AMOXOR_D  {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
-        | 01100 -> AMOAND_D  {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
-        | 01000 -> AMOOR_D   {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
-        | 10000 -> AMOMIN_D  {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
-        | 10100 -> AMOMAX_D  {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
-        | 11000 -> AMOMINU_D {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
-        | 11100 -> AMOMAXU_D {| rd = rd; rs1 = rs1; rs2 = rs1; aq = aq; rl = rl |}
+        | 0b00010 -> LR_D      {| rd = rd; rs1 = rs1; aq = aq; rl = rl |}
+        | 0b00011 -> SC_D      {| rd = rd; rs1 = rs1; rs2 = rs2; aq = aq; rl = rl |}
+        | 0b00001 -> AMOSWAP_D {| rd = rd; rs1 = rs1; rs2 = rs2; aq = aq; rl = rl |}
+        | 0b00000 -> AMOADD_D  {| rd = rd; rs1 = rs1; rs2 = rs2; aq = aq; rl = rl |}
+        | 0b00100 -> AMOXOR_D  {| rd = rd; rs1 = rs1; rs2 = rs2; aq = aq; rl = rl |}
+        | 0b01100 -> AMOAND_D  {| rd = rd; rs1 = rs1; rs2 = rs2; aq = aq; rl = rl |}
+        | 0b01000 -> AMOOR_D   {| rd = rd; rs1 = rs1; rs2 = rs2; aq = aq; rl = rl |}
+        | 0b10000 -> AMOMIN_D  {| rd = rd; rs1 = rs1; rs2 = rs2; aq = aq; rl = rl |}
+        | 0b10100 -> AMOMAX_D  {| rd = rd; rs1 = rs1; rs2 = rs2; aq = aq; rl = rl |}
+        | 0b11000 -> AMOMINU_D {| rd = rd; rs1 = rs1; rs2 = rs2; aq = aq; rl = rl |}
+        | 0b11100 -> AMOMAXU_D {| rd = rd; rs1 = rs1; rs2 = rs2; aq = aq; rl = rl |}
         | _ -> None
     
     | _ -> None

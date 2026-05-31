@@ -75,7 +75,7 @@ let Decode (mstate : MachineState) (instr: InstrField) : InstructionI =
         if mstate.Arch.archBits = RV32 then
             instr.bitSlice 24 20
         else
-            instr.bitSlice 24 20
+            instr.bitSlice 25 20
     let funct6 = instr.bitSlice 31 26
     let shamt_ok =
         ((instr.bitSlice 25 25) = 0) ||

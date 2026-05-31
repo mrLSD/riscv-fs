@@ -41,6 +41,7 @@
       <Compile Include="rv64m\alu.fs" />
 
       <Compile Include="rv64a\amo.fs" />
+      <Compile Include="rv64a\amoD.fs" />
         
       <Compile Include="Program.fs" />
     </ItemGroup>
