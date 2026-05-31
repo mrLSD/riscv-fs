@@ -48,3 +48,10 @@ let ``getMemory returns Some for mapped and None for unmapped`` () =
     let m = (MachineState.InitMachineState Map.empty RV32i false).setMemoryByte 0x10L 0xABuy
     Assert.Equal(Some 0xABuy, m.getMemory 0x10L)
     Assert.Equal(None, m.getMemory 0x20L)
+
+[<Fact>]
+let ``setRegister does not mutate the source state`` () =
+    let m0 = MachineState.InitMachineState Map.empty RV64i false
+    let m1 = m0.setRegister 1 99L
+    Assert.Equal(0L, m0.getRegister 1)
+    Assert.Equal(99L, m1.getRegister 1)

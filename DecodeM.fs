@@ -33,22 +33,18 @@ let Decode (mstate : MachineState) (instr: InstrField) : InstructionM =
     match (opcode) with
     // RV32M Standard Extension
     | 0b0110011 ->
-        match funct7 with
-        | 0b0000001 ->
-            match funct3 with
-            // Multiplication Operations
-            | 0b000 -> MUL    {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-            | 0b001 -> MULH   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-            | 0b010 -> MULHSU {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-            | 0b011 -> MULHU  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-            // Division Operations
-            | 0b100 -> DIV    {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-            | 0b101 -> DIVU   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-            | 0b110 -> REM    {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-            | 0b111 -> REMU   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
-            | _     -> None
+        match funct7, funct3 with
+        // Multiplication Operations
+        | 0b0000001, 0b000 -> MUL    {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b0000001, 0b001 -> MULH   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b0000001, 0b010 -> MULHSU {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b0000001, 0b011 -> MULHU  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        // Division Operations
+        | 0b0000001, 0b100 -> DIV    {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b0000001, 0b101 -> DIVU   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b0000001, 0b110 -> REM    {| rd = rd; rs1 = rs1; rs2 = rs2 |}
+        | 0b0000001, 0b111 -> REMU   {| rd = rd; rs1 = rs1; rs2 = rs2 |}
         | _ -> None
-
     | _ -> None
 
 // Current ISA print log message for current instruction step

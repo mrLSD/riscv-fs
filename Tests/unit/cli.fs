@@ -113,3 +113,9 @@ let ``multiple key flag with a trailing non-matching arg`` () =
     let opt = [| { CliOptions.Default with Key = Some "f"; Multiple = true } |]
     match parseCli [| "-f"; "z" |] opt AppConfig.Default with
     | Failed -> Assert.True(false, "unexpected Failed") | _ -> ()
+
+[<Fact>]
+let ``long-key-only option with value advances past both tokens`` () =
+    let opt = { CliOptions.Default with LongKey = Some "name"; Value = Some "N" }
+    let (_, leftover) = fetchArgs [| "--name"; "bob" |] opt AppConfig.Default
+    Assert.Equal<string[]>([||], leftover)

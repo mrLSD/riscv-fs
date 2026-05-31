@@ -101,3 +101,13 @@ let ``runCycle traps when PC runs into unmapped memory`` () =
     match m.RunState with
     | Trap (InstructionFetch _) -> ()
     | s -> Assert.True(false, sprintf "expected InstructionFetch trap, got %A" s)
+
+[<Fact>]
+let ``readElfFile throws on a non-ELF file`` () =
+    let path = Path.GetTempFileName()
+    try
+        File.WriteAllBytes(path, [| 0uy; 1uy; 2uy; 3uy |])
+        let threw = try (Run.readElfFile path |> ignore; false) with _ -> true
+        Assert.True(threw)
+    finally
+        File.Delete path

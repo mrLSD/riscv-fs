@@ -39,9 +39,9 @@ let private withElf (f : string -> unit) =
         File.Delete path
 
 [<Fact>]
-let ``Run.Run loads an ELF and runs to Stopped`` () =
+let ``Run.Run loads an ELF and runs to Stopped (verbose)`` () =
     withElf (fun path ->
-        let cfg = { AppConfig.Default with Arch = Some RV32i; Files = Some [| path |] }
+        let cfg = { AppConfig.Default with Arch = Some RV32i; Files = Some [| path |]; Verbosity = Some true }
         let res = Run.Run cfg
         Assert.Equal(RunMachineState.Stopped, res.RunState)
         Assert.Equal(42L, res.getRegister 5))
@@ -67,3 +67,34 @@ let ``runCycle traps on an illegal instruction`` () =
     match m.RunState with
     | Trap TrapErrors.InstructionDecode -> ()
     | s -> Assert.True(false, sprintf "%A" s)
+
+[<Fact>]
+let ``runSteps aborts a non-terminating program with StepLimit`` () =
+    // jal x0,+4 ; jal x0,-4  -> infinite 2-instruction loop (neither targets its own PC)
+    let m = (MachineState.InitMachineState Map.empty RV32i false).setRunState RunMachineState.Run
+    let m = m.storeMemoryWord 0x80000000L 0x0040006fL
+    let m = m.storeMemoryWord 0x80000004L 0xffdff06fL
+    Assert.Equal(RunMachineState.Trap TrapErrors.StepLimit, (Run.runSteps 50 m).RunState)
+
+[<Fact>]
+let ``main: a malformed ELF is reported without crashing`` () =
+    let path = Path.GetTempFileName()
+    try
+        File.WriteAllBytes(path, [| 0uy; 1uy; 2uy; 3uy |])
+        Assert.Equal(0, main.main [| "-A"; "rv32i"; path |])
+    finally
+        File.Delete path
+
+[<Fact>]
+let ``runSteps completes when the budget equals the instruction count`` () =
+    let prog = [ 0x00500093; 0x00700113; 0x002081b3; 0x00100073 ]  // 4 instrs, ebreak last
+    let m = (MachineState.InitMachineState Map.empty RV32i false).setRunState RunMachineState.Run
+    let m = prog |> List.mapi (fun i w -> (0x80000000L + int64 (i * 4), int64 w))
+                 |> List.fold (fun (s : MachineState) (a, w) -> s.storeMemoryWord a w) m
+    Assert.Equal(RunMachineState.Trap TrapErrors.EBreak, (Run.runSteps 4 m).RunState)
+    Assert.Equal(RunMachineState.Trap TrapErrors.StepLimit, (Run.runSteps 3 m).RunState)
+
+[<Fact>]
+let ``runSteps 0 immediately hits StepLimit`` () =
+    let m = (MachineState.InitMachineState Map.empty RV32i false).setRunState RunMachineState.Run
+    Assert.Equal(RunMachineState.Trap TrapErrors.StepLimit, (Run.runSteps 0 m).RunState)

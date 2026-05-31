@@ -3,8 +3,11 @@ module ISA.RISCV.CLI
 
 open System
 
-let version = "v0.4.0"
-let author = "(c) 20019 by Evgeny Ukhanov"
+// Version comes from risc-v.fsproj (<Version>) via assembly metadata — single source of truth.
+let version =
+    let v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version
+    sprintf "v%d.%d.%d" v.Major v.Minor v.Build
+let author = sprintf "(c) %d by Evgeny Ukhanov" DateTime.Now.Year
 let about = sprintf "RISC-V Simulator for Formal RISC-V ISA implementation\n%s %s" version author
 
 type AppConfig = {
@@ -86,7 +89,7 @@ let rec fetchArgs (argv : string[]) (opts : CliOptions) (cfg : AppConfig) =
                         if argv.Length > 1 then
                             let arg2 = argv.[1]
                             // Check is value not argument parameter
-                            if "-" = arg2.[..0] then
+                            if arg2.StartsWith "-" then
                                 (Error, 0)
                             else
                                 let cfg = opts.Handler arg2 cfg
@@ -100,7 +103,7 @@ let rec fetchArgs (argv : string[]) (opts : CliOptions) (cfg : AppConfig) =
                     if opts.Value.IsSome then
                         if argv.Length > 1 then
                             let arg2 = argv.[1]
-                            if "-" = arg2.[..0] then
+                            if arg2.StartsWith "-" then
                                 (Error, 0)
                             else
                                 let cfg = opts.Handler arg2 cfg
@@ -118,11 +121,11 @@ let rec fetchArgs (argv : string[]) (opts : CliOptions) (cfg : AppConfig) =
                     if opts.Value.IsSome then
                         if argv.Length > 1 then
                             let arg2 = argv.[1]
-                            if "-" = arg2.[..0] then
+                            if arg2.StartsWith "-" then
                                 (Error, 0)
                             else
                                 let cfg = opts.Handler arg2 cfg
-                                (Result(cfg), 0)
+                                (Result(cfg), 2)
                         else
                             (Error, 0)
                     else

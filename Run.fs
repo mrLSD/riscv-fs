@@ -43,34 +43,32 @@ let readElfFile (file : string) : Map<int64, byte> =
 let fetchInstruction (mstate : MachineState) : InstrField option =
     loadWord mstate.Memory mstate.PC
 
-// Basic RISC-V run life cycle. Represent Finite State Machine (FSM)
-let rec runCycle (mstate : MachineState) =
-    let instr = fetchInstruction mstate
-
-    let mstate =
-        match instr with
-        | None -> mstate.setRunState (Trap (InstructionFetch mstate.PC))
-        | _ ->
-            let instrValue = instr.Value
-            let executor = Decoder.Decode mstate instrValue
-
-            match executor with
-            | None -> mstate.setRunState (Trap TrapErrors.InstructionDecode)
+// Basic RISC-V run life cycle (FSM). `steps` bounds execution so a non-terminating
+// program (e.g. a backward self-branch) aborts with a StepLimit trap instead of hanging.
+let rec runSteps (steps : int) (mstate : MachineState) =
+    if steps <= 0 then
+        mstate.setRunState (Trap StepLimit)
+    else
+        let instr = fetchInstruction mstate
+        let mstate =
+            match instr with
+            | None -> mstate.setRunState (Trap (InstructionFetch mstate.PC))
             | _ ->
-// TODO: Change that logic
-//                if mstate.Verbosity then
-//                    verbosityMessage instr.Value decodedInstr mstate
-                // Executor for specific Instruction Set
-                // that was detected in Decoder
-                let Executor = executor.Value
-                // Execute current Instruction
-                Executor mstate
-    match mstate.RunState with
-    | Trap _ -> mstate
-    | RunMachineState.Stopped ->
-        verbosityMessageRegisters mstate
-        mstate
-    | _ -> runCycle mstate
+                let instrValue = instr.Value
+                if mstate.Verbosity then
+                    printfn "%08x: %08x" mstate.PC instrValue
+                match Decoder.Decode mstate instrValue with
+                | None -> mstate.setRunState (Trap TrapErrors.InstructionDecode)
+                | Some executor -> executor mstate
+        match mstate.RunState with
+        | Trap _ -> mstate
+        | RunMachineState.Stopped ->
+            verbosityMessageRegisters mstate
+            mstate
+        | _ -> runSteps (steps - 1) mstate
+
+// 10M-instruction cap guards against a non-terminating program.
+let runCycle (mstate : MachineState) = runSteps 10_000_000 mstate
 
 // Main application Run logic
 let Run (cfg : AppConfig) =

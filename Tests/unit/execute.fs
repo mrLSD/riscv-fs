@@ -129,3 +129,9 @@ let ``AMO .D min/max cover both selection branches`` () =
     Assert.Equal(10L, amoMem 0b10100 true 10L 5L)   // AMOMAX.D  mem>rs2 -> mem
     Assert.Equal(5L,  amoMem 0b11000 true 5L 10L)   // AMOMINU.D mem<rs2 -> mem
     Assert.Equal(10L, amoMem 0b11100 true 5L 10L)   // AMOMAXU.D mem<rs2 -> rs2
+
+[<Fact>]
+let ``AMO.W arithmetic uses only low 32 bits of rs2 on RV64`` () =
+    Assert.Equal(15L,   amoMem 0b00000 false 10L   0x0000000100000005L)  // AMOADD.W  10 + 5
+    Assert.Equal(0xABL, amoMem 0b00001 false 10L   0x00000001000000ABL)  // AMOSWAP.W store 0xAB
+    Assert.Equal(0xFL,  amoMem 0b01100 false 0xFFL 0x000000010000000FL)  // AMOAND.W  0xFF & 0xF

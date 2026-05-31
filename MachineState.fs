@@ -26,7 +26,8 @@ type MachineState = {
             x.Registers.[reg]
 
     member x.setRegister (reg: Register) (value: MachineInt) : MachineState =
-        let registers = x.Registers
+        // Copy so a prior state keeps its registers (true immutability).
+        let registers = Array.copy x.Registers
         // Check x0 register that always 0
         let value = if reg = 0 then 0L else value
         Array.set registers reg (x.alignByArch value)
@@ -76,16 +77,16 @@ type MachineState = {
         { x with Reservation = Some addr }
     member x.clearReservation : MachineState =
         { x with Reservation = None }
+    // Represent a signed value at the register width (XLEN):
+    // RV32 keeps the low 32 bits sign-extended; RV64 is unchanged.
     member x.alignByArch (value : int64) =
-        // if x32 Arch - align it to x32
-        // and then convert again to int64
         match x.Arch.archBits with
         | Architecture.RV32 -> int64(int32 value)
         | _ -> value
 
+    // Represent an unsigned value at the width (XLEN), used for PC/addresses:
+    // RV32 keeps the low 32 bits zero-extended; RV64 is unchanged.
     member x.alignByArchUnsign (value : int64) =
-        // if x32 Arch - align it to x32
-        // and then convert again to int64
         match x.Arch.archBits with
         | Architecture.RV32 -> int64(uint32 value)
         | _ -> int64(uint64 value)
