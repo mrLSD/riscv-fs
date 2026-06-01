@@ -31,14 +31,13 @@ let execDIVW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 //=================================================
 // DIVUW - Division Unsign Word operation - sign * sign
 let execDIVUW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let rs1Val = mstate.getRegister rs1
-    let rs2Val = mstate.getRegister rs2
-    let maxUnsigned = 0xFFFFFFFFFFFFFFFFL
+    let rs1Val = uint32(mstate.getRegister rs1)
+    let rs2Val = uint32(mstate.getRegister rs2)
     let rdVal =
-        if rs2Val = 0L then
-            int32 maxUnsigned
+        if rs2Val = 0u then
+            -1
         else
-            int32(uint64 rs1Val / uint64 rs2Val)
+            int32(rs1Val / rs2Val)
     let mstate = mstate.setRegister rd (int64 rdVal)
     mstate.incPC
 
@@ -61,13 +60,13 @@ let execREMW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 //=================================================
 // REMUW - Division Unsign Word operation - sign * sign
 let execREMUW (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let rs1Val = mstate.getRegister rs1
-    let rs2Val = mstate.getRegister rs2
+    let rs1Val = uint32(mstate.getRegister rs1)
+    let rs2Val = uint32(mstate.getRegister rs2)
     let rdVal =
-        if rs2Val = 0L then
+        if rs2Val = 0u then
             int32 rs1Val
         else
-            int32(uint64 rs1Val % uint64 rs2Val)
+            int32(rs1Val % rs2Val)
     let mstate = mstate.setRegister rd (int64 rdVal)
     mstate.incPC
 

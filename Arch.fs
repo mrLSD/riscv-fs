@@ -47,3 +47,4 @@ type TrapErrors =
     | ECall
     | EBreak
     | MemAddress of MachineInt
+    | StepLimit

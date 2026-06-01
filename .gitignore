@@ -3,3 +3,6 @@ obj/
 /packages/
 .idea/
 *.elf
+coverage-report/
+.vscode/
+Tests/TestResults/

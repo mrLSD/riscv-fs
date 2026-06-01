@@ -8,6 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="10.0.1">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
         <PackageReference Include="xunit" Version="2.9.3" />
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
@@ -41,6 +45,14 @@
       <Compile Include="rv64m\alu.fs" />
 
       <Compile Include="rv64a\amo.fs" />
+      <Compile Include="rv64a\amoD.fs" />
+      <Compile Include="rv64a\amoSem.fs" />
+      <Compile Include="run\run.fs" />
+      <Compile Include="unit\units.fs" />
+      <Compile Include="unit\cli.fs" />
+      <Compile Include="unit\decode.fs" />
+      <Compile Include="unit\execute.fs" />
+      <Compile Include="unit\app.fs" />
         
       <Compile Include="Program.fs" />
     </ItemGroup>

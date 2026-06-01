@@ -13,6 +13,10 @@ let main argv =
         if not x.CheckRequired then
             printfn "Wrong parameters put --help to get more information"
         else
-            let res = Run.Run x
-            printfn "Result state: %A" res.RunState
+            try
+                let res = Run.Run x
+                printfn "Result state: %A" res.RunState
+            with ex ->
+                let file = if x.Files.Value.Length > 0 then x.Files.Value.[0] else "<unknown>"
+                printfn $"Error: failed to load or run '{file}': {ex.Message}"
     0 // return an integer exit code

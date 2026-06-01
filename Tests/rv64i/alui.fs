@@ -101,6 +101,38 @@ let ``SRLI: x3 = x2 >> 5 (b101)`` (x2 : int64, x3 : int64) =
 let ``SRAI: x3 = x2 >> 5 (b101)`` (x2, x3) =
     ALUimmediate 0x40515193 x2 x3
 
+// RV64 shift-immediates use a 6-bit shamt (rs2[5:0]); exercise shamt 32 and 63.
+[<Theory>]
+[<InlineData(1, 0x100000000L)>]
+let ``SLLI: x3 = x2 << 32`` (x2 : int64, x3 : int64) =
+    ALUimmediate 0x02011193 x2 x3
+
+[<Theory>]
+[<InlineData(1, 0x8000000000000000L)>]
+let ``SLLI: x3 = x2 << 63`` (x2 : int64, x3 : int64) =
+    ALUimmediate 0x03f11193 x2 x3
+
+[<Theory>]
+[<InlineData(0xFFFFFFFF00000000L, 0xFFFFFFFFL)>]
+let ``SRLI: x3 = x2 >> 32`` (x2 : int64, x3 : int64) =
+    ALUimmediate 0x02015193 x2 x3
+
+[<Theory>]
+[<InlineData(0x8000000000000000L, 1)>]
+let ``SRLI: x3 = x2 >> 63`` (x2 : int64, x3 : int64) =
+    ALUimmediate 0x03f15193 x2 x3
+
+[<Theory>]
+[<InlineData(0x8000000000000000L, 0xFFFFFFFF80000000L)>]
+[<InlineData(0x7FFFFFFF00000000L, 0x7FFFFFFFL)>]
+let ``SRAI: x3 = x2 >> 32`` (x2 : int64, x3 : int64) =
+    ALUimmediate 0x42015193 x2 x3
+
+[<Theory>]
+[<InlineData(0x8000000000000000L, -1)>]
+let ``SRAI: x3 = x2 >> 63`` (x2 : int64, x3 : int64) =
+    ALUimmediate 0x43f15193 x2 x3
+
 [<Theory>]
 [<InlineData(5, 10)>]
 [<InlineData(-5, 0)>]

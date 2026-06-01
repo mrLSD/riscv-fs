@@ -1,4 +1,4 @@
-module Tests.rv32a.amo
+module Tests.rv64a.amo
 
 open Xunit
 

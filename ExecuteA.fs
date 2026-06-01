@@ -16,6 +16,7 @@ let execLR_W (rd : Register) (rs1 : Register) (mstate : MachineState) =
         mstate.setRunState (Trap (MemAddress addr))
     else
         let mstate = mstate.setRegister rd (int64 memResult.Value)
+        let mstate = mstate.setReservation addr
         mstate.incPC
 
 //=================================================
@@ -24,10 +25,15 @@ let execLR_W (rd : Register) (rs1 : Register) (mstate : MachineState) =
 // always set the check register to 0 (indicating load success)
 let execSC_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
     let addr = mstate.getRegister rs1
-    let resMemOp = mstate.getRegister rs2
-    let mstate = mstate.storeMemoryWord addr resMemOp
-    let mstate = mstate.setRegister rd 0L
-    mstate.incPC
+    if mstate.Reservation = Some addr then
+        let mstate = mstate.storeMemoryWord addr (mstate.getRegister rs2)
+        let mstate = mstate.setRegister rd 0L
+        let mstate = mstate.clearReservation
+        mstate.incPC
+    else
+        let mstate = mstate.setRegister rd 1L
+        let mstate = mstate.clearReservation
+        mstate.incPC
 
 //=================================================
 // AMOSWAP.W - AMO Swap word
@@ -115,7 +121,7 @@ let execAMOMIN_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         mstate.setRunState (Trap (MemAddress addr))
     else        
         let resMemOp =
-            if (int64 memResult.Value) > rs2Val then
+            if memResult.Value > int32 rs2Val then
                 rs2Val
             else
                 int64 memResult.Value
@@ -134,7 +140,7 @@ let execAMOMAX_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
         mstate.setRunState (Trap (MemAddress addr))
     else        
         let resMemOp =
-            if (int64 memResult.Value) < rs2Val then
+            if memResult.Value < int32 rs2Val then
                 rs2Val
             else
                 int64 memResult.Value
@@ -153,7 +159,7 @@ let execAMOMINU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
         mstate.setRunState (Trap (MemAddress addr))
     else        
         let resMemOp =
-            if (uint64 memResult.Value) > (uint64 rs2Val) then
+            if (uint32 memResult.Value) > (uint32 rs2Val) then
                 rs2Val
             else
                 int64 memResult.Value
@@ -172,7 +178,7 @@ let execAMOMAXU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
         mstate.setRunState (Trap (MemAddress addr))
     else        
         let resMemOp =
-            if (uint64 memResult.Value) < (uint64 rs2Val) then
+            if (uint32 memResult.Value) < (uint32 rs2Val) then
                 rs2Val
             else
                 int64 memResult.Value
@@ -182,6 +188,15 @@ let execAMOMAXU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
 
 // Execute A-instructions
 let Execute (instr : InstructionA) (mstate : MachineState) =
+    let addr =
+        match instr with
+        | LR_W i -> mstate.getRegister i.rs1
+        | SC_W i | AMOSWAP_W i | AMOADD_W i | AMOXOR_W i | AMOAND_W i | AMOOR_W i
+        | AMOMIN_W i | AMOMAX_W i | AMOMINU_W i | AMOMAXU_W i -> mstate.getRegister i.rs1
+        | InstructionA.None -> 0L
+    if instr <> InstructionA.None && addr % 4L <> 0L then
+        mstate.setRunState (Trap (MemAddress addr))
+    else
     match instr with
     | LR_W i ->
         execLR_W i.rd i.rs1 mstate

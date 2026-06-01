@@ -132,6 +132,14 @@ let ``DIVU: x3 = (unsign x2) / (unsign x1)`` (x3, x2, x1) =
 let ``DIVUW: x3 = unsign x2 / unsign x1`` (x3, x2, x1) =
     ALU 0x021151bb x1 x2 x3
 
+// DIVUW must use only the low 32 bits of each operand (upper bits ignored).
+[<Theory>]
+[<InlineData(2, 0x0000000100000005L, 2)>]
+[<InlineData(5, 11, 0x0000000100000002L)>]
+[<InlineData(-1, 20, 0x0000000100000000L)>]
+let ``DIVUW: only low 32 bits`` (x3, x2, x1) =
+    ALU 0x021151bb x1 x2 x3
+
 [<Theory>]
 [<InlineData( 2, 20,  6)>]
 [<InlineData(-2,-20,  6)>]
@@ -183,4 +191,11 @@ let ``x64-REMU: x3 = (unsign x2) % (unsign x1)`` (x3, x2, x1) =
 [<InlineData(1, 1, 0)>]
 [<InlineData(0, 0, 0)>]
 let ``REMUW: x3 = unsign x2 % unsign x1`` (x3, x2, x1) =
+    ALU 0x021171bb x1 x2 x3
+
+// REMUW must use only the low 32 bits of each operand (upper bits ignored).
+[<Theory>]
+[<InlineData(5, 0x0000000100000005L, 100)>]
+[<InlineData(5, 0x0000000200000005L, 0x0000000100000000L)>]
+let ``REMUW: only low 32 bits`` (x3, x2, x1) =
     ALU 0x021171bb x1 x2 x3

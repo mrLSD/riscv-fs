@@ -94,7 +94,7 @@ let execDIV (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
     let rs2Val = mstate.getRegister rs2
     let minSigned =
         match mstate.Arch.archBits with
-        | RV32 -> 0x80000000L
+        | RV32 -> -2147483648L
         | _    -> 0x8000000000000000L
     let rdVal =
         if rs2Val = 0L then
@@ -135,7 +135,7 @@ let execREM (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineS
     let rs2Val = mstate.getRegister rs2
     let minSigned =
         match mstate.Arch.archBits with
-        | RV32 -> 0x80000000L
+        | RV32 -> -2147483648L
         | _    -> 0x8000000000000000L
     let rdVal =
         if rs2Val = 0L then

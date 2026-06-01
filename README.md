@@ -1,5 +1,6 @@
 # RISC-V formal ISA Specification
-[![Build Status](https://travis-ci.org/mrLSD/riscv-fs.svg?branch=master)](https://travis-ci.org/mrLSD/riscv-fs)
+[![.NET CI](https://github.com/mrLSD/riscv-fs/actions/workflows/dotnet.yml/badge.svg)](https://github.com/mrLSD/riscv-fs/actions/workflows/dotnet.yml)
+[![codecov](https://codecov.io/gh/mrLSD/riscv-fs/branch/master/graph/badge.svg)](https://codecov.io/gh/mrLSD/riscv-fs)
 
 **Copyright &copy; Evgeny Ukhanov**
 
@@ -21,7 +22,6 @@ Technical Group constituted by The RISC-V Foundation
 * [Features & Current status](#features--current-status) 
 * [Reading the code](#reading-the-code)
 * [How to build and run it on RISC-V binaries](#how-to-build-and-run-it-on-risc-v-binaries)
-  * [Install .NET SDK](#install-.net-sdk)
   * [Make the application executable](#make-the-application-executable)
   * [Run the application executable](#run-the-application-executable)
 * [How to Contribute](#how-to-contribute)
@@ -37,7 +37,7 @@ Technical Group constituted by The RISC-V Foundation
   - [x] Standard extension M (integer multiply/divide)
   - [x] Tests for Standard extension M RV32/RV64
   - [x] Standard extension A (atomic memory ops)
-  - [ ] Tests for Standard extension A RV32/RV64
+  - [x] Tests for Standard extension A RV32/RV64
 * Features under development
   * Standard extension C (Compressed 16-bit instructions)
   * Standard extension F (Single-precision floating point)
@@ -127,31 +127,7 @@ Supported OS:
 * Windows
 * MacOS
 
-Supported **.NET SDK**:
-* .NET SDK 2.2
-* .NET SDK 3.0
-
-### Install .NET SDK
-
-For Windows preferred way to use Visual Studio.
-
-Other examples will be for Linux.
-Please follow to instruction https://dotnet.microsoft.com/download
-
-For Ubuntu:
-```
-$ wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-$ sudo dpkg -i packages-microsoft-prod.deb
-$ sudo apt-get update
-$ sudo apt-get install apt-transport-https
-$ sudo apt-get update
-$ sudo apt-get install dotnet-sdk-3.0
-```
-To check installation:
-
-`$ dotnet --version`
-
-will tell you what version of `dotnet` you have.
+#### Supported `.NET 10` 
 
 ### Make the application executable
 You can build the application executable with:

@@ -5,7 +5,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <RootNamespace>ISA.RISCV</RootNamespace>
         <PackageId>ISA.RISC-V</PackageId>
-        <PackageVersion>1.0.0</PackageVersion>
+        <Version>0.5.0</Version>
         <Title>RISC-V CPU</Title>
         <Authors>mrLSD (Evgeny Ukhanov)</Authors>
         <Description>RISC-V CPU formal implementation that implement basic RISC-V ISA: rv32i
