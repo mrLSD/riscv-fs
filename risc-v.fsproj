@@ -5,10 +5,10 @@
         <TargetFramework>net10.0</TargetFramework>
         <RootNamespace>ISA.RISCV</RootNamespace>
         <PackageId>ISA.RISC-V</PackageId>
-        <Version>0.5.0</Version>
+        <Version>0.6.0</Version>
         <Title>RISC-V CPU</Title>
         <Authors>mrLSD (Evgeny Ukhanov)</Authors>
-        <Description>RISC-V CPU formal implementation that implement basic RISC-V ISA: rv32i
+        <Description>RISC-V CPU formal implementation that implement basic RISC-V ISA: rv32imac
 
 Additionally it's possible to operate with CLI, reading ELF files and set verbosity output.</Description>
         <Copyright>Evgeny Ukhanov</Copyright>
@@ -19,7 +19,7 @@ Additionally it's possible to operate with CLI, reading ELF files and set verbos
 
     <ItemGroup>
         <PackageReference Include="ELFSharp" Version="2.17.3" />
-        <PackageReference Update="FSharp.Core" Version="10.0.107" />
+        <PackageReference Update="FSharp.Core" Version="10.0.108" />
     </ItemGroup>
 
     <ItemGroup>
@@ -32,12 +32,14 @@ Additionally it's possible to operate with CLI, reading ELF files and set verbos
         <Compile Include="DecodeM64.fs" />
         <Compile Include="DecodeA.fs" />
         <Compile Include="DecodeA64.fs" />
+        <Compile Include="DecodeC.fs" />
         <Compile Include="ExecuteI.fs" />
         <Compile Include="ExecuteI64.fs" />
         <Compile Include="ExecuteM.fs" />
         <Compile Include="ExecuteM64.fs" />
         <Compile Include="ExecuteA.fs" />
         <Compile Include="ExecuteA64.fs" />
+        <Compile Include="ExecuteC.fs" />
         <Compile Include="Decoder.fs" />
         <Compile Include="CLI.fs" />
         <Compile Include="Run.fs" />

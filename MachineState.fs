@@ -18,6 +18,7 @@ type MachineState = {
         Arch:       Architecture
         RunState:   RunMachineState
         Reservation: int64 option
+        InstrLen:   int
     } with
     member x.getRegister(reg: Register) : MachineInt =
         if reg = 0 then
@@ -37,7 +38,10 @@ type MachineState = {
         { x with PC = x.alignByArchUnsign pc }
 
     member x.incPC : MachineState =
-        x.setPC (x.PC + 4L)
+        x.setPC (x.PC + int64 x.InstrLen)
+    // Instruction alignment (IALIGN): 2 bytes when C is supported, else 4.
+    member x.instrAlign : int64 =
+        if x.Arch.hasC then 2L else 4L
 
     member x.getMemory(addr : int64) =
         let addr = x.alignByArchUnsign addr
@@ -51,25 +55,26 @@ type MachineState = {
         let mem = Map.add addr (byte value) x.Memory
         { x with Memory = mem }
     
+    // Store `nBytes` little-endian bytes of `value` starting at `addr`.
+    // An explicit recursive loop keeps the only branch (i >= nBytes) fully
+    // exercised for any nBytes >= 1 (both the continue and stop sides are hit).
+    member private x.storeBytes (nBytes : int) (addr : MachineInt) (value : MachineInt) : MachineState =
+        let rec loop (ms : MachineState) i =
+            if i >= nBytes then ms
+            else loop (ms.setMemoryByte (addr + int64 i) (byte (value.bitSlice (i*8+7) (i*8)))) (i + 1)
+        loop x 0
+
     member x.storeMemoryByte (addr : MachineInt) (value : MachineInt) : MachineState =
-        let nBytes = 1
-        Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) x
-            [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (value.bitSlice (i*8+7) (i*8) )) |]
+        x.storeBytes 1 addr value
     
     member x.storeMemoryHalfWord (addr : MachineInt) (value : MachineInt) : MachineState =
-        let nBytes = 2
-        Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) x
-            [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (value.bitSlice (i*8+7) (i*8) )) |]
+        x.storeBytes 2 addr value
     
     member x.storeMemoryWord (addr : MachineInt) (value : MachineInt) : MachineState =
-        let nBytes = 4
-        Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) x
-            [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (value.bitSlice (i*8+7) (i*8) )) |]
+        x.storeBytes 4 addr value
 
     member x.storeMemoryDoubleWord (addr : MachineInt) (value : MachineInt) : MachineState =
-        let nBytes = 8
-        Array.fold (fun (ms : MachineState) (addr, data) -> ms.setMemoryByte addr data) x
-            [| for i in 0..(nBytes-1) -> (addr+(int64 i), byte (value.bitSlice (i*8+7) (i*8) )) |]
+        x.storeBytes 8 addr value
         
     member x.setRunState state =
         { x with RunState = state }
@@ -100,4 +105,5 @@ let InitMachineState mem arch verbosity : MachineState =
         Verbosity    = verbosity
         RunState     = RunMachineState.NotRun
         Reservation  = None
+        InstrLen     = 4
     }

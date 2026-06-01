@@ -16,6 +16,14 @@ open ISA.RISCV.Utils.Bits
 [<InlineData("rv64ia")>]
 [<InlineData("rv32ima")>]
 [<InlineData("rv64ima")>]
+[<InlineData("rv32ic")>]
+[<InlineData("rv64ic")>]
+[<InlineData("rv32imc")>]
+[<InlineData("rv64imc")>]
+[<InlineData("rv32iac")>]
+[<InlineData("rv64iac")>]
+[<InlineData("rv32imac")>]
+[<InlineData("rv64imac")>]
 let ``Architecture.fromString parses every valid arch`` (s : string) =
     Assert.True((Architecture.fromString s).IsSome)
 
@@ -34,6 +42,12 @@ let ``Int64 bit helpers`` () =
     Assert.Equal<int[]>([| 1; 3 |], x.toArray)
     x.print
     x.display
+
+[<Fact>]
+let ``combineBytes over empty, single and multi-byte arrays`` () =
+    Assert.Equal(0L, combineBytes [||])                       // empty range branch
+    Assert.Equal(0xABL, combineBytes [| 0xABuy |])            // single byte
+    Assert.Equal(0xCDABL, combineBytes [| 0xABuy; 0xCDuy |])  // little-endian combine
 
 [<Fact>]
 let ``load helpers return None on unmapped memory`` () =

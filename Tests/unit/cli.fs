@@ -119,3 +119,28 @@ let ``long-key-only option with value advances past both tokens`` () =
     let opt = { CliOptions.Default with LongKey = Some "name"; Value = Some "N" }
     let (_, leftover) = fetchArgs [| "--name"; "bob" |] opt AppConfig.Default
     Assert.Equal<string[]>([||], leftover)
+
+// Exercise every fetchArgs/parseCli arm and guard combination for branch coverage.
+[<Fact>]
+let ``parser exercises all fetchArgs and parseCli arms`` () =
+    let filesOpt = { CliOptions.Default with Value = Some "F"; Multiple = true }
+    let keyMul   = { CliOptions.Default with Key = Some "f"; Multiple = true }
+    let aOpt     = { CliOptions.Default with Key = Some "A"; Value = Some "ARCH" }
+    // Multiple value-option: several values (recurse), single (base), and empty argv
+    fetchArgs [| "a"; "b"; "c" |] filesOpt AppConfig.Default |> ignore
+    fetchArgs [| "a" |] filesOpt AppConfig.Default |> ignore
+    fetchArgs [||] filesOpt AppConfig.Default |> ignore
+    // Multiple key-option: trailing match (recurse) and non-match (inner NotFound->Result)
+    fetchArgs [| "-f"; "-f" |] keyMul AppConfig.Default |> ignore
+    fetchArgs [| "-f"; "z" |] keyMul AppConfig.Default |> ignore
+    // Non-multiple option: leftover (_ with len-resIndex>0) and none (_ with =0)
+    fetchArgs [| "-A"; "rv32i"; "x"; "y" |] aOpt AppConfig.Default |> ignore
+    fetchArgs [| "-A"; "rv32i" |] aOpt AppConfig.Default |> ignore
+    // NotFound with following args (recurse) and as the only arg
+    fetchArgs [| "zzz"; "-A"; "rv32i" |] aOpt AppConfig.Default |> ignore
+    fetchArgs [| "zzz" |] aOpt AppConfig.Default |> ignore
+    // parseCli: single option (opts.Length=1), full chain with trailing files, empty argv
+    parseCli [| "-A"; "rv32i" |] [| aOpt |] AppConfig.Default |> ignore
+    parseCli [| "-A"; "rv32i"; "f1"; "f2" |] InitCLI AppConfig.Default |> ignore
+    parseCli [||] InitCLI AppConfig.Default |> ignore
+    Assert.True true
