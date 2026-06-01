@@ -21,7 +21,7 @@ let execAUIPC (rd : Register) (imm20 : InstrField) (mstate : MachineState) =
 // JALR - Jump Relative immediately
 let execJALR (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let newPC = ((mstate.getRegister rs1) + (int64 imm12)) &&& (~~~1L)
-    if newPC % 4L <> 0L then
+    if newPC % mstate.instrAlign <> 0L then
         mstate.setRunState (Trap JumpAddress)
     else if newPC = mstate.PC then
         mstate.setRunState Stopped
@@ -34,7 +34,7 @@ let execJALR (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Mac
 // JAL - Jump immediately
 let execJAL (rd : Register) (imm20 : InstrField) (mstate : MachineState) =
     let newPC = mstate.PC + int64 imm20
-    if newPC % 4L <> 0L then
+    if newPC % mstate.instrAlign <> 0L then
         mstate.setRunState (Trap JumpAddress)
     else if newPC = mstate.PC then
         mstate.setRunState Stopped
@@ -48,7 +48,7 @@ let branch (branchCheck : MachineInt -> MachineInt -> bool) (rs1 : Register) (rs
     let x1 = mstate.getRegister rs1
     let x2 = mstate.getRegister rs2
     let newPC = mstate.PC + int64 imm12
-    if newPC % 4L <> 0L then
+    if newPC % mstate.instrAlign <> 0L then
         mstate.setRunState (Trap BreakAddress)
     else if newPC = mstate.PC then
         mstate.setRunState Stopped
@@ -88,7 +88,7 @@ let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : Ma
         | RV32 -> uint32 x1 < uint32 x2
         | _ -> uint64 x1 < uint64 x2
     let newPC = mstate.PC + int64 imm12
-    if newPC % 4L <> 0L then
+    if newPC % mstate.instrAlign <> 0L then
         mstate.setRunState (Trap BreakAddress)
     else if newPC = mstate.PC then
         mstate.setRunState Stopped
@@ -109,7 +109,7 @@ let execBGEU (rs1 : Register) (rs2: Register) (imm12 : InstrField) (mstate : Mac
         | _ -> uint64 x1 >= uint64 x2
 
     let newPC = mstate.PC + int64 imm12
-    if newPC % 4L <> 0L then
+    if newPC % mstate.instrAlign <> 0L then
         mstate.setRunState (Trap BreakAddress)
     else if newPC = mstate.PC then
         mstate.setRunState Stopped

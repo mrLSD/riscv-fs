@@ -16,6 +16,14 @@ open ISA.RISCV.Utils.Bits
 [<InlineData("rv64ia")>]
 [<InlineData("rv32ima")>]
 [<InlineData("rv64ima")>]
+[<InlineData("rv32ic")>]
+[<InlineData("rv64ic")>]
+[<InlineData("rv32imc")>]
+[<InlineData("rv64imc")>]
+[<InlineData("rv32iac")>]
+[<InlineData("rv64iac")>]
+[<InlineData("rv32imac")>]
+[<InlineData("rv64imac")>]
 let ``Architecture.fromString parses every valid arch`` (s : string) =
     Assert.True((Architecture.fromString s).IsSome)
 

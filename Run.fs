@@ -41,7 +41,14 @@ let readElfFile (file : string) : Map<int64, byte> =
 // Get instruction from current Machine State that related to
 // current PC as memory address for loading instruction data for Decoding
 let fetchInstruction (mstate : MachineState) : InstrField option =
-    loadWord mstate.Memory mstate.PC
+    match loadHalfWord mstate.Memory mstate.PC with
+    | None -> None
+    | Some hw ->
+        // 32-bit instruction iff inst[1:0] = 0b11, otherwise 16-bit compressed.
+        if (int hw &&& 0x3) = 0x3 then
+            loadWord mstate.Memory mstate.PC
+        else
+            Some(int32 (uint16 hw))
 
 // Basic RISC-V run life cycle (FSM). `steps` bounds execution so a non-terminating
 // program (e.g. a backward self-branch) aborts with a StepLimit trap instead of hanging.

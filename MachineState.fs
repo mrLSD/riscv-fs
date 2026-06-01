@@ -18,6 +18,7 @@ type MachineState = {
         Arch:       Architecture
         RunState:   RunMachineState
         Reservation: int64 option
+        InstrLen:   int
     } with
     member x.getRegister(reg: Register) : MachineInt =
         if reg = 0 then
@@ -37,7 +38,10 @@ type MachineState = {
         { x with PC = x.alignByArchUnsign pc }
 
     member x.incPC : MachineState =
-        x.setPC (x.PC + 4L)
+        x.setPC (x.PC + int64 x.InstrLen)
+    // Instruction alignment (IALIGN): 2 bytes when C is supported, else 4.
+    member x.instrAlign : int64 =
+        if x.Arch.hasC then 2L else 4L
 
     member x.getMemory(addr : int64) =
         let addr = x.alignByArchUnsign addr
@@ -100,4 +104,5 @@ let InitMachineState mem arch verbosity : MachineState =
         Verbosity    = verbosity
         RunState     = RunMachineState.NotRun
         Reservation  = None
+        InstrLen     = 4
     }

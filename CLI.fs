@@ -184,7 +184,7 @@ let rec InitCLI =
             Key =  Some("A");
             LongKey = Some("arch");
             Value = Some("ARCH")
-            HelpMessage = "RISC-V architecture. Available: rv32i, rv32im, rv32ia, rv32ima, rv64i, rv64im, rv64ia, rv64ima. Default: rv32i"
+            HelpMessage = "RISC-V architecture (required). Available: rv32i, rv32im, rv32ia, rv32ima, rv32ic, rv32imc, rv32iac, rv32imac, rv64i, rv64im, rv64ia, rv64ima, rv64ic, rv64imc, rv64iac, rv64imac"
             Handler =
                 fun arg cfg ->
                     { cfg with
