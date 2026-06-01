@@ -17,5 +17,6 @@ let main argv =
                 let res = Run.Run x
                 printfn "Result state: %A" res.RunState
             with ex ->
-                printfn "Error: failed to load or run '%s': %s" x.Files.Value.[0] ex.Message
+                let file = if x.Files.Value.Length > 0 then x.Files.Value.[0] else "<unknown>"
+                printfn $"Error: failed to load or run '{file}': {ex.Message}"
     0 // return an integer exit code

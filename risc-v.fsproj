@@ -18,10 +18,6 @@ Additionally it's possible to operate with CLI, reading ELF files and set verbos
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="10.0.1">
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-          <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
         <PackageReference Include="ELFSharp" Version="2.17.3" />
         <PackageReference Update="FSharp.Core" Version="10.0.107" />
     </ItemGroup>
