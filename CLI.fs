@@ -142,7 +142,7 @@ let rec fetchArgs (argv : string[]) (opts : CliOptions) (cfg : AppConfig) =
 
         match cfgRes with
         | Result(res) when opts.Multiple && argv.Length - resIndex > 0 ->
-            let cfgRes = fetchArgs argv.[resIndex..] opts res
+            let cfgRes = fetchArgs (Array.skip resIndex argv) opts res
             // If NotFound for that branch loop -
             // redeclare to Result type
             let resValue = match cfgRes with
@@ -150,11 +150,11 @@ let rec fetchArgs (argv : string[]) (opts : CliOptions) (cfg : AppConfig) =
                            | _ -> cfgRes
             resValue
         | NotFound(res) when argv.Length > 0 ->
-            let (cfgRes, changedArgs) = fetchArgs argv.[1..] opts res
+            let (cfgRes, changedArgs) = fetchArgs (Array.skip 1 argv) opts res
             (cfgRes, Array.append [|arg|] changedArgs)
         | _ ->
             if argv.Length - resIndex > 0 then
-                (cfgRes, argv.[resIndex..])
+                (cfgRes, Array.skip resIndex argv)
             else
                 (cfgRes, [||])
 
@@ -164,7 +164,7 @@ let rec parseCli (argv : string[]) (opts : CliOptions[]) (cfg : AppConfig) =
         Success(cfg)
     else
         let opt = opts.[0]
-        let opts = if opts.Length > 1 then opts.[1..] else [||]
+        let opts = if opts.Length > 1 then Array.skip 1 opts else [||]
         let (resCfg, newArgv) = fetchArgs argv opt cfg
         match resCfg with
         | Error ->

@@ -287,6 +287,9 @@ let ``reserved and FP-compressed encodings decode to None`` () =
     Assert.Equal(DC.None, DC.Decode m32 (cADDI16SP 0))      // C.ADDI16SP nzimm=0
     Assert.Equal(DC.None, DC.Decode m32 (cLUI 5 0))         // C.LUI nzimm=0
     Assert.Equal(DC.None, DC.Decode m64 (cADDIW 0 1))       // C.ADDIW rd=0
+    Assert.Equal(DC.None, DC.Decode m32 (cSRLI 8 32))       // C.SRLI shamt>=32 RV32 (shamtOk=false)
+    Assert.Equal(DC.None, DC.Decode m32 (cSRAI 8 32))       // C.SRAI shamt>=32 RV32 (shamtOk=false)
+    Assert.Equal(DC.None, DC.Decode m64 (cLDSP 0 8))        // C.LDSP rd=0
 
 [<Fact>]
 let ``C Execute None traps`` () =
@@ -308,17 +311,22 @@ let ``runSteps executes a compressed program (PC += 2)`` () =
 
 // ---- verbosityMessage: cover every output group ----
 [<Fact>]
-let ``C verbosityMessage covers all groups`` () =
+let ``C verbosityMessage covers every constructor`` () =
     let m = st RV64ic
     let vm w = DC.verbosityMessage w (DC.Decode m w) m
-    vm (cADDI 1 1)
-    vm (cLW 9 8 4)
-    vm (cSW 8 9 4)
-    vm (cSLLI 5 4)
-    vm (caEnc 0 0b00 8 9)
-    vm (cJ 16)
-    vm (cBEQZ 8 16)
-    vm (crEnc 0 1 0)
-    vm (cSWSP 5 4)
-    DC.verbosityMessage 0 DC.None m
-    DC.verbosityMessage 0 DC.C_EBREAK m
+    // RV64ic decodes every constructor except C.JAL (RV32-only)
+    vm (cADDI4SPN 8 16); vm (cADDI 1 1); vm (cADDIW 5 1); vm (cLI 5 1); vm (cLUI 5 1)
+    vm (cANDI 8 0xF); vm (cLWSP 5 4); vm (cLDSP 5 8)
+    vm (cLW 9 8 4); vm (cLD 9 8 8); vm (cSW 8 9 4); vm (cSD 8 9 8)
+    vm (cSRLI 8 4); vm (cSRAI 8 2); vm (cSLLI 5 4)
+    vm (caEnc 0 0b00 8 9); vm (caEnc 0 0b01 8 9); vm (caEnc 0 0b10 8 9); vm (caEnc 0 0b11 8 9)
+    vm (caEnc 1 0b00 8 9); vm (caEnc 1 0b01 8 9)              // C.SUBW C.ADDW
+    vm (cJ 16); vm (cADDI16SP 32); vm (cBEQZ 8 16); vm (cBNEZ 8 16)
+    vm (crEnc 0 5 0); vm (crEnc 1 5 0)                        // C.JR C.JALR
+    vm (crEnc 0 5 6); vm (crEnc 1 5 6)                        // C.MV C.ADD
+    vm (cSWSP 5 4); vm (cSDSP 5 8)
+    // C.JAL is RV32-only (on RV64 funct3=001 decodes as C.ADDIW)
+    let m32 = st RV32ic
+    DC.verbosityMessage (cJAL 16) (DC.Decode m32 (cJAL 16)) m32
+    DC.verbosityMessage 0 DC.None m         // _ -> "Undef"
+    DC.verbosityMessage 0 DC.C_EBREAK m     // _ -> "Undef"

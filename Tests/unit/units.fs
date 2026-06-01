@@ -44,6 +44,12 @@ let ``Int64 bit helpers`` () =
     x.display
 
 [<Fact>]
+let ``combineBytes over empty, single and multi-byte arrays`` () =
+    Assert.Equal(0L, combineBytes [||])                       // empty range branch
+    Assert.Equal(0xABL, combineBytes [| 0xABuy |])            // single byte
+    Assert.Equal(0xCDABL, combineBytes [| 0xABuy; 0xCDuy |])  // little-endian combine
+
+[<Fact>]
 let ``load helpers return None on unmapped memory`` () =
     let mem : Map<int64, byte> = Map.empty
     Assert.True((loadByte mem 0L).IsNone)
