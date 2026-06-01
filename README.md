@@ -38,8 +38,9 @@ Technical Group constituted by The RISC-V Foundation
   - [x] Tests for Standard extension M RV32/RV64
   - [x] Standard extension A (atomic memory ops)
   - [x] Tests for Standard extension A RV32/RV64
+  - [x] Standard extension C (Compressed 16-bit instructions)
+  - [x] Tests for Standard extension C RV32/RV64
 * Features under development
-  * Standard extension C (Compressed 16-bit instructions)
   * Standard extension F (Single-precision floating point)
   * Standard extension D (Double-precision floating point)
   * Privilege Level M (Machine)
