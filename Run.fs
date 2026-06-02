@@ -19,24 +19,38 @@ let verbosityMessageRegisters (mstate : MachineState) =
             let value = sprintf "0x%x" mstate.Registers.[x]
             printfn "%s" (String.Format("\tx{0, -3}{1}", x, value))
 
-/// Read Elf data content to Map data with format: [address, dataByte].
+/// Read Elf data content to Map data with format: [address, dataByte], paired with the
+/// ELF entry point (e_entry) so the PC starts where the program is actually linked.
 /// Loads every PT_LOAD segment (code, data, zero-filled bss) for 32- and 64-bit ELF.
-let readElfFile (file : string) : Map<int64, byte> =
+let readElfFile (file : string) : Map<int64, byte> * int64 =
+    // The memory Map keeps one node per mapped byte (~100+ bytes of managed heap each),
+    // so an untrusted ELF's attacker-controlled p_memsz must be bounded BEFORE allocation.
+    // Sum each segment's memsz saturated at the cap, in uint64 so a huge or wrapping
+    // p_memsz cannot evade the check, and reject the file if the total exceeds the limit.
+    let maxMappedBytes = 4UL * 1024UL * 1024UL
     let toPairs (vaddr : int64) (bytes : byte array) =
         Array.mapi (fun i b -> (vaddr + int64 i, b)) bytes
+    let segmentBytes (sz : uint64) = min sz (maxMappedBytes + 1UL)
+    let checkSize (total : uint64) =
+        if total > maxMappedBytes then
+            failwithf "ELF load segments exceed the %d-byte memory limit" maxMappedBytes
     match ELFReader.CheckELFType file with
     | Class.Bit64 ->
         let elf = ELFReader.Load<uint64> file
-        elf.Segments
-        |> Seq.filter (fun s -> s.Type = SegmentType.Load)
-        |> Seq.collect (fun s -> toPairs (int64 s.Address) (s.GetMemoryContents()))
-        |> Map.ofSeq
+        let segments = elf.Segments |> Seq.filter (fun s -> s.Type = SegmentType.Load)
+        checkSize (segments |> Seq.sumBy (fun s -> segmentBytes (uint64 s.Size)))
+        let mem = segments
+                  |> Seq.collect (fun s -> toPairs (int64 s.Address) (s.GetMemoryContents()))
+                  |> Map.ofSeq
+        (mem, int64 elf.EntryPoint)
     | _ ->
         let elf = ELFReader.Load<uint32> file
-        elf.Segments
-        |> Seq.filter (fun s -> s.Type = SegmentType.Load)
-        |> Seq.collect (fun s -> toPairs (int64 s.Address) (s.GetMemoryContents()))
-        |> Map.ofSeq
+        let segments = elf.Segments |> Seq.filter (fun s -> s.Type = SegmentType.Load)
+        checkSize (segments |> Seq.sumBy (fun s -> segmentBytes (uint64 s.Size)))
+        let mem = segments
+                  |> Seq.collect (fun s -> toPairs (int64 s.Address) (s.GetMemoryContents()))
+                  |> Map.ofSeq
+        (mem, int64 elf.EntryPoint)
 
 // Get instruction from current Machine State that related to
 // current PC as memory address for loading instruction data for Decoding
@@ -68,9 +82,11 @@ let rec runSteps (steps : int) (mstate : MachineState) =
                 | None -> mstate.setRunState (Trap TrapErrors.InstructionDecode)
                 | Some executor -> executor mstate
         match mstate.RunState with
-        | Trap _ -> mstate
+        | Trap _ ->
+            if mstate.Verbosity then verbosityMessageRegisters mstate
+            mstate
         | RunMachineState.Stopped ->
-            verbosityMessageRegisters mstate
+            if mstate.Verbosity then verbosityMessageRegisters mstate
             mstate
         | _ -> runSteps (steps - 1) mstate
 
@@ -79,6 +95,8 @@ let runCycle (mstate : MachineState) = runSteps 10_000_000 mstate
 
 // Main application Run logic
 let Run (cfg : AppConfig) =
-    let data = readElfFile cfg.Files.Value.[0]
-    let mstate = InitMachineState data cfg.Arch.Value cfg.Verbosity.Value
+    let (data, entry) = readElfFile cfg.Files.Value.[0]
+    // Start the PC at the ELF entry point (e_entry) instead of a fixed constant, so a
+    // program linked anywhere (not only 0x80000000) fetches its first instruction.
+    let mstate = (InitMachineState data cfg.Arch.Value cfg.Verbosity.Value).setPC entry
     runCycle mstate

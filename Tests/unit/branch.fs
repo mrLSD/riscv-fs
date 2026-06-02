@@ -88,10 +88,8 @@ let ``I decode: SRAI guard false branches`` () =
 
 [<Fact>]
 let ``I decode: FENCE/SYSTEM guard false branches`` () =
-    // FENCE opcode (0b0001111) with rd / rs1 / funct3 != 0 -> None
-    Assert.Equal(DI.None, DI.Decode m32 0x0000008F)  // rd=1
-    Assert.Equal(DI.None, DI.Decode m32 0x0000800F)  // rs1=1
-    Assert.Equal(DI.None, DI.Decode m32 0x0000100F)  // funct3=1
+    // FENCE opcode (0b0001111): rd/rs1 are ignored per spec; only funct3 != 0 -> None
+    Assert.Equal(DI.None, DI.Decode m32 0x0000100F)  // funct3=1 (e.g. unimplemented FENCE.I)
     // SYSTEM opcode (0b1110011) with rd / rs1 / funct3 != 0, or imm not 0/1 -> None
     Assert.Equal(DI.None, DI.Decode m32 0x000000F3)  // rd=1
     Assert.Equal(DI.None, DI.Decode m32 0x00008073)  // rs1=1

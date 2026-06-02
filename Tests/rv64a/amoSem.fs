@@ -21,7 +21,7 @@ let private exec (m : MachineState) (instr : int) =
     Assert.NotEqual(e, None)
     e.Value m
 
-// ---- M1: LR/SC reservation ----
+// ---- LR/SC reservation ----
 [<Fact>]
 let ``SC.W succeeds after LR.W to the same address`` () =
     let addr = 0x2000L
@@ -57,7 +57,32 @@ let ``SC.W fails when the address differs from the reservation`` () =
     Assert.Equal(1L, m.getRegister 12)
     Assert.Equal(0x55L, int64 (loadWord m.Memory 0x3000L).Value)
 
-// ---- M2: AMO.W uses only the low 32 bits of rs2 on RV64 ----
+// ---- SC must fail when its width does not match the LR it pairs with ----
+[<Fact>]
+let ``SC.D after LR.W fails on a width mismatch`` () =
+    let addr = 0x2000L
+    let m = init ()
+    let m = m.setRegister 10 addr
+    let m = m.setRegister 11 0x1234L
+    let m = m.storeMemoryDoubleWord addr 0xAAL
+    let m = exec m (encW 0b00010 0 10 0)    // lr.w (width 4) reserves addr
+    let m = exec m (encD 0b00011 11 10 12)  // sc.d (width 8) at addr -> must fail
+    Assert.Equal(1L, m.getRegister 12)
+    Assert.Equal(0xAAL, (loadDouble m.Memory addr).Value)
+
+[<Fact>]
+let ``SC.W after LR.D fails on a width mismatch`` () =
+    let addr = 0x2000L
+    let m = init ()
+    let m = m.setRegister 10 addr
+    let m = m.setRegister 11 0x1234L
+    let m = m.storeMemoryDoubleWord addr 0xAAL
+    let m = exec m (encD 0b00010 0 10 0)    // lr.d (width 8) reserves addr
+    let m = exec m (encW 0b00011 11 10 12)  // sc.w (width 4) at addr -> must fail
+    Assert.Equal(1L, m.getRegister 12)
+    Assert.Equal(0xAAL, (loadDouble m.Memory addr).Value)
+
+// ---- AMO.W uses only the low 32 bits of rs2 on RV64 ----
 [<Fact>]
 let ``AMOMIN.W compares only low 32 bits of rs2`` () =
     let addr = 0x2000L
@@ -80,7 +105,7 @@ let ``AMOMINU.W compares only low 32 bits of rs2`` () =
     Assert.Equal(10L, m.getRegister 12)
     Assert.Equal(5L, int64 (loadWord m.Memory addr).Value)
 
-// ---- M6: misaligned atomic address traps ----
+// ---- misaligned atomic address traps ----
 [<Fact>]
 let ``AMOADD.W traps on a misaligned address`` () =
     let m = init ()

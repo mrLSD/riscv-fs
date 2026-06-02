@@ -180,8 +180,9 @@ let Decode (mstate : MachineState) (instr: InstrField) : InstructionI =
         | 0b111 when funct7 = 0b0000000 -> AND  {| rd = rd; rs1 = rs1; rs2 = rs2 |}
         | _ -> None
 
-    // Fence Opcode
-    | 0b0001111 when rd = 0 && rs1 = 0 && funct3 = 0b000 -> FENCE {| fm = fm; pred = pred; succ = succ  |}
+    // Fence Opcode. The rd/rs1 fields are reserved for finer-grain fences; a base
+    // implementation ignores them (per spec) rather than rejecting the instruction.
+    | 0b0001111 when funct3 = 0b000 -> FENCE {| fm = fm; pred = pred; succ = succ  |}
 
     // System opcodes
     | 0b1110011 when rd = 0 && rs1 = 0 && funct3 = 0b000 && imm12_I = 0b000000000000  -> ECALL

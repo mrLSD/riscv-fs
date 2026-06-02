@@ -20,7 +20,7 @@ let execAUIPC (rd : Register) (imm20 : InstrField) (mstate : MachineState) =
 //=================================================
 // JALR - Jump Relative immediately
 let execJALR (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
-    let newPC = ((mstate.getRegister rs1) + (int64 imm12)) &&& (~~~1L)
+    let newPC = mstate.alignByArchUnsign (((mstate.getRegister rs1) + (int64 imm12)) &&& (~~~1L))
     if newPC % mstate.instrAlign <> 0L then
         mstate.setRunState (Trap JumpAddress)
     else if newPC = mstate.PC then
@@ -47,16 +47,18 @@ let execJAL (rd : Register) (imm20 : InstrField) (mstate : MachineState) =
 let branch (branchCheck : MachineInt -> MachineInt -> bool) (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
     let x1 = mstate.getRegister rs1
     let x2 = mstate.getRegister rs2
-    let newPC = mstate.PC + int64 imm12
-    if newPC % mstate.instrAlign <> 0L then
-        mstate.setRunState (Trap BreakAddress)
-    else if newPC = mstate.PC then
-        mstate.setRunState Stopped
-    else
-        if branchCheck x1 x2 then
-            mstate.setPC newPC
+    // The misalignment trap and the self-loop sentinel apply only when the
+    // branch is taken; a not-taken branch always falls through to PC+InstrLen.
+    if branchCheck x1 x2 then
+        let newPC = mstate.PC + int64 imm12
+        if newPC % mstate.instrAlign <> 0L then
+            mstate.setRunState (Trap BreakAddress)
+        else if newPC = mstate.PC then
+            mstate.setRunState Stopped
         else
-            mstate.incPC
+            mstate.setPC newPC
+    else
+        mstate.incPC
 
 //=================================================
 // BEQ - Branch if Equal
@@ -87,16 +89,16 @@ let execBLTU (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : Ma
         match mstate.Arch.archBits with
         | RV32 -> uint32 x1 < uint32 x2
         | _ -> uint64 x1 < uint64 x2
-    let newPC = mstate.PC + int64 imm12
-    if newPC % mstate.instrAlign <> 0L then
-        mstate.setRunState (Trap BreakAddress)
-    else if newPC = mstate.PC then
-        mstate.setRunState Stopped
-    else
-        if branchCheck then
-            mstate.setPC newPC
+    if branchCheck then
+        let newPC = mstate.PC + int64 imm12
+        if newPC % mstate.instrAlign <> 0L then
+            mstate.setRunState (Trap BreakAddress)
+        else if newPC = mstate.PC then
+            mstate.setRunState Stopped
         else
-            mstate.incPC
+            mstate.setPC newPC
+    else
+        mstate.incPC
 
 //=================================================
 // BGEU - Branch If Greater or Equal (Unsigned)
@@ -107,23 +109,22 @@ let execBGEU (rs1 : Register) (rs2: Register) (imm12 : InstrField) (mstate : Mac
         match mstate.Arch.archBits with
         | RV32 -> uint32 x1 >= uint32 x2
         | _ -> uint64 x1 >= uint64 x2
-
-    let newPC = mstate.PC + int64 imm12
-    if newPC % mstate.instrAlign <> 0L then
-        mstate.setRunState (Trap BreakAddress)
-    else if newPC = mstate.PC then
-        mstate.setRunState Stopped
-    else
-        if branchCheck then
-            mstate.setPC newPC
+    if branchCheck then
+        let newPC = mstate.PC + int64 imm12
+        if newPC % mstate.instrAlign <> 0L then
+            mstate.setRunState (Trap BreakAddress)
+        else if newPC = mstate.PC then
+            mstate.setRunState Stopped
         else
-            mstate.incPC
+            mstate.setPC newPC
+    else
+        mstate.incPC
 
 //=================================================
 // LB - Load Byte from Memory
 let execLB (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + int64 imm12
-    let memResult = loadByte mstate.Memory addr
+    let addr = mstate.alignByArchUnsign ((mstate.getRegister rs1) + int64 imm12)
+    let memResult = mstate.loadMemoryByte addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
@@ -133,8 +134,8 @@ let execLB (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Machi
 //=================================================
 // LH - Load Half-word (2 bytes)  from Memory
 let execLH (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + int64 imm12
-    let memResult = loadHalfWord mstate.Memory addr
+    let addr = mstate.alignByArchUnsign ((mstate.getRegister rs1) + int64 imm12)
+    let memResult = mstate.loadMemoryHalfWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
@@ -144,8 +145,8 @@ let execLH (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Machi
 //=================================================
 // LW - Load Word (4 bytes) from Memory
 let execLW (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + int64 imm12
-    let memResult = loadWord mstate.Memory addr
+    let addr = mstate.alignByArchUnsign ((mstate.getRegister rs1) + int64 imm12)
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
@@ -155,8 +156,8 @@ let execLW (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Machi
 //=================================================
 // LBU - Load Byte Unsigned from Memory
 let execLBU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + int64 imm12
-    let memResult = loadByte mstate.Memory addr
+    let addr = mstate.alignByArchUnsign ((mstate.getRegister rs1) + int64 imm12)
+    let memResult = mstate.loadMemoryByte addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
@@ -167,8 +168,8 @@ let execLBU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Mach
 //=================================================
 // LHU - Load Half-word (2 bytes) Unsigned from Memory
 let execLHU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + int64 imm12
-    let memResult = loadHalfWord mstate.Memory addr
+    let addr = mstate.alignByArchUnsign ((mstate.getRegister rs1) + int64 imm12)
+    let memResult = mstate.loadMemoryHalfWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
@@ -179,7 +180,7 @@ let execLHU (rd : Register) (rs1 : Register) (imm12 : InstrField) (mstate : Mach
 //=================================================
 // SB - Store Byte to Memory
 let execSB (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + int64 imm12
+    let addr = mstate.alignByArchUnsign ((mstate.getRegister rs1) + int64 imm12)
     let rs2Val = mstate.getRegister rs2
     let mstate = mstate.storeMemoryByte addr rs2Val
     mstate.incPC
@@ -187,7 +188,7 @@ let execSB (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : Mach
 //=================================================
 // SH - Store 2 Bytes (Hald word) to Memory
 let execSH (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + int64 imm12
+    let addr = mstate.alignByArchUnsign ((mstate.getRegister rs1) + int64 imm12)
     let rs2Val = mstate.getRegister rs2
     let mstate = mstate.storeMemoryHalfWord addr rs2Val
     mstate.incPC
@@ -195,7 +196,7 @@ let execSH (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : Mach
 //=================================================
 // SW - Store 4 Bytes (Word) to Memory
 let execSW (rs1 : Register) (rs2 : Register) (imm12 : InstrField) (mstate : MachineState) =
-    let addr = (mstate.getRegister rs1) + int64 imm12
+    let addr = mstate.alignByArchUnsign ((mstate.getRegister rs1) + int64 imm12)
     let rs2Val = mstate.getRegister rs2
     let mstate = mstate.storeMemoryWord addr rs2Val
     mstate.incPC

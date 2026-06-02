@@ -98,3 +98,21 @@ let ``runSteps completes when the budget equals the instruction count`` () =
 let ``runSteps 0 immediately hits StepLimit`` () =
     let m = (MachineState.InitMachineState Map.empty RV32i false).setRunState RunMachineState.Run
     Assert.Equal(RunMachineState.Trap TrapErrors.StepLimit, (Run.runSteps 0 m).RunState)
+
+// Tthe PC starts at the ELF entry point (e_entry), not a hardcoded 0x80000000.
+// Patch progElf's e_entry (file offset 0x18) to 0x80000004 so execution starts at the
+// second instruction (jal x0,0 self-loop), skipping `addi x5,x0,42`; x5 must stay 0.
+[<Fact>]
+let ``Run.Run starts execution at the ELF entry point`` () =
+    let elf = Array.copy progElf
+    elf.[0x18] <- 0x04uy; elf.[0x19] <- 0x00uy; elf.[0x1A] <- 0x00uy; elf.[0x1B] <- 0x80uy
+    let path = Path.GetTempFileName()
+    try
+        File.WriteAllBytes(path, elf)
+        let cfg = { AppConfig.Default with Arch = Some RV32i; Files = Some [| path |]; Verbosity = Some false }
+        let res = Run.Run cfg
+        Assert.Equal(0x80000004L, res.PC)                 // started at the entry point and self-looped there
+        Assert.Equal(RunMachineState.Stopped, res.RunState)
+        Assert.Equal(0L, res.getRegister 5)               // the addi at 0x80000000 was skipped
+    finally
+        File.Delete path

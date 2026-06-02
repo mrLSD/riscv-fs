@@ -67,20 +67,68 @@ let ``JAL misaligned target traps`` () =
 let ``JAL to self stops`` () =
     Assert.Equal(RunMachineState.Stopped, (step (st RV32i) 0x0000006f).RunState)
 
+// On RV32 a self-jump to a bit-31 address must still be detected (the register
+// holds it sign-extended, so newPC needs XLEN normalization before the PC compare).
+[<Fact>]
+let ``RV32 JALR self-jump to a high address stops`` () =
+    let m = (st RV32i).setRegister 1 0x80000000L   // PC default is 0x80000000
+    Assert.Equal(RunMachineState.Stopped, (step m 0x00008067).RunState)  // jalr x0,x1,0
+
+// A store then load through a bit-31 base address must round-trip on RV32
+// (loads previously used the raw sign-extended address as the memory key and trapped).
+[<Fact>]
+let ``RV32 load reads back a store at a bit-31 address`` () =
+    let m = (st RV32i).setRegister 1 0x80000000L
+    let m = m.setRegister 2 0x12345678L
+    let m = step m 0x0020A023   // sw x2, 0(x1)
+    let m = step m 0x0000A183   // lw x3, 0(x1)
+    Assert.Equal(RunMachineState.Run, m.RunState)
+    Assert.Equal(0x12345678L, m.getRegister 3)
+
+// The same asymmetry for atomics — LR.W through a bit-31 base must read the store.
+[<Fact>]
+let ``RV32 atomic reads back a store at a bit-31 address`` () =
+    let m = (st RV32ia).setRegister 1 0x80000000L
+    let m = m.setRegister 2 0x0000000AL
+    let m = step m 0x0020A023            // sw x2,0(x1) : seed memory
+    let m = step m (encW 0b00010 0 1 3)  // lr.w x3,(x1)
+    Assert.Equal(RunMachineState.Run, m.RunState)
+    Assert.Equal(0xAL, m.getRegister 3)
+
+// x1 = 0, x2 = 1: lets the unsigned-compare branches (BLTU/BGEU) be exercised as
+// taken (0 < 1) or not-taken (0 >= 1 is false) without depending on x0.
+let private brSt () = ((st RV32i).setRegister 1 0L).setRegister 2 1L
+
+// A taken branch with a misaligned target traps (no-C machine: instrAlign = 4).
 [<Theory>]
-[<InlineData(0x00000163)>] // beq  x0,x0,2 -> misaligned
-[<InlineData(0x00006163)>] // bltu x0,x0,2
-[<InlineData(0x00007163)>] // bgeu x0,x0,2
-let ``branch misaligned target traps`` (instr : int) =
-    match (step (st RV32i) instr).RunState with
+[<InlineData(0x00000163)>] // beq  x0,x0,2  (taken)
+[<InlineData(0x00007163)>] // bgeu x0,x0,2  (taken: 0 >= 0)
+[<InlineData(0x0020E163)>] // bltu x1,x2,2  (taken: 0 < 1)
+let ``taken branch with a misaligned target traps`` (instr : int) =
+    match (step (brSt ()) instr).RunState with
     | Trap BreakAddress -> () | s -> Assert.True(false, sprintf "%A" s)
 
+// A taken self-branch (target == PC) halts as the infinite-loop sentinel.
 [<Theory>]
-[<InlineData(0x00000063)>] // beq  x0,x0,0 -> self
-[<InlineData(0x00006063)>] // bltu
-[<InlineData(0x00007063)>] // bgeu
-let ``branch to self stops`` (instr : int) =
-    Assert.Equal(RunMachineState.Stopped, (step (st RV32i) instr).RunState)
+[<InlineData(0x00000063)>] // beq  x0,x0,0  (taken)
+[<InlineData(0x00007063)>] // bgeu x0,x0,0  (taken)
+[<InlineData(0x0020E063)>] // bltu x1,x2,0  (taken: 0 < 1)
+let ``taken self-branch stops`` (instr : int) =
+    Assert.Equal(RunMachineState.Stopped, (step (brSt ()) instr).RunState)
+
+// A NOT-taken branch falls through to PC+InstrLen even if its (unused) target is
+// misaligned or equals PC (regression: the checks previously ran before branchCheck).
+[<Theory>]
+[<InlineData(0x00001163)>] // bne  x0,x0,2  (not taken; misaligned target)
+[<InlineData(0x00001063)>] // bne  x0,x0,0  (not taken; target == PC)
+[<InlineData(0x00006163)>] // bltu x0,x0,2  (not taken)
+[<InlineData(0x00006063)>] // bltu x0,x0,0  (not taken)
+[<InlineData(0x0020F163)>] // bgeu x1,x2,2  (not taken: 0 >= 1 is false)
+[<InlineData(0x0020F063)>] // bgeu x1,x2,0  (not taken)
+let ``not-taken branch falls through without trapping or stopping`` (instr : int) =
+    let m = step (brSt ()) instr
+    Assert.Equal(RunMachineState.Run, m.RunState)
+    Assert.Equal(0x80000004L, m.PC)
 
 [<Fact>]
 let ``A .W ops trap on an unmapped aligned address`` () =
@@ -135,3 +183,25 @@ let ``AMO.W arithmetic uses only low 32 bits of rs2 on RV64`` () =
     Assert.Equal(15L,   amoMem 0b00000 false 10L   0x0000000100000005L)  // AMOADD.W  10 + 5
     Assert.Equal(0xABL, amoMem 0b00001 false 10L   0x00000001000000ABL)  // AMOSWAP.W store 0xAB
     Assert.Equal(0xFL,  amoMem 0b01100 false 0xFFL 0x000000010000000FL)  // AMOAND.W  0xFF & 0xF
+
+// On RV32 a multi-byte access whose bytes wrap past 0xFFFFFFFF must round-trip.
+// Stores already normalize each byte address to 32 bits (so byte 0x1_0000_0000 folds to
+// key 0x0); loads now normalize each probed byte address identically. Previously the load
+// probed the un-wrapped keys (0x1_0000_0000..) and trapped MemAddress / read stale data.
+[<Fact>]
+let ``RV32 word store and load round-trip across the 4GB boundary`` () =
+    let m = (st RV32i).setRegister 1 0xFFFFFFFEL          // base 0xFFFFFFFE
+    let m = m.setRegister 2 0x11223344L
+    let m = step m 0x0020A023                             // sw x2, 0(x1)  (high 2 bytes wrap to 0x0/0x1)
+    let m = step m 0x0000A183                             // lw x3, 0(x1)
+    Assert.Equal(RunMachineState.Run, m.RunState)
+    Assert.Equal(0x11223344L, m.getRegister 3)
+
+[<Fact>]
+let ``RV32 halfword store and load round-trip across the 4GB boundary`` () =
+    let m = (st RV32i).setRegister 1 0xFFFFFFFFL          // base 0xFFFFFFFF: second byte wraps to 0x0
+    let m = m.setRegister 2 0x6789L
+    let m = step m 0x00209023                             // sh x2, 0(x1)
+    let m = step m 0x00009183                             // lh x3, 0(x1)
+    Assert.Equal(RunMachineState.Run, m.RunState)
+    Assert.Equal(0x6789L, m.getRegister 3)

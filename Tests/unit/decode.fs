@@ -38,6 +38,17 @@ let ``A decode returns None for unknown funct5`` () =
 let ``A64 decode returns None for unknown funct5`` () =
     Assert.Equal(DecA64.InstructionA64.None, DecA64.Decode 0x2800302f) // funct5=00101, .D
 
+// ---- FENCE ignores its reserved rd/rs1 fields instead of trapping ----
+[<Fact>]
+let ``FENCE decodes with nonzero rd and rs1 (fields ignored)`` () =
+    match DecI.Decode m32 0x0001008F with   // fence with rd=x1, rs1=x2, funct3=000
+    | DecI.FENCE _ -> ()
+    | x -> Assert.True(false, sprintf "%A" x)
+
+[<Fact>]
+let ``FENCE.I (funct3=001) is not implemented and decodes to None`` () =
+    Assert.Equal(DecI.InstructionI.None, DecI.Decode m32 0x0000100F)
+
 // ---- verbosityMessage (logging) coverage ----
 [<Fact>]
 let ``I verbosityMessage covers all arms`` () =

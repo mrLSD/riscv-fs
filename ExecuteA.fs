@@ -10,13 +10,13 @@ open ISA.RISCV.Utils.Bits
 // This acts just like a lw in this implementation (no need for sync)
 // (except there's no immediate)
 let execLR_W (rd : Register) (rs1 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
-    let memResult = loadWord mstate.Memory addr
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
         let mstate = mstate.setRegister rd (int64 memResult.Value)
-        let mstate = mstate.setReservation addr
+        let mstate = mstate.setReservation addr 4
         mstate.incPC
 
 //=================================================
@@ -24,8 +24,8 @@ let execLR_W (rd : Register) (rs1 : Register) (mstate : MachineState) =
 // This acts just like a sd in this implementation, but it will
 // always set the check register to 0 (indicating load success)
 let execSC_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
-    if mstate.Reservation = Some addr then
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
+    if mstate.Reservation = Some (addr, 4) then
         let mstate = mstate.storeMemoryWord addr (mstate.getRegister rs2)
         let mstate = mstate.setRegister rd 0L
         let mstate = mstate.clearReservation
@@ -38,10 +38,10 @@ let execSC_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Machine
 //=================================================
 // AMOSWAP.W - AMO Swap word
 let execAMOSWAP_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
     let rs2Val = mstate.getRegister rs2
     
-    let memResult = loadWord mstate.Memory addr
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
@@ -53,10 +53,10 @@ let execAMOSWAP_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
 //=================================================
 // AMOADD.W - AMO Add Word
 let execAMOADD_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
     let rs2Val = mstate.getRegister rs2
     
-    let memResult = loadWord mstate.Memory addr
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else
@@ -68,10 +68,10 @@ let execAMOADD_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
 //=================================================
 // AMOXOR.W - AMO Xor Word
 let execAMOXOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
     let rs2Val = mstate.getRegister rs2
     
-    let memResult = loadWord mstate.Memory addr
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
@@ -83,10 +83,10 @@ let execAMOXOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
 //=================================================
 // AMOAND.W - AMO And Word
 let execAMOAND_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
     let rs2Val = mstate.getRegister rs2
     
-    let memResult = loadWord mstate.Memory addr
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
@@ -98,10 +98,10 @@ let execAMOAND_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
 //=================================================
 // AMOOR.W - AMO Or Word
 let execAMOOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
     let rs2Val = mstate.getRegister rs2
     
-    let memResult = loadWord mstate.Memory addr
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
@@ -113,10 +113,10 @@ let execAMOOR_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mach
 //=================================================
 // AMOMIN.W - AMO Min Word
 let execAMOMIN_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
     let rs2Val = mstate.getRegister rs2
     
-    let memResult = loadWord mstate.Memory addr
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
@@ -132,10 +132,10 @@ let execAMOMIN_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
 //=================================================
 // AMOMAX.W - AMO Max Word
 let execAMOMAX_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
     let rs2Val = mstate.getRegister rs2
     
-    let memResult = loadWord mstate.Memory addr
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
@@ -151,10 +151,10 @@ let execAMOMAX_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Mac
 //=================================================
 // AMOMINU.W - AMO Unsigned Min Word
 let execAMOMINU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
     let rs2Val = mstate.getRegister rs2
     
-    let memResult = loadWord mstate.Memory addr
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
@@ -170,10 +170,10 @@ let execAMOMINU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
 //=================================================
 // AMOMAXU.W - AMO Unsigned Max Word    
 let execAMOMAXU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : MachineState) =
-    let addr = mstate.getRegister rs1
+    let addr = mstate.alignByArchUnsign (mstate.getRegister rs1)
     let rs2Val = mstate.getRegister rs2
     
-    let memResult = loadWord mstate.Memory addr
+    let memResult = mstate.loadMemoryWord addr
     if memResult.IsNone then
         mstate.setRunState (Trap (MemAddress addr))
     else        
@@ -189,11 +189,12 @@ let execAMOMAXU_W (rd : Register) (rs1 : Register) (rs2 : Register) (mstate : Ma
 // Execute A-instructions
 let Execute (instr : InstructionA) (mstate : MachineState) =
     let addr =
-        match instr with
-        | LR_W i -> mstate.getRegister i.rs1
-        | SC_W i | AMOSWAP_W i | AMOADD_W i | AMOXOR_W i | AMOAND_W i | AMOOR_W i
-        | AMOMIN_W i | AMOMAX_W i | AMOMINU_W i | AMOMAXU_W i -> mstate.getRegister i.rs1
-        | InstructionA.None -> 0L
+        mstate.alignByArchUnsign (
+            match instr with
+            | LR_W i -> mstate.getRegister i.rs1
+            | SC_W i | AMOSWAP_W i | AMOADD_W i | AMOXOR_W i | AMOAND_W i | AMOOR_W i
+            | AMOMIN_W i | AMOMAX_W i | AMOMINU_W i | AMOMAXU_W i -> mstate.getRegister i.rs1
+            | InstructionA.None -> 0L)
     if instr <> InstructionA.None && addr % 4L <> 0L then
         mstate.setRunState (Trap (MemAddress addr))
     else
