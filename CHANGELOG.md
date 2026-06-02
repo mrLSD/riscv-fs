@@ -8,6 +8,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 `riscv-fs` is a formal RISC-V ISA simulator written in F#: it decodes and executes
 RISC-V instructions, loads ELF files, and runs from a CLI.
 
+## [0.6.1] - 2026-06-03
+
+Audit and hardening patch release: ELF entry-point execution, untrusted-ELF memory
+limits, XLEN address normalization, branch/`FENCE` conformance fixes, and a
+linear-time CLI argument parser.
+
+### Security
+
+- The ELF loader now bounds the total size of all `PT_LOAD` segments (4 MiB cap)
+  **before** allocating memory. Each segment's `p_memsz` is summed saturated at the cap
+  in `uint64`, so a huge or wrapping `p_memsz` cannot evade the check; oversized files
+  are rejected. Previously an attacker-controlled `p_memsz` could exhaust the heap, since
+  the memory `Map` holds one node per mapped byte.
+
+### Added
+
+- `MachineState.loadMemoryByte`/`loadMemoryHalfWord`/`loadMemoryWord`/`loadMemoryDoubleWord`
+  and the shared `loadBytes` helper — symmetric with the `storeBytes` path. Each byte
+  address is normalized to XLEN, so a multi-byte access that wraps past `2^XLEN` reads back
+  exactly the bytes the matching store wrote; an unmapped byte returns `None`, raising a
+  `MemAddress` trap.
+- Expanded unit and integration tests covering the entry-point load, branch fall-through,
+  reservation width, `FENCE` field handling, and CLI parsing edge cases.
+
+### Changed
+
+- The PC now starts at the ELF entry point (`e_entry`) instead of the hardcoded
+  `0x80000000`, so a program linked at any address fetches its first instruction.
+  `readElfFile` now returns `(memory, entryPoint)`.
+- All `I`/`I64`/`A`/`A64` load, store, AMO, and `JALR` effective addresses are normalized
+  through `alignByArchUnsign` (XLEN masking), and the atomics read through the new
+  `MachineState.loadMemory*` helpers instead of the raw memory map — load and store paths
+  now agree on wrap-around behavior.
+- LR/SC reservation now records both the address **and** the access width
+  (`(int64 * int) option`); an `SC` succeeds only when it pairs with an `LR` of the same
+  address and width.
+- The `-v` register dump now prints on `Trap` as well as `Stopped`, and both are gated
+  behind the verbosity flag (the `Stopped` dump was previously unconditional).
+- `fetchArgs` rewritten as an O(n)-time, O(1)-stack tail-recursive walk with an explicit
+  leftover accumulator. The previous version recursed once per token (non-tail) with a
+  per-frame `Array.skip`, parsing in O(n²) and overflowing the stack on a very large
+  `argv`. The `(CliResult * leftover-argv)` contract is preserved for every option shape
+  (verified by a 280k-case differential fuzz against the old code).
+
+### Fixed
+
+- Conditional branches (`BEQ`/`BNE`/`BLT`/`BGE`/`BLTU`/`BGEU`): the target-misalignment
+  trap and the self-loop `Stopped` sentinel now apply only when the branch is **taken**.
+  A not-taken branch always falls through to `PC + InstrLen` instead of being able to trap
+  or halt on its (untaken) target.
+- `FENCE` is now decoded regardless of its `rd`/`rs1` fields — they are reserved for
+  finer-grain fences and ignored by a base implementation, per spec — instead of being
+  rejected as illegal when those fields are non-zero.
+- A value-only (`FILE`) CLI option no longer swallows a dash-prefixed unknown option as a
+  file name; it is reported as a parse error.
+
 ## [0.6.0] - 2026-06-02
 
 The **"C" (Compressed)** extension release. ([#20])
@@ -179,6 +235,7 @@ Initial release: the **RV32I** base integer ISA. ([#1], [#2], [#3], [#4], [#5])
 
 - Branch instructions, `BLTU`/`BGEU`, `SRL`, `SRLI`/`SLTIU`, and `JALR` execution.
 
+[0.6.1]: https://github.com/mrLSD/riscv-fs/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/mrLSD/riscv-fs/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/mrLSD/riscv-fs/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/mrLSD/riscv-fs/compare/v0.4.0...v0.4.1
