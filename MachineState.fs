@@ -17,7 +17,7 @@ type MachineState = {
         Verbosity:  bool
         Arch:       Architecture
         RunState:   RunMachineState
-        Reservation: int64 option
+        Reservation: (int64 * int) option
         InstrLen:   int
     } with
     member x.getRegister(reg: Register) : MachineInt =
@@ -75,11 +75,37 @@ type MachineState = {
 
     member x.storeMemoryDoubleWord (addr : MachineInt) (value : MachineInt) : MachineState =
         x.storeBytes 8 addr value
-        
+
+    // Symmetric with storeBytes: load `nBytes` little-endian bytes starting at `addr`,
+    // normalizing EACH byte address to XLEN (alignByArchUnsign) just as the store path
+    // does, so a multi-byte access that wraps past 2^XLEN reads the same Map keys the
+    // matching store wrote. Returns None (=> the caller raises a MemAddress trap) if any
+    // byte is unmapped.
+    member private x.loadBytes (nBytes : int) (addr : MachineInt) : MachineInt option =
+        let rec loop i acc =
+            if i >= nBytes then Some acc
+            else
+                let a = x.alignByArchUnsign (addr + int64 i)
+                match Map.tryFind a x.Memory with
+                | None   -> None
+                | Some b -> loop (i + 1) (acc ||| (int64 b <<< (i * 8)))
+        loop 0 0L
+
+    member x.loadMemoryByte (addr : MachineInt) : int8 option =
+        x.loadBytes 1 addr |> Option.map int8
+    member x.loadMemoryHalfWord (addr : MachineInt) : int16 option =
+        x.loadBytes 2 addr |> Option.map int16
+    member x.loadMemoryWord (addr : MachineInt) : int32 option =
+        x.loadBytes 4 addr |> Option.map int32
+    member x.loadMemoryDoubleWord (addr : MachineInt) : int64 option =
+        x.loadBytes 8 addr
+
     member x.setRunState state =
         { x with RunState = state }
-    member x.setReservation (addr : MachineInt) : MachineState =
-        { x with Reservation = Some addr }
+    // Reservation tracks both the address and the access width (bytes): an SC
+    // succeeds only when it pairs with an LR of the same address and width.
+    member x.setReservation (addr : MachineInt) (width : int) : MachineState =
+        { x with Reservation = Some (addr, width) }
     member x.clearReservation : MachineState =
         { x with Reservation = None }
     // Represent a signed value at the register width (XLEN):

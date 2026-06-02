@@ -50,6 +50,14 @@ let ``missing arch value => Failed`` () = Assert.Equal(Failed, parse [| "-A" |])
 let ``arch value starting with dash => Failed`` () = Assert.Equal(Failed, parse [| "-A"; "-x" |])
 
 [<Fact>]
+let ``unknown dash option is rejected, not taken as a file`` () =
+    Assert.Equal(Failed, parse [| "-A"; "rv32i"; "-z"; "a.elf" |])
+
+[<Fact>]
+let ``duplicate flag does not leak into the file list`` () =
+    Assert.Equal(Failed, parse [| "-v"; "-v"; "-A"; "rv32i"; "a.elf" |])
+
+[<Fact>]
 let ``no arch or files => Success but not CheckRequired`` () =
     match parse [| "-v" |] with
     | Success cfg -> Assert.False(cfg.CheckRequired)
@@ -144,3 +152,25 @@ let ``parser exercises all fetchArgs and parseCli arms`` () =
     parseCli [| "-A"; "rv32i"; "f1"; "f2" |] InitCLI AppConfig.Default |> ignore
     parseCli [||] InitCLI AppConfig.Default |> ignore
     Assert.True true
+
+// FetchArgs is tail-recursive (O(1) stack, O(n) time). A very large argv must
+// parse without the StackOverflowException the previous per-token non-tail recursion
+// raised (~1e5 tokens on the default stack). Both deep paths are exercised: the NotFound
+// accumulator path and the Multiple-match consume path, each ~5e5 tokens.
+[<Fact>]
+let ``fetchArgs handles a huge non-matching argv without overflowing the stack`` () =
+    let argv = Array.init 500000 (fun i -> sprintf "f%d" i)
+    let opt = { CliOptions.Default with Key = Some "A"; Value = Some "ARCH" }   // never matches f<i>
+    let (res, leftover) = fetchArgs argv opt AppConfig.Default
+    match res with
+    | NotFound _ -> Assert.Equal(500000, leftover.Length)   // nothing matched; all preserved in order
+    | r -> Assert.True(false, sprintf "%A" r)
+
+[<Fact>]
+let ``fetchArgs handles a huge matching argv without overflowing the stack`` () =
+    let argv = Array.init 500000 (fun i -> sprintf "f%d" i)
+    let opt = { CliOptions.Default with Value = Some "F"; Multiple = true }      // identity handler matches each
+    let (res, leftover) = fetchArgs argv opt AppConfig.Default
+    match res with
+    | Result _ -> Assert.Equal<string[]>([||], leftover)    // all tokens consumed
+    | r -> Assert.True(false, sprintf "%A" r)
