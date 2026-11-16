@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 `riscv-fs` is a formal RISC-V ISA simulator written in F#: it decodes and executes
 RISC-V instructions, loads ELF files, and runs from a CLI.
 
+## [Unreleased]
+
+### Changed
+
+- Migrated to .NET 11: `TargetFramework` is now `net11.0` for the simulator and the test
+  project, `FSharp.Core` is bumped to `11.0.101`, and CI builds with the `11.0.x` SDK.
+- Bumped test tooling: `Microsoft.NET.Test.Sdk` 18.12.0, `xunit.runner.visualstudio` 4.0.1,
+  `coverlet.collector` 10.1.1.
+
 ## [0.6.1] - 2026-06-03
 
 Audit and hardening patch release: ELF entry-point execution, untrusted-ELF memory
@@ -235,6 +244,7 @@ Initial release: the **RV32I** base integer ISA. ([#1], [#2], [#3], [#4], [#5])
 
 - Branch instructions, `BLTU`/`BGEU`, `SRL`, `SRLI`/`SLTIU`, and `JALR` execution.
 
+[Unreleased]: https://github.com/mrLSD/riscv-fs/compare/v0.6.1...HEAD
 [0.6.1]: https://github.com/mrLSD/riscv-fs/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/mrLSD/riscv-fs/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/mrLSD/riscv-fs/compare/v0.4.1...v0.5.0

@@ -128,7 +128,7 @@ Supported OS:
 * Windows
 * MacOS
 
-#### Supported `.NET 10` 
+#### Supported `.NET 11` 
 
 ### Make the application executable
 You can build the application executable with:
