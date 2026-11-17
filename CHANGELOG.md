@@ -10,18 +10,25 @@ RISC-V instructions, loads ELF files, and runs from a CLI.
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-11-17
+
+Toolchain maintenance release: the simulator now targets **.NET 11**. No changes to
+ISA semantics, CLI behavior, or public APIs. ([#22])
+
 ### Changed
 
-- Migrated to .NET 11: `TargetFramework` is now `net11.0` for the simulator and the test
-  project, `FSharp.Core` is bumped to `11.0.101`, and CI builds with the `11.0.x` SDK.
+- Upgraded to **.NET 11** (from .NET 10): `TargetFramework` is now `net11.0` for the
+  simulator and the test project, and `FSharp.Core` is bumped to `11.0.101`. Building
+  and running now require the .NET 11 SDK/runtime. ([#22])
+- CI builds and tests with the `11.0.x` SDK. ([#22])
 - Bumped test tooling: `Microsoft.NET.Test.Sdk` 18.12.0, `xunit.runner.visualstudio` 4.0.1,
-  `coverlet.collector` 10.1.1.
+  `coverlet.collector` 10.1.1. ([#22])
 
 ## [0.6.1] - 2026-06-03
 
 Audit and hardening patch release: ELF entry-point execution, untrusted-ELF memory
 limits, XLEN address normalization, branch/`FENCE` conformance fixes, and a
-linear-time CLI argument parser.
+linear-time CLI argument parser. ([#21])
 
 ### Security
 
@@ -244,7 +251,8 @@ Initial release: the **RV32I** base integer ISA. ([#1], [#2], [#3], [#4], [#5])
 
 - Branch instructions, `BLTU`/`BGEU`, `SRL`, `SRLI`/`SLTIU`, and `JALR` execution.
 
-[Unreleased]: https://github.com/mrLSD/riscv-fs/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/mrLSD/riscv-fs/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/mrLSD/riscv-fs/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/mrLSD/riscv-fs/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/mrLSD/riscv-fs/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/mrLSD/riscv-fs/compare/v0.4.1...v0.5.0
@@ -272,3 +280,5 @@ Initial release: the **RV32I** base integer ISA. ([#1], [#2], [#3], [#4], [#5])
 [#18]: https://github.com/mrLSD/riscv-fs/pull/18
 [#19]: https://github.com/mrLSD/riscv-fs/pull/19
 [#20]: https://github.com/mrLSD/riscv-fs/pull/20
+[#21]: https://github.com/mrLSD/riscv-fs/pull/21
+[#22]: https://github.com/mrLSD/riscv-fs/pull/22
